@@ -30,6 +30,7 @@
     .btn-save { background: #6c757d; color: white; }
     .btn-down { background: #28a745; color: white; }
     .btn-up { background: #ffc107; color: #333; }
+    .btn-clear { background: #dc3545; color: white; }
     .sync-status { font-size: 0.7rem; color: #2c5a6e; margin-top: 8px; }
     .sync-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     
@@ -209,6 +210,19 @@
     .btn-cancel { background: #6c757d; color: white; margin: 0 20px 12px; }
     .btn-proceed { background: #dc3545; color: white; margin: 0 20px 20px; }
     
+    /* Індикатор збережених ключів */
+    .saved-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      background: #d4edda;
+      color: #155724;
+      padding: 4px 10px;
+      border-radius: 30px;
+      margin-left: 8px;
+    }
+    
     footer { margin-top: 20px; text-align: center; font-size: 0.65rem; color: #3a6b7c; padding: 12px; }
     @media (min-width: 700px) { .action-panel { flex-direction: row; } .select-group { flex-direction: row; } .select-group input { flex: 2; } .select-group select { flex: 1; } }
   </style>
@@ -221,15 +235,16 @@
   <div class="sync-panel">
     <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
     <div class="sync-row">
-      <input type="text" id="apiKeyInput" placeholder="API ключ">
-      <input type="text" id="binIdInput" placeholder="ID Bin">
+      <input type="text" id="apiKeyInput" placeholder="API ключ" autocomplete="off">
+      <input type="text" id="binIdInput" placeholder="ID Bin" autocomplete="off">
       <button id="saveConfigBtn" class="btn-save">💾 Зберегти</button>
+      <button id="clearConfigBtn" class="btn-clear">🗑 Очистити</button>
     </div>
     <div class="sync-buttons">
       <button id="syncDownBtn" class="btn-down">📥 Завантажити</button>
       <button id="syncUpBtn" class="btn-up">📤 Відправити</button>
     </div>
-    <div class="sync-status" id="syncStatus">⚙️ Введіть ключі</div>
+    <div class="sync-status" id="syncStatus">⚙️ Введіть ключі або натисніть "Завантажити"</div>
   </div>
 
   <div class="action-panel">
@@ -268,7 +283,7 @@
   <!-- СІТКА 3х3 -->
   <div class="categories-grid" id="categoriesGrid"></div>
   
-  <footer>💡 Новий користувач: Зберегти ключі → Завантажити</footer>
+  <footer>💡 Ключі зберігаються на вашому пристрої автоматично</footer>
 </div>
 
 <script>
@@ -406,6 +421,7 @@
     renderCategories();
   }
   
+  // Завантаження конфігурації з localStorage
   function loadConfig() {
     const saved = localStorage.getItem("sync_cfg");
     if (saved) {
@@ -413,21 +429,51 @@
         config = JSON.parse(saved);
         document.getElementById("apiKeyInput").value = config.apiKey || "";
         document.getElementById("binIdInput").value = config.binId || "";
+        
+        if (config.apiKey && config.binId) {
+          document.getElementById("syncStatus").innerHTML = "🔑 Ключі завантажено! Натисніть 'Завантажити'";
+        }
       } catch(e) {}
     }
   }
   
+  // Збереження конфігурації в localStorage
   function saveConfig() {
     config.apiKey = document.getElementById("apiKeyInput").value.trim();
     config.binId = document.getElementById("binIdInput").value.trim();
     localStorage.setItem("sync_cfg", JSON.stringify(config));
-    document.getElementById("syncStatus").innerHTML = "✅ Збережено!";
+    
+    if (config.apiKey && config.binId) {
+      document.getElementById("syncStatus").innerHTML = "✅ Ключі збережено на цьому пристрої!";
+    } else {
+      document.getElementById("syncStatus").innerHTML = "⚠️ Введіть обидва ключі";
+    }
+  }
+  
+  // Очищення збережених ключів
+  function clearConfig() {
+    if (confirm("Очистити збережені API ключі та Bin ID? Після цього потрібно буде ввести їх знову.")) {
+      config.apiKey = "";
+      config.binId = "";
+      localStorage.removeItem("sync_cfg");
+      document.getElementById("apiKeyInput").value = "";
+      document.getElementById("binIdInput").value = "";
+      document.getElementById("syncStatus").innerHTML = "🗑 Ключі очищено. Введіть нові та натисніть 'Зберегти'";
+    }
   }
   
   async function download() {
+    // Якщо ключі не завантажені в config, але є в полях - використовуємо їх
     if (!config.apiKey || !config.binId) {
-      document.getElementById("syncStatus").innerHTML = "⚠️ Збережіть ключі!";
-      return;
+      const apiKey = document.getElementById("apiKeyInput").value.trim();
+      const binId = document.getElementById("binIdInput").value.trim();
+      if (apiKey && binId) {
+        config.apiKey = apiKey;
+        config.binId = binId;
+      } else {
+        document.getElementById("syncStatus").innerHTML = "⚠️ Введіть API ключ та ID Bin!";
+        return;
+      }
     }
     
     if (hasLocalChanges()) {
@@ -450,12 +496,12 @@
           saveToLocal();
           updateSnapshot();
           renderCategories();
-          document.getElementById("syncStatus").innerHTML = "✅ Завантажено!";
+          document.getElementById("syncStatus").innerHTML = "✅ Завантажено! Дані синхронізовано.";
         } else {
-          document.getElementById("syncStatus").innerHTML = "⚠️ Хмара порожня";
+          document.getElementById("syncStatus").innerHTML = "⚠️ Хмара порожня. Додайте магазини та натисніть 'Відправити'";
         }
       } else {
-        document.getElementById("syncStatus").innerHTML = "❌ Помилка!";
+        document.getElementById("syncStatus").innerHTML = "❌ Помилка завантаження. Перевірте ключі та ID Bin";
       }
     } catch(e) {
       document.getElementById("syncStatus").innerHTML = "❌ Немає інтернету";
@@ -464,8 +510,15 @@
   
   async function upload(force = false) {
     if (!config.apiKey || !config.binId) {
-      document.getElementById("syncStatus").innerHTML = "⚠️ Збережіть ключі!";
-      return;
+      const apiKey = document.getElementById("apiKeyInput").value.trim();
+      const binId = document.getElementById("binIdInput").value.trim();
+      if (apiKey && binId) {
+        config.apiKey = apiKey;
+        config.binId = binId;
+      } else {
+        document.getElementById("syncStatus").innerHTML = "⚠️ Введіть API ключ та ID Bin!";
+        return;
+      }
     }
     
     const deletedShops = getDeletedShops();
@@ -492,9 +545,9 @@
       });
       if (res.ok) {
         updateSnapshot();
-        document.getElementById("syncStatus").innerHTML = "✅ Відправлено!";
+        document.getElementById("syncStatus").innerHTML = "✅ Відправлено! Дані збережено в хмарі.";
       } else {
-        document.getElementById("syncStatus").innerHTML = "❌ Помилка!";
+        document.getElementById("syncStatus").innerHTML = "❌ Помилка відправлення";
       }
     } catch(e) {
       document.getElementById("syncStatus").innerHTML = "❌ Немає інтернету";
@@ -514,7 +567,7 @@
     if (reason) shopReasons[n] = reason;
     saveToLocal();
     renderCategories();
-    document.getElementById("syncStatus").innerHTML = "✅ Збережено! Натисніть 'Відправити'";
+    document.getElementById("syncStatus").innerHTML = "✅ Магазин додано! Натисніть 'Відправити' для синхронізації";
   }
   
   function removeShop(n, color, comp) {
@@ -522,7 +575,7 @@
     delete shopReasons[n];
     saveToLocal();
     renderCategories();
-    document.getElementById("syncStatus").innerHTML = "✅ Видалено! Натисніть 'Відправити'";
+    document.getElementById("syncStatus").innerHTML = "✅ Магазин видалено! Натисніть 'Відправити' для синхронізації";
   }
   
   function getReasonText(key) {
@@ -687,6 +740,7 @@
   updateSnapshot();
   
   document.getElementById("saveConfigBtn").onclick = saveConfig;
+  document.getElementById("clearConfigBtn").onclick = clearConfig;
   document.getElementById("syncDownBtn").onclick = download;
   document.getElementById("syncUpBtn").onclick = () => upload(false);
   document.getElementById("checkShopBtn").onclick = checkShop;
