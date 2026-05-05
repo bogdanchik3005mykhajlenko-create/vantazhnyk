@@ -45,9 +45,16 @@
     .select-group input, .select-group select { padding: 14px; border-radius: 30px; border: 1px solid #bccbd4; font-size: 1rem; width: 100%; }
     .extra-options { margin-top: 12px; padding-top: 8px; border-top: 1px solid #dee2e6; }
     .extra-title { font-size: 0.75rem; font-weight: 600; color: #2c5a6e; margin-bottom: 8px; }
-    .reason-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
-    .reason-btn { background: #e9ecef; border: 1px solid #ced4da; padding: 8px 12px; border-radius: 30px; font-size: 0.7rem; cursor: pointer; }
-    .reason-btn.selected { background: #2c7da0; color: white; }
+    .reason-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 140px;
+      overflow-y: auto;
+      padding: 4px 2px;
+    }
+    .reason-btn { background: #e9ecef; border: 1px solid #ced4da; padding: 8px 12px; border-radius: 30px; font-size: 0.7rem; cursor: pointer; white-space: nowrap; }
+    .reason-btn.selected { background: #2c7da0; color: white; border-color: #2c7da0; }
     .groups-grid { display: flex; flex-direction: column; gap: 20px; margin-top: 16px; }
     .group-col { background: rgba(255,255,255,0.92); border-radius: 20px; overflow: hidden; }
     .group-header { padding: 14px; font-size: 1.3rem; font-weight: bold; text-align: center; }
@@ -112,13 +119,9 @@
         </select>
       </div>
       <div class="extra-options">
-        <div class="extra-title">📝 Причина:</div>
+        <div class="extra-title">📝 Причина (гортай, якщо не вміщується):</div>
         <div class="reason-buttons" id="reasonButtons">
-          <div class="reason-btn" data-reason="рокля_до_підсобки">🛒 Рокля</div>
-          <div class="reason-btn" data-reason="розрив_перед_магазином">📦 Розрив перед</div>
-          <div class="reason-btn" data-reason="ліфт_корідор">🛗 Ліфт→коридор→розбір</div>
-          <div class="reason-btn" data-reason="другий_поверх">🏢 2й поверх</div>
-          <div class="reason-btn" data-reason="глибокий_підвал">⬇️ Підвал</div>
+          <!-- 44 причини будуть додані через JS -->
         </div>
       </div>
       <button id="addShopBtn" style="width:100%; margin-top:12px;">✅ Додати</button>
@@ -130,6 +133,54 @@
 </div>
 
 <script>
+  // ==================== 44 ПРИЧИНИ ДОСТАВКИ ====================
+  const fullReasonsList = [
+    { key: "рокля_підсобка", title: "🛒 Рокля до підсобки" },
+    { key: "рокля_далеко", title: "🚶 Рокля + далеко" },
+    { key: "рокля_гора", title: "⛰️ Рокля + гора" },
+    { key: "рокля_вузько", title: "🚫 Рокля + вузько" },
+    { key: "рокля_поріг", title: "📏 Рокля + поріг" },
+    { key: "розрив_перед_весь", title: "📦 Розрив перед → весь магазин" },
+    { key: "розрив_перед_коротко", title: "📦 Розрив перед → коротко" },
+    { key: "розрив_всередині_весь", title: "🏪 Розрив всередині → весь магазин" },
+    { key: "розрив_всередині_коротко", title: "🏪 Розрив всередині → коротко" },
+    { key: "розрив_біля_підсобки", title: "🚪 Розрив біля підсобки" },
+    { key: "розбір_вулиця", title: "🌧️ Розбір на вулиці" },
+    { key: "розбір_рампа", title: "🚛 Розбір на рампі" },
+    { key: "вузький_двір", title: "🚫 Вузький двір" },
+    { key: "вузька_рампа", title: "🚫 Вузька рампа" },
+    { key: "немає_пандуса", title: "🚫 Немає пандуса" },
+    { key: "парковка_далеко", title: "🚶 Парковка далеко" },
+    { key: "чорний_хід", title: "🚪 Чорний хід" },
+    { key: "через_вітрину", title: "🪟 Через вітрину" },
+    { key: "через_поріг", title: "📏 Через поріг" },
+    { key: "сходи_вверх_мало", title: "📈 Сходи вверх (1-3)" },
+    { key: "сходи_вниз_мало", title: "📉 Сходи вниз (1-3)" },
+    { key: "сходи_круті", title: "📈📈 Круті сходи" },
+    { key: "другий_поверх_руками", title: "🏢 2й поверх → руками" },
+    { key: "другий_поверх_розрив_знизу", title: "🏢 2й поверх + розрив внизу" },
+    { key: "другий_поверх_розрив_зверху", title: "🏢 2й поверх + розрив зверху" },
+    { key: "підвал_один", title: "⬇️ Підвал 1 проліт" },
+    { key: "підвал_глибокий", title: "⬇️⬇️ Глибокий підвал" },
+    { key: "підвал_вузько", title: "⬇️🚫 Підвал + вузько" },
+    { key: "підвал_далеко", title: "⬇️🚶 Підвал + далеко" },
+    { key: "ліфт_розбір_внизу_далеко", title: "🛗 Розбір внизу → ліфт → далеко" },
+    { key: "ліфт_розбір_внизу_коротко", title: "🛗 Розбір внизу → ліфт → коротко" },
+    { key: "ліфт_палети_розбір_далеко", title: "🛗 Палети на ліфт → розбір → далеко" },
+    { key: "ліфт_палети_розбір_коротко", title: "🛗 Палети на ліфт → розбір → коротко" },
+    { key: "ліфт_палети_тягнути_далеко", title: "🛗 Палети на ліфт → тягнути далеко" },
+    { key: "ліфт_палети_тягнути_коротко", title: "🛗 Палети на ліфт → тягнути коротко" },
+    { key: "ліфт_палети_рокля", title: "🛗 Палети на ліфт → рокля" },
+    { key: "ліфт_замалий", title: "🛗📦 Ліфт замалий" },
+    { key: "немає_вантажного_ліфта", title: "🛗🚫 Немає вантажного ліфта" },
+    { key: "підсобка_кінець_коридору", title: "🚶 Підсобка в кінці коридору" },
+    { key: "підсобка_2й_поверх_окремо", title: "🏢 Підсобка на 2 поверсі" },
+    { key: "підсобка_далеко_2й_поверх", title: "🏢 Підсобка далеко + 2й поверх" },
+    { key: "розрив_сходи", title: "📦+📈 Розрив + сходи" },
+    { key: "вузький_двір_підвал", title: "🚫+⬇️ Вузький двір + підвал" },
+    { key: "ліфт_комбо", title: "🏢+🛗+🚶 2й поверх+ліфт+далеко" }
+  ];
+
   // Прості дані - тільки числа
   let shops = {
     "білі": { "легко": [], "потно": [], "тяжко": [] },
@@ -269,14 +320,8 @@
   }
   
   function getReasonText(key) {
-    const r = {
-      "рокля_до_підсобки": "рокля",
-      "розрив_перед_магазином": "розрив перед",
-      "ліфт_корідор": "ліфт→коридор→розбір",
-      "другий_поверх": "2й поверх",
-      "глибокий_підвал": "підвал"
-    };
-    return r[key] || "";
+    const found = fullReasonsList.find(r => r.key === key);
+    return found ? found.title : "";
   }
   
   function renderGroups() {
@@ -373,12 +418,20 @@
   }
   
   function initReasonButtons() {
-    document.querySelectorAll('.reason-btn').forEach(btn => {
+    const container = document.getElementById("reasonButtons");
+    if (!container) return;
+    container.innerHTML = "";
+    fullReasonsList.forEach(reason => {
+      const btn = document.createElement("div");
+      btn.className = "reason-btn";
+      btn.textContent = reason.title;
+      btn.dataset.reason = reason.key;
       btn.onclick = () => {
         document.querySelectorAll('.reason-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
-        selectedReason = btn.dataset.reason;
+        selectedReason = reason.key;
       };
+      container.appendChild(btn);
     });
   }
   
@@ -390,9 +443,9 @@
       }
     }
     if (!has) {
-      addShop(708, "чорні", "тяжко", "другий_поверх");
-      addShop(39, "чорні", "легко", "рокля_до_підсобки");
-      addShop(3039, "білі", "легко", "рокля_до_підсобки");
+      addShop(708, "чорні", "тяжко", "другий_поверх_руками");
+      addShop(39, "чорні", "легко", "рокля_підсобка");
+      addShop(3039, "білі", "легко", "рокля_підсобка");
     }
   }
   
