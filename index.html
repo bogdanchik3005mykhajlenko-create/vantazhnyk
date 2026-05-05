@@ -12,7 +12,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body { background: linear-gradient(135deg, #e2e9f0 0%, #cfdbe5 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 12px; min-height: 100vh; }
     .container { max-width: 800px; margin: 0 auto; }
-    h1 { font-size: 1.6rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; color: #1a3a44; flex-wrap: wrap; gap: 8px; }
+    h1 { font-size: 1.5rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; color: #1a3a44; flex-wrap: wrap; gap: 8px; }
     h1 small { font-size: 0.65rem; background: #2c7da0; color: white; padding: 4px 10px; border-radius: 40px; }
     .sub { color: #2c5a6e; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #aac7d6; font-size: 0.8rem; }
     
@@ -24,22 +24,82 @@
       border: 1px solid #b8d4e3;
     }
     .sync-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; }
-    .sync-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-    .sync-row input { flex: 2; padding: 10px 12px; border: 1px solid #cbdae2; border-radius: 30px; font-size: 0.8rem; }
-    .sync-row button, .sync-buttons button { padding: 8px 16px; font-size: 0.8rem; border-radius: 30px; border: none; font-weight: 600; cursor: pointer; }
+    .sync-row { 
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .input-group label {
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: #2c5a6e;
+      min-width: 55px;
+    }
+    .input-group input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #cbdae2;
+      border-radius: 30px;
+      font-size: 0.8rem;
+    }
+    .saved-key-badge {
+      background: #d4edda;
+      color: #155724;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .saved-key-badge:active {
+      background: #c3e6cb;
+      transform: scale(0.97);
+    }
+    .key-badge-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.7rem;
+    }
+    .sync-row-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .sync-row-buttons button {
+      flex: 1;
+      min-width: 80px;
+      padding: 8px 12px;
+      font-size: 0.75rem;
+    }
     .btn-save { background: #6c757d; color: white; }
+    .btn-clear { background: #dc3545; color: white; }
+    .btn-forget { background: #343a40; color: white; }
     .btn-down { background: #28a745; color: white; }
     .btn-up { background: #ffc107; color: #333; }
-    .btn-clear { background: #dc3545; color: white; }
-    .sync-status { font-size: 0.7rem; color: #2c5a6e; margin-top: 8px; }
+    .sync-status { font-size: 0.7rem; color: #2c5a6e; margin-top: 8px; padding: 6px; background: rgba(255,255,255,0.5); border-radius: 12px; }
     .sync-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .sync-buttons button { flex: 1; min-width: 100px; }
     
     .action-panel { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
     .check-card, .add-card { background: white; border-radius: 18px; padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    h3 { margin-bottom: 10px; font-size: 1.1rem; }
+    h3 { margin-bottom: 10px; font-size: 1rem; }
     .check-input-group { display: flex; gap: 8px; flex-wrap: wrap; }
     .check-input-group input { flex: 2; padding: 14px; border: 2px solid #cbdae2; border-radius: 30px; font-size: 1rem; }
-    button { background: #2c7da0; border: none; padding: 12px 20px; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; min-height: 48px; }
+    button { background: #2c7da0; border: none; padding: 12px 20px; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; min-height: 44px; }
     button:active { transform: scale(0.96); }
     .check-result { margin-top: 12px; padding: 12px; background: #eef3fa; border-radius: 16px; font-size: 0.9rem; border-left: 4px solid #2c7da0; }
     .select-group { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
@@ -57,51 +117,36 @@
     .reason-btn { background: #e9ecef; border: 1px solid #ced4da; padding: 8px 12px; border-radius: 30px; font-size: 0.7rem; cursor: pointer; white-space: nowrap; }
     .reason-btn.selected { background: #2c7da0; color: white; border-color: #2c7da0; }
     
-    /* СІТКА 3х3 */
     .categories-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      gap: 10px;
       margin-top: 16px;
       margin-bottom: 20px;
     }
     .category-card {
       background: white;
-      border-radius: 20px;
+      border-radius: 18px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.2s ease;
+      transition: transform 0.1s ease;
     }
     .category-card:active { transform: scale(0.97); }
     .cat-header {
-      padding: 14px 8px;
+      padding: 10px 4px;
       text-align: center;
       font-weight: bold;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
     }
     .white-header { background: #e3e8ee; color: #1e3a4a; border-bottom: 3px solid #2c7da0; }
     .gray-header { background: #5a6e78; color: white; border-bottom: 3px solid #2c3e42; }
     .black-header { background: #1e2a2e; color: white; border-bottom: 3px solid #f39c12; }
-    .cat-body {
-      padding: 12px;
-      text-align: center;
-    }
-    .cat-count {
-      font-size: 2.2rem;
-      font-weight: bold;
-      color: #2c7da0;
-    }
-    .cat-label {
-      font-size: 0.7rem;
-      color: #6c757d;
-      margin-top: 4px;
-    }
-    .empty-cat {
-      opacity: 0.5;
-    }
+    .cat-body { padding: 10px; text-align: center; }
+    .cat-count { font-size: 1.8rem; font-weight: bold; color: #2c7da0; }
+    .cat-label { font-size: 0.65rem; color: #6c757d; margin-top: 4px; }
+    .empty-cat { opacity: 0.5; }
     
-    /* Модальне вікно для списку магазинів */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -124,93 +169,38 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     }
     .modal-header {
-      padding: 18px 20px;
-      font-size: 1.2rem;
+      padding: 16px 20px;
+      font-size: 1.1rem;
       font-weight: bold;
       text-align: center;
       border-bottom: 1px solid #e9ecef;
     }
-    .modal-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-    }
+    .modal-list { flex: 1; overflow-y: auto; padding: 12px; }
     .modal-shop-item {
       background: #f8f9fa;
-      border-radius: 16px;
-      padding: 12px;
+      border-radius: 14px;
+      padding: 10px;
       margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
     }
-    .modal-shop-num {
-      font-weight: bold;
-      font-size: 1rem;
-      background: #2c7da0;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 30px;
-    }
-    .modal-shop-reason {
-      font-size: 0.7rem;
-      color: #6c757d;
-      flex: 1;
-    }
-    .modal-close {
-      background: #6c757d;
-      margin: 12px 20px 20px;
-      padding: 12px;
-    }
-    .empty-modal {
-      text-align: center;
-      color: #8c9aa8;
-      padding: 32px;
-      font-style: italic;
-    }
-    .delete-shop-modal {
-      background: #ffe0e0;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 30px;
-      color: #b91c1c;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    .modal-shop-num { font-weight: bold; font-size: 0.9rem; background: #2c7da0; color: white; padding: 4px 10px; border-radius: 30px; }
+    .modal-shop-reason { font-size: 0.65rem; color: #6c757d; flex: 1; }
+    .modal-close { background: #6c757d; margin: 12px 20px 20px; padding: 10px; }
+    .empty-modal { text-align: center; color: #8c9aa8; padding: 32px; font-style: italic; }
+    .delete-shop-modal { background: #ffe0e0; border: none; padding: 5px 10px; border-radius: 30px; color: #b91c1c; font-weight: bold; cursor: pointer; font-size: 0.75rem; }
     
-    /* Стилі для попередження про видалення */
-    .warning-modal .modal-header {
-      background: #fff0f0;
-      color: #b91c1c;
-    }
-    .deleted-list {
-      background: #fff0f0;
-      border-radius: 12px;
-      padding: 10px;
-      margin: 10px 0;
-      max-height: 150px;
-      overflow-y: auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .deleted-list span {
-      display: inline-block;
-      background: #b91c1c;
-      color: white;
-      padding: 6px 14px;
-      border-radius: 30px;
-      font-size: 0.9rem;
-    }
+    .warning-modal .modal-header { background: #fff0f0; color: #b91c1c; }
+    .deleted-list { background: #fff0f0; border-radius: 12px; padding: 10px; margin: 10px 0; max-height: 150px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+    .deleted-list span { background: #b91c1c; color: white; padding: 6px 14px; border-radius: 30px; font-size: 0.9rem; }
     .btn-cancel { background: #6c757d; color: white; margin: 0 20px 12px; }
     .btn-proceed { background: #dc3545; color: white; margin: 0 20px 20px; }
     
-    /* СТОРІНКА ВХОДУ */
     .login-overlay {
       position: fixed;
       top: 0;
@@ -226,63 +216,35 @@
     .login-card {
       background: white;
       border-radius: 32px;
-      padding: 32px 24px;
+      padding: 28px 20px;
       width: 85%;
       max-width: 340px;
       text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     }
-    .login-card h2 {
-      margin-bottom: 8px;
-      color: #1a3a44;
-    }
-    .login-card p {
-      color: #6c757d;
-      font-size: 0.8rem;
-      margin-bottom: 24px;
-    }
-    .login-card input {
-      width: 100%;
-      padding: 14px;
-      border: 2px solid #cbdae2;
-      border-radius: 40px;
-      font-size: 1rem;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    .login-card button {
-      width: 100%;
-      background: #2c7da0;
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 40px;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    .login-card button:active { transform: scale(0.97); }
-    .error-msg {
-      color: #dc3545;
-      font-size: 0.8rem;
-      margin-top: 12px;
-    }
+    .login-card h2 { margin-bottom: 8px; color: #1a3a44; font-size: 1.3rem; }
+    .login-card p { color: #6c757d; font-size: 0.75rem; margin-bottom: 20px; }
+    .login-card input { width: 100%; padding: 14px; border: 2px solid #cbdae2; border-radius: 40px; font-size: 1rem; margin-bottom: 16px; text-align: center; }
+    .login-card button { width: 100%; background: #2c7da0; padding: 14px; font-size: 1rem; }
+    .error-msg { color: #dc3545; font-size: 0.75rem; margin-top: 10px; }
     
-    footer { margin-top: 20px; text-align: center; font-size: 0.65rem; color: #3a6b7c; padding: 12px; }
-    @media (min-width: 700px) { .action-panel { flex-direction: row; } .select-group { flex-direction: row; } .select-group input { flex: 2; } .select-group select { flex: 1; } }
+    footer { margin-top: 20px; text-align: center; font-size: 0.6rem; color: #3a6b7c; padding: 12px; }
+    @media (min-width: 700px) { 
+      .action-panel { flex-direction: row; } 
+      .select-group { flex-direction: row; } 
+      .select-group input { flex: 2; } 
+      .select-group select { flex: 1; }
+      .sync-row { flex-direction: row; flex-wrap: wrap; }
+      .input-group { flex: 1; }
+      .sync-row-buttons { flex: 1; justify-content: flex-end; }
+    }
   </style>
 </head>
 <body>
-<div id="app">
-  <!-- Сторінка буде показана після авторизації -->
-</div>
+<div id="app"></div>
 
 <script>
-  // ==================== НАЛАШТУВАННЯ ====================
-  // ⚠️ НОВИЙ ПАРОЛЬ: "Вантажник-водій" ⚠️
   const ACCESS_PASSWORD = "Закони водіїв";
   
-  // ==================== ОСНОВНИЙ КОД ====================
   const fullReasonsList = [
     { key: "рокля_підсобка", title: "🛒 Рокля до підсобки" },
     { key: "рокля_далеко", title: "🚶 Рокля + далеко" },
@@ -338,25 +300,19 @@
   let shopReasons = {};
   let config = { apiKey: "", binId: "" };
   let selectedReason = "";
-  
-  // Система відстеження видалень
   let lastSnapshotShopsSet = new Set();
   
   function getAllShopNumbers() {
     const set = new Set();
     for (const color of ["білі","сірі","чорні"]) {
       for (const comp of ["легко","потно","тяжко"]) {
-        for (const num of shops[color][comp]) {
-          set.add(num);
-        }
+        for (const num of shops[color][comp]) set.add(num);
       }
     }
     return set;
   }
   
-  function updateSnapshot() {
-    lastSnapshotShopsSet = getAllShopNumbers();
-  }
+  function updateSnapshot() { lastSnapshotShopsSet = getAllShopNumbers(); }
   
   function getDeletedShops() {
     const currentSet = getAllShopNumbers();
@@ -376,6 +332,32 @@
     return false;
   }
   
+  // ФУНКЦІЯ "ЗАБУТИ ВСЕ"
+  function forgetEverything() {
+    if (confirm("⚠️ ЦЕ ВИДАЛИТЬ ВСІ ДАНІ!\n\n• Збережені API ключі\n• Всі магазини на цьому пристрої\n• Авторизацію\n\nПісля цього сайт буде як новий. Продовжити?")) {
+      localStorage.removeItem("shops");
+      localStorage.removeItem("reasons");
+      localStorage.removeItem("sync_cfg");
+      localStorage.removeItem("app_authorized");
+      
+      // Скидаємо дані в пам'яті
+      shops = {
+        "білі": { "легко": [], "потно": [], "тяжко": [] },
+        "сірі": { "легко": [], "потно": [], "тяжко": [] },
+        "чорні": { "легко": [], "потно": [], "тяжко": [] }
+      };
+      shopReasons = {};
+      config = { apiKey: "", binId: "" };
+      
+      // Додаємо демо-дані
+      initDemo();
+      updateSnapshot();
+      
+      // Перезавантажуємо сторінку для повного скидання
+      location.reload();
+    }
+  }
+  
   function showDeletionWarning(deletedShops, onConfirm, onCancel) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -384,9 +366,7 @@
         <div class="modal-header">⚠️ ВАЖЛИВО!</div>
         <div class="modal-list">
           <p style="margin-bottom:12px;">Виявлено ВИДАЛЕННЯ магазинів:</p>
-          <div class="deleted-list">
-            ${deletedShops.map(s => `<span>🏪 ${s}</span>`).join('')}
-          </div>
+          <div class="deleted-list">${deletedShops.map(s => `<span>🏪 ${s}</span>`).join('')}</div>
           <p style="margin-top:16px; color:#666;">Вони будуть НАЗАВЖДИ видалені з хмари.</p>
         </div>
         <button class="btn-cancel">Скасувати</button>
@@ -405,15 +385,11 @@
   
   function loadFromLocal() {
     const savedShops = localStorage.getItem("shops");
-    if (savedShops) {
-      try { shops = JSON.parse(savedShops); } catch(e) {}
-    }
+    if (savedShops) { try { shops = JSON.parse(savedShops); } catch(e) {} }
     const savedReasons = localStorage.getItem("reasons");
-    if (savedReasons) {
-      try { shopReasons = JSON.parse(savedReasons); } catch(e) {}
-    }
+    if (savedReasons) { try { shopReasons = JSON.parse(savedReasons); } catch(e) {} }
     updateSnapshot();
-    renderCategories();
+    if (typeof renderCategories === 'function') renderCategories();
   }
   
   function loadConfig() {
@@ -427,16 +403,55 @@
         if (binInput) binInput.value = config.binId || "";
       } catch(e) {}
     }
+    updateSavedKeysDisplay();
+  }
+  
+  function updateSavedKeysDisplay() {
+    const container = document.getElementById("savedKeysContainer");
+    if (!container) return;
+    
+    const savedApi = config.apiKey || localStorage.getItem("sync_cfg") ? JSON.parse(localStorage.getItem("sync_cfg") || '{}').apiKey : "";
+    const savedBin = config.binId || localStorage.getItem("sync_cfg") ? JSON.parse(localStorage.getItem("sync_cfg") || '{}').binId : "";
+    
+    let html = '';
+    if (savedApi && savedApi.length > 3) {
+      const maskedApi = savedApi.slice(0, 8) + '••••••••';
+      html += `<span class="saved-key-badge" data-keytype="api" data-keyvalue="${savedApi}">🔑 API: ${maskedApi}</span>`;
+    }
+    if (savedBin && savedBin.length > 3) {
+      const maskedBin = savedBin.slice(0, 6) + '••••••';
+      html += `<span class="saved-key-badge" data-keytype="bin" data-keyvalue="${savedBin}">📦 Bin: ${maskedBin}</span>`;
+    }
+    if (!savedApi && !savedBin) {
+      html = '<span style="font-size:0.65rem; color:#6c757d;">💾 Немає збережених ключів</span>';
+    }
+    container.innerHTML = html;
+    
+    document.querySelectorAll('.saved-key-badge').forEach(badge => {
+      badge.onclick = (e) => {
+        e.stopPropagation();
+        const keyType = badge.dataset.keytype;
+        const keyValue = badge.dataset.keyvalue;
+        if (keyType === 'api') {
+          document.getElementById("apiKeyInput").value = keyValue;
+          document.getElementById("syncStatus").innerHTML = "✅ API ключ вставлено! Натисніть 'Зберегти'";
+        } else if (keyType === 'bin') {
+          document.getElementById("binIdInput").value = keyValue;
+          document.getElementById("syncStatus").innerHTML = "✅ Bin ID вставлено! Натисніть 'Зберегти'";
+        }
+      };
+    });
   }
   
   function saveConfig() {
     config.apiKey = document.getElementById("apiKeyInput").value.trim();
     config.binId = document.getElementById("binIdInput").value.trim();
     localStorage.setItem("sync_cfg", JSON.stringify(config));
+    updateSavedKeysDisplay();
     const statusEl = document.getElementById("syncStatus");
     if (statusEl) {
       if (config.apiKey && config.binId) {
-        statusEl.innerHTML = "✅ Ключі збережено на цьому пристрої!";
+        statusEl.innerHTML = "✅ Ключі збережено!";
       } else {
         statusEl.innerHTML = "⚠️ Введіть обидва ключі";
       }
@@ -444,14 +459,13 @@
   }
   
   function clearConfig() {
-    if (confirm("Очистити збережені API ключі та Bin ID?")) {
+    if (confirm("Очистити збережені ключі?")) {
       config.apiKey = "";
       config.binId = "";
       localStorage.removeItem("sync_cfg");
-      const apiInput = document.getElementById("apiKeyInput");
-      const binInput = document.getElementById("binIdInput");
-      if (apiInput) apiInput.value = "";
-      if (binInput) binInput.value = "";
+      document.getElementById("apiKeyInput").value = "";
+      document.getElementById("binIdInput").value = "";
+      updateSavedKeysDisplay();
       const statusEl = document.getElementById("syncStatus");
       if (statusEl) statusEl.innerHTML = "🗑 Ключі очищено";
     }
@@ -472,7 +486,7 @@
     }
     
     if (hasLocalChanges()) {
-      if (!confirm("⚠️ УВАГА! У вас є незбережені зміни. Завантажити з хмари? Локальні зміни будуть втрачені.")) {
+      if (!confirm("⚠️ У вас є незбережені зміни. Завантажити з хмари? Локальні зміни будуть втрачені.")) {
         const statusEl = document.getElementById("syncStatus");
         if (statusEl) statusEl.innerHTML = "⏸️ Завантаження скасовано";
         return;
@@ -492,8 +506,8 @@
           shopReasons = data.record.reasons || {};
           saveToLocal();
           updateSnapshot();
-          renderCategories();
-          if (statusEl) statusEl.innerHTML = "✅ Завантажено! Дані синхронізовано.";
+          if (typeof renderCategories === 'function') renderCategories();
+          if (statusEl) statusEl.innerHTML = "✅ Завантажено!";
         } else {
           if (statusEl) statusEl.innerHTML = "⚠️ Хмара порожня";
         }
@@ -520,16 +534,11 @@
     }
     
     const deletedShops = getDeletedShops();
-    
     if (!force && deletedShops.length > 0) {
-      showDeletionWarning(
-        deletedShops,
-        () => upload(true),
-        () => {
-          const statusEl = document.getElementById("syncStatus");
-          if (statusEl) statusEl.innerHTML = "⏸️ Відправлення скасовано";
-        }
-      );
+      showDeletionWarning(deletedShops, () => upload(true), () => {
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = "⏸️ Відправлення скасовано";
+      });
       return;
     }
     
@@ -539,15 +548,12 @@
       const data = { shops: shops, reasons: shopReasons };
       const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Master-Key": config.apiKey
-        },
+        headers: { "Content-Type": "application/json", "X-Master-Key": config.apiKey },
         body: JSON.stringify(data)
       });
       if (res.ok) {
         updateSnapshot();
-        if (statusEl) statusEl.innerHTML = "✅ Відправлено! Дані збережено в хмарі.";
+        if (statusEl) statusEl.innerHTML = "✅ Відправлено!";
       } else {
         if (statusEl) statusEl.innerHTML = "❌ Помилка відправлення";
       }
@@ -568,7 +574,7 @@
     shops[color][comp].sort((a,b)=>a-b);
     if (reason) shopReasons[n] = reason;
     saveToLocal();
-    renderCategories();
+    if (typeof renderCategories === 'function') renderCategories();
     const statusEl = document.getElementById("syncStatus");
     if (statusEl) statusEl.innerHTML = "✅ Магазин додано! Натисніть 'Відправити'";
   }
@@ -577,9 +583,9 @@
     shops[color][comp] = shops[color][comp].filter(i => i !== n);
     delete shopReasons[n];
     saveToLocal();
-    renderCategories();
+    if (typeof renderCategories === 'function') renderCategories();
     const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "✅ Магазин видалено! Натисніть 'Відправити'";
+    if (statusEl) statusEl.innerHTML = "✅ Магазин видалено!";
   }
   
   function getReasonText(key) {
@@ -594,33 +600,24 @@
     
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    
     let listHtml = '';
     if (shopsList.length === 0) {
       listHtml = '<div class="empty-modal">✖️ Немає магазинів</div>';
     } else {
       listHtml = shopsList.map(shop => {
         const reason = getReasonText(shopReasons[shop]);
-        return `
-          <div class="modal-shop-item">
-            <span class="modal-shop-num">${shop}</span>
-            ${reason ? `<span class="modal-shop-reason">📌 ${reason}</span>` : '<span class="modal-shop-reason"></span>'}
-            <button class="delete-shop-modal" data-shop="${shop}" data-color="${color}" data-comp="${complexity}">✖ Видалити</button>
-          </div>
-        `;
+        return `<div class="modal-shop-item">
+          <span class="modal-shop-num">${shop}</span>
+          ${reason ? `<span class="modal-shop-reason">📌 ${reason}</span>` : '<span class="modal-shop-reason"></span>'}
+          <button class="delete-shop-modal" data-shop="${shop}" data-color="${color}" data-comp="${complexity}">✖ Видалити</button>
+        </div>`;
       }).join('');
     }
-    
-    overlay.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header" style="background:#2c7da0; color:white;">${colorNames[color]} · ${compNames[complexity]}</div>
-        <div class="modal-list" id="modalShopList">
-          ${listHtml}
-        </div>
-        <button class="modal-close" id="closeModalBtn">Закрити</button>
-      </div>
-    `;
-    
+    overlay.innerHTML = `<div class="modal-content">
+      <div class="modal-header" style="background:#2c7da0; color:white;">${colorNames[color]} · ${compNames[complexity]}</div>
+      <div class="modal-list">${listHtml}</div>
+      <button class="modal-close" id="closeModalBtn">Закрити</button>
+    </div>`;
     document.body.appendChild(overlay);
     
     overlay.querySelectorAll('.delete-shop-modal').forEach(btn => {
@@ -634,7 +631,6 @@
         }
       };
     });
-    
     overlay.querySelector('#closeModalBtn').onclick = () => overlay.remove();
     overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
   }
@@ -652,25 +648,18 @@
     for (let color of colors) {
       for (let comp of comps) {
         const count = shops[color][comp].length;
-        html += `
-          <div class="category-card" data-color="${color}" data-comp="${comp}">
-            <div class="cat-header ${headerClass[color]}">${colorTitles[color]}</div>
-            <div class="cat-body ${count === 0 ? 'empty-cat' : ''}">
-              <div class="cat-count">${count}</div>
-              <div class="cat-label">${compIcons[comp]} ${comp}</div>
-            </div>
+        html += `<div class="category-card" data-color="${color}" data-comp="${comp}">
+          <div class="cat-header ${headerClass[color]}">${colorTitles[color]}</div>
+          <div class="cat-body ${count === 0 ? 'empty-cat' : ''}">
+            <div class="cat-count">${count}</div>
+            <div class="cat-label">${compIcons[comp]} ${comp}</div>
           </div>
-        `;
+        </div>`;
       }
     }
     container.innerHTML = html;
-    
     document.querySelectorAll('.category-card').forEach(card => {
-      card.onclick = () => {
-        const color = card.dataset.color;
-        const comp = card.dataset.comp;
-        openCategoryModal(color, comp);
-      };
+      card.onclick = () => openCategoryModal(card.dataset.color, card.dataset.comp);
     });
   }
   
@@ -746,40 +735,32 @@
     }
   }
   
-  // ==================== СИСТЕМА АВТОРИЗАЦІЇ ====================
+  // АВТОРИЗАЦІЯ
   function checkAuth() {
     const isAuthorized = localStorage.getItem("app_authorized") === "true";
-    if (!isAuthorized) {
-      showLoginScreen();
-    } else {
-      showMainApp();
-    }
+    if (!isAuthorized) showLoginScreen();
+    else showMainApp();
   }
   
   function showLoginScreen() {
     const overlay = document.createElement('div');
     overlay.className = 'login-overlay';
     overlay.id = 'loginOverlay';
-    overlay.innerHTML = `
-      <div class="login-card">
-        <h2>🚛 Вантажник-водій</h2>
-        <p>Введіть пароль для доступу</p>
-        <input type="password" id="passwordInput" placeholder="Пароль" autocomplete="off">
-        <button id="loginBtn">Увійти</button>
-        <div id="loginError" class="error-msg"></div>
-      </div>
-    `;
+    overlay.innerHTML = `<div class="login-card">
+      <h2>🚛 Вантажники-водії</h2>
+      <p>Введіть пароль для доступу</p>
+      <input type="password" id="passwordInput" placeholder="Пароль" autocomplete="off">
+      <button id="loginBtn">Увійти</button>
+      <div id="loginError" class="error-msg"></div>
+    </div>`;
     document.body.appendChild(overlay);
     
     const loginBtn = document.getElementById('loginBtn');
     const passwordInput = document.getElementById('passwordInput');
-    
     function attemptLogin() {
-      const password = passwordInput.value.trim();
-      if (password === ACCESS_PASSWORD) {
+      if (passwordInput.value.trim() === ACCESS_PASSWORD) {
         localStorage.setItem("app_authorized", "true");
-        const overlayEl = document.getElementById('loginOverlay');
-        if (overlayEl) overlayEl.remove();
+        document.getElementById('loginOverlay')?.remove();
         showMainApp();
       } else {
         const errorEl = document.getElementById('loginError');
@@ -788,90 +769,58 @@
         passwordInput.focus();
       }
     }
-    
     loginBtn.onclick = attemptLogin;
-    passwordInput.onkeypress = (e) => {
-      if (e.key === 'Enter') attemptLogin();
-    };
+    passwordInput.onkeypress = (e) => { if (e.key === 'Enter') attemptLogin(); };
   }
   
   function showMainApp() {
     const appContainer = document.getElementById('app');
-    appContainer.innerHTML = `
-      <div class="container">
-        <h1>🚛 Закони водіїв 📦 <small>синхронізація</small></h1>
-        <div class="sub">🏬 Натисніть на категорію для перегляду магазинів</div>
-
-        <div class="sync-panel">
-          <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
-          <div class="sync-row">
-            <input type="text" id="apiKeyInput" placeholder="API ключ" autocomplete="off">
-            <input type="text" id="binIdInput" placeholder="ID Bin" autocomplete="off">
-            <button id="saveConfigBtn" class="btn-save">💾 Зберегти</button>
-            <button id="clearConfigBtn" class="btn-clear">🗑 Очистити</button>
-          </div>
-          <div class="sync-buttons">
-            <button id="syncDownBtn" class="btn-down">📥 Завантажити</button>
-            <button id="syncUpBtn" class="btn-up">📤 Відправити</button>
-          </div>
-          <div class="sync-status" id="syncStatus">⚙️ Введіть ключі або натисніть "Завантажити"</div>
+    appContainer.innerHTML = `<div class="container">
+      <h1>🚛 Вантажники-водії 📦 <small>синхронізація</small></h1>
+      <div class="sub">🏬 Натисніть на категорію для перегляду магазинів</div>
+      <div class="sync-panel">
+        <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
+        <div class="sync-row">
+          <div class="input-group"><label>🔑 API</label><input type="text" id="apiKeyInput" placeholder="API ключ" autocomplete="off"></div>
+          <div class="input-group"><label>📦 Bin</label><input type="text" id="binIdInput" placeholder="ID Bin" autocomplete="off"></div>
         </div>
-
-        <div class="action-panel">
-          <div class="check-card">
-            <h3>🔍 Перевірити</h3>
-            <div class="check-input-group">
-              <input type="number" id="checkShopInput" placeholder="Номер">
-              <button id="checkShopBtn">Підказка</button>
-            </div>
-            <div id="checkResult" class="check-result">👆 Введіть номер</div>
-          </div>
-
-          <div class="add-card">
-            <h3>➕ Додати</h3>
-            <div class="select-group">
-              <input type="number" id="newShopNumber" placeholder="Номер">
-              <select id="newShopColor">
-                <option value="білі">⚪ Білі</option>
-                <option value="сірі">⚫ Сірі</option>
-                <option value="чорні">⬛ Чорні</option>
-              </select>
-              <select id="newShopComplexity">
-                <option value="легко">🟢 Легко</option>
-                <option value="потно">💦 Потно</option>
-                <option value="тяжко">⛰️ Тяжко</option>
-              </select>
-            </div>
-            <div class="extra-options">
-              <div class="extra-title">📝 Причина:</div>
-              <div class="reason-buttons" id="reasonButtons"></div>
-            </div>
-            <button id="addShopBtn" style="width:100%; margin-top:12px;">✅ Додати</button>
-          </div>
+        <div class="key-badge-container" id="savedKeysContainer"></div>
+        <div class="sync-row-buttons">
+          <button id="saveConfigBtn" class="btn-save">💾 Зберегти</button>
+          <button id="clearConfigBtn" class="btn-clear">🗑 Очистити</button>
+          <button id="forgetAllBtn" class="btn-forget">⚠️ Забути все</button>
         </div>
-
-        <div class="categories-grid" id="categoriesGrid"></div>
-        
-        <footer>💡 Ключі зберігаються на вашому пристрої автоматично</footer>
+        <div class="sync-buttons">
+          <button id="syncDownBtn" class="btn-down">📥 Завантажити</button>
+          <button id="syncUpBtn" class="btn-up">📤 Відправити</button>
+        </div>
+        <div class="sync-status" id="syncStatus">⚙️ Введіть ключі або натисніть "Завантажити"</div>
       </div>
-    `;
+      <div class="action-panel">
+        <div class="check-card"><h3>🔍 Перевірити</h3><div class="check-input-group"><input type="number" id="checkShopInput" placeholder="Номер"><button id="checkShopBtn">Підказка</button></div><div id="checkResult" class="check-result">👆 Введіть номер</div></div>
+        <div class="add-card"><h3>➕ Додати</h3><div class="select-group"><input type="number" id="newShopNumber" placeholder="Номер"><select id="newShopColor"><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select><select id="newShopComplexity"><option value="легко">🟢 Легко</option><option value="потно">💦 Потно</option><option value="тяжко">⛰️ Тяжко</option></select></div><div class="extra-options"><div class="extra-title">📝 Причина:</div><div class="reason-buttons" id="reasonButtons"></div></div><button id="addShopBtn" style="width:100%; margin-top:12px;">✅ Додати</button></div>
+      </div>
+      <div class="categories-grid" id="categoriesGrid"></div>
+      <footer>💡 Ключі зберігаються на вашому пристрої. Натисніть на маску ключа для швидкого вводу</footer>
+    </div>`;
     
-    // Ініціалізація всіх компонентів
     loadFromLocal();
     loadConfig();
     initDemo();
     initReasonButtons();
     updateSnapshot();
+    renderCategories();
+    updateSavedKeysDisplay();
     
     document.getElementById("saveConfigBtn").onclick = saveConfig;
     document.getElementById("clearConfigBtn").onclick = clearConfig;
+    document.getElementById("forgetAllBtn").onclick = forgetEverything;
     document.getElementById("syncDownBtn").onclick = download;
     document.getElementById("syncUpBtn").onclick = () => upload(false);
     document.getElementById("checkShopBtn").onclick = checkShop;
     document.getElementById("addShopBtn").onclick = addFromMobile;
   }
   
-  // Запуск перевірки авторизації
   checkAuth();
 </script>
 </body>
