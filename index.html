@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Вантажник">
-  <title>Вантажник-водій</title>
+  <title>Закони водіїв</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body { background: linear-gradient(135deg, #e2e9f0 0%, #cfdbe5 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 12px; min-height: 100vh; }
@@ -210,17 +210,62 @@
     .btn-cancel { background: #6c757d; color: white; margin: 0 20px 12px; }
     .btn-proceed { background: #dc3545; color: white; margin: 0 20px 20px; }
     
-    /* Індикатор збережених ключів */
-    .saved-indicator {
-      display: inline-flex;
+    /* СТОРІНКА ВХОДУ */
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #1a3a44 0%, #2c7da0 100%);
+      display: flex;
       align-items: center;
-      gap: 4px;
-      font-size: 0.7rem;
-      background: #d4edda;
-      color: #155724;
-      padding: 4px 10px;
-      border-radius: 30px;
-      margin-left: 8px;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .login-card {
+      background: white;
+      border-radius: 32px;
+      padding: 32px 24px;
+      width: 85%;
+      max-width: 340px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .login-card h2 {
+      margin-bottom: 8px;
+      color: #1a3a44;
+    }
+    .login-card p {
+      color: #6c757d;
+      font-size: 0.8rem;
+      margin-bottom: 24px;
+    }
+    .login-card input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #cbdae2;
+      border-radius: 40px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .login-card button {
+      width: 100%;
+      background: #2c7da0;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 40px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .login-card button:active { transform: scale(0.97); }
+    .error-msg {
+      color: #dc3545;
+      font-size: 0.8rem;
+      margin-top: 12px;
     }
     
     footer { margin-top: 20px; text-align: center; font-size: 0.65rem; color: #3a6b7c; padding: 12px; }
@@ -228,65 +273,16 @@
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>📦 Вантажник-водій 🚛 <small>синхронізація</small></h1>
-  <div class="sub">🏬 Натисніть на категорію для перегляду магазинів</div>
-
-  <div class="sync-panel">
-    <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
-    <div class="sync-row">
-      <input type="text" id="apiKeyInput" placeholder="API ключ" autocomplete="off">
-      <input type="text" id="binIdInput" placeholder="ID Bin" autocomplete="off">
-      <button id="saveConfigBtn" class="btn-save">💾 Зберегти</button>
-      <button id="clearConfigBtn" class="btn-clear">🗑 Очистити</button>
-    </div>
-    <div class="sync-buttons">
-      <button id="syncDownBtn" class="btn-down">📥 Завантажити</button>
-      <button id="syncUpBtn" class="btn-up">📤 Відправити</button>
-    </div>
-    <div class="sync-status" id="syncStatus">⚙️ Введіть ключі або натисніть "Завантажити"</div>
-  </div>
-
-  <div class="action-panel">
-    <div class="check-card">
-      <h3>🔍 Перевірити</h3>
-      <div class="check-input-group">
-        <input type="number" id="checkShopInput" placeholder="Номер">
-        <button id="checkShopBtn">Підказка</button>
-      </div>
-      <div id="checkResult" class="check-result">👆 Введіть номер</div>
-    </div>
-
-    <div class="add-card">
-      <h3>➕ Додати</h3>
-      <div class="select-group">
-        <input type="number" id="newShopNumber" placeholder="Номер">
-        <select id="newShopColor">
-          <option value="білі">⚪ Білі</option>
-          <option value="сірі">⚫ Сірі</option>
-          <option value="чорні">⬛ Чорні</option>
-        </select>
-        <select id="newShopComplexity">
-          <option value="легко">🟢 Легко</option>
-          <option value="потно">💦 Потно</option>
-          <option value="тяжко">⛰️ Тяжко</option>
-        </select>
-      </div>
-      <div class="extra-options">
-        <div class="extra-title">📝 Причина:</div>
-        <div class="reason-buttons" id="reasonButtons"></div>
-      </div>
-      <button id="addShopBtn" style="width:100%; margin-top:12px;">✅ Додати</button>
-    </div>
-  </div>
-
-  <!-- СІТКА 3х3 -->
-  <div class="categories-grid" id="categoriesGrid"></div>
-  
-  <footer>💡 Ключі зберігаються на вашому пристрої автоматично</footer>
+<div id="app">
+  <!-- Сторінка буде показана після авторизації -->
 </div>
 
 <script>
+  // ==================== НАЛАШТУВАННЯ ====================
+  // ⚠️ ЗМІНІТЬ ЦЕЙ ПАРОЛЬ НА СВІЙ ⚠️
+  const ACCESS_PASSWORD = "вантажник2024";
+  
+  // ==================== ОСНОВНИЙ КОД ====================
   const fullReasonsList = [
     { key: "рокля_підсобка", title: "🛒 Рокля до підсобки" },
     { key: "рокля_далеко", title: "🚶 Рокля + далеко" },
@@ -343,7 +339,7 @@
   let config = { apiKey: "", binId: "" };
   let selectedReason = "";
   
-  // ========== СИСТЕМА ВІДСТЕЖЕННЯ ВИДАЛЕНЬ ==========
+  // Система відстеження видалень
   let lastSnapshotShopsSet = new Set();
   
   function getAllShopNumbers() {
@@ -379,7 +375,6 @@
     }
     return false;
   }
-  // ============================================
   
   function showDeletionWarning(deletedShops, onConfirm, onCancel) {
     const overlay = document.createElement('div');
@@ -421,49 +416,48 @@
     renderCategories();
   }
   
-  // Завантаження конфігурації з localStorage
   function loadConfig() {
     const saved = localStorage.getItem("sync_cfg");
     if (saved) {
       try {
         config = JSON.parse(saved);
-        document.getElementById("apiKeyInput").value = config.apiKey || "";
-        document.getElementById("binIdInput").value = config.binId || "";
-        
-        if (config.apiKey && config.binId) {
-          document.getElementById("syncStatus").innerHTML = "🔑 Ключі завантажено! Натисніть 'Завантажити'";
-        }
+        const apiInput = document.getElementById("apiKeyInput");
+        const binInput = document.getElementById("binIdInput");
+        if (apiInput) apiInput.value = config.apiKey || "";
+        if (binInput) binInput.value = config.binId || "";
       } catch(e) {}
     }
   }
   
-  // Збереження конфігурації в localStorage
   function saveConfig() {
     config.apiKey = document.getElementById("apiKeyInput").value.trim();
     config.binId = document.getElementById("binIdInput").value.trim();
     localStorage.setItem("sync_cfg", JSON.stringify(config));
-    
-    if (config.apiKey && config.binId) {
-      document.getElementById("syncStatus").innerHTML = "✅ Ключі збережено на цьому пристрої!";
-    } else {
-      document.getElementById("syncStatus").innerHTML = "⚠️ Введіть обидва ключі";
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) {
+      if (config.apiKey && config.binId) {
+        statusEl.innerHTML = "✅ Ключі збережено на цьому пристрої!";
+      } else {
+        statusEl.innerHTML = "⚠️ Введіть обидва ключі";
+      }
     }
   }
   
-  // Очищення збережених ключів
   function clearConfig() {
-    if (confirm("Очистити збережені API ключі та Bin ID? Після цього потрібно буде ввести їх знову.")) {
+    if (confirm("Очистити збережені API ключі та Bin ID?")) {
       config.apiKey = "";
       config.binId = "";
       localStorage.removeItem("sync_cfg");
-      document.getElementById("apiKeyInput").value = "";
-      document.getElementById("binIdInput").value = "";
-      document.getElementById("syncStatus").innerHTML = "🗑 Ключі очищено. Введіть нові та натисніть 'Зберегти'";
+      const apiInput = document.getElementById("apiKeyInput");
+      const binInput = document.getElementById("binIdInput");
+      if (apiInput) apiInput.value = "";
+      if (binInput) binInput.value = "";
+      const statusEl = document.getElementById("syncStatus");
+      if (statusEl) statusEl.innerHTML = "🗑 Ключі очищено";
     }
   }
   
   async function download() {
-    // Якщо ключі не завантажені в config, але є в полях - використовуємо їх
     if (!config.apiKey || !config.binId) {
       const apiKey = document.getElementById("apiKeyInput").value.trim();
       const binId = document.getElementById("binIdInput").value.trim();
@@ -471,19 +465,22 @@
         config.apiKey = apiKey;
         config.binId = binId;
       } else {
-        document.getElementById("syncStatus").innerHTML = "⚠️ Введіть API ключ та ID Bin!";
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
         return;
       }
     }
     
     if (hasLocalChanges()) {
-      if (!confirm("⚠️ УВАГА! У вас є незбережені зміни (додані/видалені магазини). Якщо ви завантажите з хмари, вони будуть ВТРАЧЕНІ. Продовжити?")) {
-        document.getElementById("syncStatus").innerHTML = "⏸️ Завантаження скасовано";
+      if (!confirm("⚠️ УВАГА! У вас є незбережені зміни. Завантажити з хмари? Локальні зміни будуть втрачені.")) {
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = "⏸️ Завантаження скасовано";
         return;
       }
     }
     
-    document.getElementById("syncStatus").innerHTML = "📥 Завантаження...";
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) statusEl.innerHTML = "📥 Завантаження...";
     try {
       const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
         headers: { "X-Master-Key": config.apiKey }
@@ -496,15 +493,15 @@
           saveToLocal();
           updateSnapshot();
           renderCategories();
-          document.getElementById("syncStatus").innerHTML = "✅ Завантажено! Дані синхронізовано.";
+          if (statusEl) statusEl.innerHTML = "✅ Завантажено! Дані синхронізовано.";
         } else {
-          document.getElementById("syncStatus").innerHTML = "⚠️ Хмара порожня. Додайте магазини та натисніть 'Відправити'";
+          if (statusEl) statusEl.innerHTML = "⚠️ Хмара порожня";
         }
       } else {
-        document.getElementById("syncStatus").innerHTML = "❌ Помилка завантаження. Перевірте ключі та ID Bin";
+        if (statusEl) statusEl.innerHTML = "❌ Помилка завантаження";
       }
     } catch(e) {
-      document.getElementById("syncStatus").innerHTML = "❌ Немає інтернету";
+      if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
     }
   }
   
@@ -516,7 +513,8 @@
         config.apiKey = apiKey;
         config.binId = binId;
       } else {
-        document.getElementById("syncStatus").innerHTML = "⚠️ Введіть API ключ та ID Bin!";
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
         return;
       }
     }
@@ -527,12 +525,16 @@
       showDeletionWarning(
         deletedShops,
         () => upload(true),
-        () => document.getElementById("syncStatus").innerHTML = "⏸️ Відправлення скасовано"
+        () => {
+          const statusEl = document.getElementById("syncStatus");
+          if (statusEl) statusEl.innerHTML = "⏸️ Відправлення скасовано";
+        }
       );
       return;
     }
     
-    document.getElementById("syncStatus").innerHTML = "📤 Відправка...";
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) statusEl.innerHTML = "📤 Відправка...";
     try {
       const data = { shops: shops, reasons: shopReasons };
       const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
@@ -545,12 +547,12 @@
       });
       if (res.ok) {
         updateSnapshot();
-        document.getElementById("syncStatus").innerHTML = "✅ Відправлено! Дані збережено в хмарі.";
+        if (statusEl) statusEl.innerHTML = "✅ Відправлено! Дані збережено в хмарі.";
       } else {
-        document.getElementById("syncStatus").innerHTML = "❌ Помилка відправлення";
+        if (statusEl) statusEl.innerHTML = "❌ Помилка відправлення";
       }
     } catch(e) {
-      document.getElementById("syncStatus").innerHTML = "❌ Немає інтернету";
+      if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
     }
   }
   
@@ -567,7 +569,8 @@
     if (reason) shopReasons[n] = reason;
     saveToLocal();
     renderCategories();
-    document.getElementById("syncStatus").innerHTML = "✅ Магазин додано! Натисніть 'Відправити' для синхронізації";
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) statusEl.innerHTML = "✅ Магазин додано! Натисніть 'Відправити'";
   }
   
   function removeShop(n, color, comp) {
@@ -575,7 +578,8 @@
     delete shopReasons[n];
     saveToLocal();
     renderCategories();
-    document.getElementById("syncStatus").innerHTML = "✅ Магазин видалено! Натисніть 'Відправити' для синхронізації";
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) statusEl.innerHTML = "✅ Магазин видалено! Натисніть 'Відправити'";
   }
   
   function getReasonText(key) {
@@ -672,20 +676,29 @@
   
   function checkShop() {
     let v = document.getElementById("checkShopInput").value.trim();
-    if (!v) { document.getElementById("checkResult").innerHTML = "⚠️ Введіть номер"; return; }
+    if (!v) { 
+      const resultEl = document.getElementById("checkResult");
+      if (resultEl) resultEl.innerHTML = "⚠️ Введіть номер";
+      return; 
+    }
     let num = Number(v);
-    if (isNaN(num)) { document.getElementById("checkResult").innerHTML = "❌ Помилка"; return; }
+    if (isNaN(num)) { 
+      const resultEl = document.getElementById("checkResult");
+      if (resultEl) resultEl.innerHTML = "❌ Помилка";
+      return; 
+    }
     let found = null;
     for (let c of ["білі","сірі","чорні"]) {
       for (let cp of ["легко","потно","тяжко"]) {
         if (shops[c][cp].includes(num)) found = { color: c, comp: cp };
       }
     }
+    const resultEl = document.getElementById("checkResult");
     if (found) {
       let reason = getReasonText(shopReasons[num]);
-      document.getElementById("checkResult").innerHTML = `<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color}, ${found.comp}${reason ? `, ${reason}` : ''}`;
+      if (resultEl) resultEl.innerHTML = `<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color}, ${found.comp}${reason ? `, ${reason}` : ''}`;
     } else {
-      document.getElementById("checkResult").innerHTML = `<strong>🏪 Магазин ${num}</strong><br>⚠️ Немає даних`;
+      if (resultEl) resultEl.innerHTML = `<strong>🏪 Магазин ${num}</strong><br>⚠️ Немає даних`;
     }
   }
   
@@ -733,18 +746,133 @@
     }
   }
   
-  loadFromLocal();
-  loadConfig();
-  initDemo();
-  initReasonButtons();
-  updateSnapshot();
+  // ==================== СИСТЕМА АВТОРИЗАЦІЇ ====================
+  function checkAuth() {
+    const isAuthorized = localStorage.getItem("app_authorized") === "true";
+    if (!isAuthorized) {
+      showLoginScreen();
+    } else {
+      showMainApp();
+    }
+  }
   
-  document.getElementById("saveConfigBtn").onclick = saveConfig;
-  document.getElementById("clearConfigBtn").onclick = clearConfig;
-  document.getElementById("syncDownBtn").onclick = download;
-  document.getElementById("syncUpBtn").onclick = () => upload(false);
-  document.getElementById("checkShopBtn").onclick = checkShop;
-  document.getElementById("addShopBtn").onclick = addFromMobile;
+  function showLoginScreen() {
+    const overlay = document.createElement('div');
+    overlay.className = 'login-overlay';
+    overlay.id = 'loginOverlay';
+    overlay.innerHTML = `
+      <div class="login-card">
+        <h2>🔐 Вантажник-водій</h2>
+        <p>Введіть пароль для доступу</p>
+        <input type="password" id="passwordInput" placeholder="Пароль" autocomplete="off">
+        <button id="loginBtn">Увійти</button>
+        <div id="loginError" class="error-msg"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const loginBtn = document.getElementById('loginBtn');
+    const passwordInput = document.getElementById('passwordInput');
+    
+    function attemptLogin() {
+      const password = passwordInput.value.trim();
+      if (password === ACCESS_PASSWORD) {
+        localStorage.setItem("app_authorized", "true");
+        const overlayEl = document.getElementById('loginOverlay');
+        if (overlayEl) overlayEl.remove();
+        showMainApp();
+      } else {
+        const errorEl = document.getElementById('loginError');
+        if (errorEl) errorEl.textContent = "❌ Невірний пароль";
+        passwordInput.value = "";
+        passwordInput.focus();
+      }
+    }
+    
+    loginBtn.onclick = attemptLogin;
+    passwordInput.onkeypress = (e) => {
+      if (e.key === 'Enter') attemptLogin();
+    };
+  }
+  
+  function showMainApp() {
+    const appContainer = document.getElementById('app');
+    appContainer.innerHTML = `
+      <div class="container">
+        <h1>📦 Вантажник-водій 🚛 <small>синхронізація</small></h1>
+        <div class="sub">🏬 Натисніть на категорію для перегляду магазинів</div>
+
+        <div class="sync-panel">
+          <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
+          <div class="sync-row">
+            <input type="text" id="apiKeyInput" placeholder="API ключ" autocomplete="off">
+            <input type="text" id="binIdInput" placeholder="ID Bin" autocomplete="off">
+            <button id="saveConfigBtn" class="btn-save">💾 Зберегти</button>
+            <button id="clearConfigBtn" class="btn-clear">🗑 Очистити</button>
+          </div>
+          <div class="sync-buttons">
+            <button id="syncDownBtn" class="btn-down">📥 Завантажити</button>
+            <button id="syncUpBtn" class="btn-up">📤 Відправити</button>
+          </div>
+          <div class="sync-status" id="syncStatus">⚙️ Введіть ключі або натисніть "Завантажити"</div>
+        </div>
+
+        <div class="action-panel">
+          <div class="check-card">
+            <h3>🔍 Перевірити</h3>
+            <div class="check-input-group">
+              <input type="number" id="checkShopInput" placeholder="Номер">
+              <button id="checkShopBtn">Підказка</button>
+            </div>
+            <div id="checkResult" class="check-result">👆 Введіть номер</div>
+          </div>
+
+          <div class="add-card">
+            <h3>➕ Додати</h3>
+            <div class="select-group">
+              <input type="number" id="newShopNumber" placeholder="Номер">
+              <select id="newShopColor">
+                <option value="білі">⚪ Білі</option>
+                <option value="сірі">⚫ Сірі</option>
+                <option value="чорні">⬛ Чорні</option>
+              </select>
+              <select id="newShopComplexity">
+                <option value="легко">🟢 Легко</option>
+                <option value="потно">💦 Потно</option>
+                <option value="тяжко">⛰️ Тяжко</option>
+              </select>
+            </div>
+            <div class="extra-options">
+              <div class="extra-title">📝 Причина:</div>
+              <div class="reason-buttons" id="reasonButtons"></div>
+            </div>
+            <button id="addShopBtn" style="width:100%; margin-top:12px;">✅ Додати</button>
+          </div>
+        </div>
+
+        <div class="categories-grid" id="categoriesGrid"></div>
+        
+        <footer>💡 Ключі зберігаються на вашому пристрої автоматично</footer>
+      </div>
+    `;
+    
+    // Ініціалізація всіх компонентів
+    loadFromLocal();
+    loadConfig();
+    initDemo();
+    initReasonButtons();
+    updateSnapshot();
+    
+    document.getElementById("saveConfigBtn").onclick = saveConfig;
+    document.getElementById("clearConfigBtn").onclick = clearConfig;
+    document.getElementById("syncDownBtn").onclick = download;
+    document.getElementById("syncUpBtn").onclick = () => upload(false);
+    document.getElementById("checkShopBtn").onclick = checkShop;
+    document.getElementById("addShopBtn").onclick = addFromMobile;
+  }
+  
+  // Запуск перевірки авторизації
+  checkAuth();
 </script>
 </body>
 </html>
