@@ -190,7 +190,61 @@
   let shopReasons = {};
   let config = { apiKey: "", binId: "" };
   let selectedReason = "";
-
+  
+  // ---- СИСТЕМА ВІДСЛІДКОВУВАННЯ ЗМІН (для попереджень) ----
+  let lastLocalSnapshot = ""; // JSON-зліпок останнього "чистого" стану (після завантаження або старту)
+  
+  // Створюємо зліпок поточних даних (тільки магазини + причини)
+  function getCurrentSnapshot() {
+    return JSON.stringify({ shops, shopReasons });
+  }
+  
+  // Оновлюємо зліпок після того, як стан став "синхронізованим"
+  function updateSnapshot() {
+    lastLocalSnapshot = getCurrentSnapshot();
+  }
+  
+  // Перевіряємо, чи є локальні зміни (не збережені в хмарі)
+  function hasLocalChanges() {
+    return getCurrentSnapshot() !== lastLocalSnapshot;
+  }
+  
+  // Підрахунок загальної кількості магазинів
+  function countTotalShops() {
+    let total = 0;
+    for (let c of ["білі","сірі","чорні"]) {
+      for (let cp of ["легко","потно","тяжко"]) {
+        total += shops[c][cp].length;
+      }
+    }
+    return total;
+  }
+  
+  // Отримуємо кількість магазинів у snapshot (для порівняння видалень)
+  function getTotalShopsFromSnapshot(snapshot) {
+    try {
+      const data = JSON.parse(snapshot);
+      let total = 0;
+      for (let c of ["білі","сірі","чорні"]) {
+        for (let cp of ["легко","потно","тяжко"]) {
+          if (data.shops && data.shops[c] && data.shops[c][cp]) {
+            total += data.shops[c][cp].length;
+          }
+        }
+      }
+      return total;
+    } catch(e) { return 0; }
+  }
+  
+  // Перевіряємо, чи були видалення (порівняно з останнім зліпком)
+  function wasAnyShopDeleted() {
+    if (!lastLocalSnapshot) return false;
+    const prevTotal = getTotalShopsFromSnapshot(lastLocalSnapshot);
+    const currentTotal = countTotalShops();
+    return currentTotal < prevTotal;
+  }
+  // ------------------------------------------------------------
+  
   function saveToLocal() {
     localStorage.setItem("shops", JSON.stringify(shops));
     localStorage.setItem("reasons", JSON.stringify(shopReasons));
@@ -209,6 +263,8 @@
         shopReasons = JSON.parse(savedReasons);
       } catch(e) {}
     }
+    // Оновлюємо зліпок після завантаження з локального сховища
+    updateSnapshot();
     renderGroups();
   }
   
@@ -235,6 +291,16 @@
       document.getElementById("syncStatus").innerHTML = "⚠️ Збережіть ключі!";
       return;
     }
+    
+    // *** ПЕРЕВІРКА: якщо є незбережені локальні зміни, показуємо попередження ***
+    if (hasLocalChanges()) {
+      const userConfirmed = confirm("⚠️ УВАГА! У вас є незбережені зміни (додані/видалені магазини). Якщо ви завантажите з хмари, вони будуть ВТРАЧЕНІ. Продовжити?");
+      if (!userConfirmed) {
+        document.getElementById("syncStatus").innerHTML = "⏸️ Завантаження скасовано";
+        return;
+      }
+    }
+    
     document.getElementById("syncStatus").innerHTML = "📥 Завантаження...";
     try {
       const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
@@ -246,6 +312,8 @@
           shops = data.record.shops;
           shopReasons = data.record.reasons || {};
           saveToLocal();
+          // ОНОВЛЮЄМО СНАПШОТ після успішного завантаження
+          updateSnapshot();
           renderGroups();
           document.getElementById("syncStatus").innerHTML = "✅ Завантажено!";
         } else {
@@ -259,11 +327,21 @@
     }
   }
   
-  async function upload() {
+  async function upload(force = false) {
     if (!config.apiKey || !config.binId) {
       document.getElementById("syncStatus").innerHTML = "⚠️ Збережіть ключі!";
       return;
     }
+    
+    // *** ОСОБЛИВА ПЕРЕВІРКА: чи був видалений ХОЧА Б ОДИН магазин після останнього завантаження ***
+    if (!force && wasAnyShopDeleted()) {
+      const userWantsToSend = confirm("⚠️ ВАЖЛИВО! Виявлено ВИДАЛЕННЯ магазинів! Відправити зміни до хмари? Якщо так, то хмарні дані будуть оновлені (магазини будуть видалені назавжди). Натисніть OK, щоб відправити, або Скасувати.");
+      if (!userWantsToSend) {
+        document.getElementById("syncStatus").innerHTML = "⏸️ Відправлення скасовано";
+        return;
+      }
+    }
+    
     document.getElementById("syncStatus").innerHTML = "📤 Відправка...";
     try {
       const data = { shops: shops, reasons: shopReasons };
@@ -276,6 +354,8 @@
         body: JSON.stringify(data)
       });
       if (res.ok) {
+        // Після успішної відправки оновлюємо зліпок (тепер стан синхронізований)
+        updateSnapshot();
         document.getElementById("syncStatus").innerHTML = "✅ Відправлено!";
       } else {
         document.getElementById("syncStatus").innerHTML = "❌ Помилка!";
@@ -283,6 +363,11 @@
     } catch(e) {
       document.getElementById("syncStatus").innerHTML = "❌ Немає інтернету";
     }
+  }
+  
+  // Обгортка для upload, яка викликається кнопкою
+  function handleUploadClick() {
+    upload(false);
   }
   
   function addShop(num, color, comp, reason) {
@@ -373,7 +458,7 @@
     
     document.querySelectorAll('.delete-shop').forEach(btn => {
       btn.onclick = () => {
-        if (confirm(`Видалити?`)) {
+        if (confirm(`Видалити магазин ${btn.dataset.shop}?`)) {
           removeShop(parseInt(btn.dataset.shop), btn.dataset.color, btn.dataset.comp);
         }
       };
@@ -446,6 +531,7 @@
       addShop(708, "чорні", "тяжко", "другий_поверх_руками");
       addShop(39, "чорні", "легко", "рокля_підсобка");
       addShop(3039, "білі", "легко", "рокля_підсобка");
+      // Оскільки addShop вже робить saveToLocal, але snapshot треба оновити
     }
   }
   
@@ -454,9 +540,12 @@
   initDemo();
   initReasonButtons();
   
+  // Переконуємось, що snapshot синхронізований після завантаження та демо-даних
+  updateSnapshot();
+  
   document.getElementById("saveConfigBtn").onclick = saveConfig;
   document.getElementById("syncDownBtn").onclick = download;
-  document.getElementById("syncUpBtn").onclick = upload;
+  document.getElementById("syncUpBtn").onclick = handleUploadClick;
   document.getElementById("checkShopBtn").onclick = checkShop;
   document.getElementById("addShopBtn").onclick = addFromMobile;
 </script>
