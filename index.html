@@ -72,6 +72,71 @@
     .empty-msg { color: #8c9aa8; font-style: italic; font-size: 0.8rem; padding: 6px 0; }
     footer { margin-top: 20px; text-align: center; font-size: 0.65rem; color: #3a6b7c; padding: 12px; }
     @media (min-width: 700px) { .action-panel { flex-direction: row; } .select-group { flex-direction: row; } .select-group input { flex: 2; } .select-group select { flex: 1; } }
+    
+    /* Стилі для модального вікна */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      max-width: 90%;
+      width: 400px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .modal-content h3 {
+      margin-bottom: 12px;
+      color: #b91c1c;
+    }
+    .modal-content p {
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .deleted-list {
+      background: #fff0f0;
+      border-radius: 12px;
+      padding: 10px;
+      margin: 10px 0;
+      max-height: 150px;
+      overflow-y: auto;
+      text-align: left;
+    }
+    .deleted-list span {
+      display: inline-block;
+      background: #b91c1c;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin: 4px;
+      font-size: 0.8rem;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .modal-buttons button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 40px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-cancel { background: #6c757d; color: white; }
+    .btn-proceed { background: #dc3545; color: white; }
   </style>
 </head>
 <body>
@@ -120,9 +185,7 @@
       </div>
       <div class="extra-options">
         <div class="extra-title">📝 Причина (гортай, якщо не вміщується):</div>
-        <div class="reason-buttons" id="reasonButtons">
-          <!-- 44 причини будуть додані через JS -->
-        </div>
+        <div class="reason-buttons" id="reasonButtons"></div>
       </div>
       <button id="addShopBtn" style="width:100%; margin-top:12px;">✅ Додати</button>
     </div>
@@ -133,7 +196,6 @@
 </div>
 
 <script>
-  // ==================== 44 ПРИЧИНИ ДОСТАВКИ ====================
   const fullReasonsList = [
     { key: "рокля_підсобка", title: "🛒 Рокля до підсобки" },
     { key: "рокля_далеко", title: "🚶 Рокля + далеко" },
@@ -181,7 +243,6 @@
     { key: "ліфт_комбо", title: "🏢+🛗+🚶 2й поверх+ліфт+далеко" }
   ];
 
-  // Прості дані - тільки числа
   let shops = {
     "білі": { "легко": [], "потно": [], "тяжко": [] },
     "сірі": { "легко": [], "потно": [], "тяжко": [] },
@@ -191,59 +252,84 @@
   let config = { apiKey: "", binId: "" };
   let selectedReason = "";
   
-  // ---- СИСТЕМА ВІДСЛІДКОВУВАННЯ ЗМІН (для попереджень) ----
-  let lastLocalSnapshot = ""; // JSON-зліпок останнього "чистого" стану (після завантаження або старту)
+  // ========== НОВА СИСТЕМА ВІДСТЕЖЕННЯ ==========
+  let lastSnapshotShopsSet = new Set(); // Множина всіх номерів магазинів з останнього зліпка
   
-  // Створюємо зліпок поточних даних (тільки магазини + причини)
-  function getCurrentSnapshot() {
-    return JSON.stringify({ shops, shopReasons });
-  }
-  
-  // Оновлюємо зліпок після того, як стан став "синхронізованим"
-  function updateSnapshot() {
-    lastLocalSnapshot = getCurrentSnapshot();
-  }
-  
-  // Перевіряємо, чи є локальні зміни (не збережені в хмарі)
-  function hasLocalChanges() {
-    return getCurrentSnapshot() !== lastLocalSnapshot;
-  }
-  
-  // Підрахунок загальної кількості магазинів
-  function countTotalShops() {
-    let total = 0;
-    for (let c of ["білі","сірі","чорні"]) {
-      for (let cp of ["легко","потно","тяжко"]) {
-        total += shops[c][cp].length;
-      }
-    }
-    return total;
-  }
-  
-  // Отримуємо кількість магазинів у snapshot (для порівняння видалень)
-  function getTotalShopsFromSnapshot(snapshot) {
-    try {
-      const data = JSON.parse(snapshot);
-      let total = 0;
-      for (let c of ["білі","сірі","чорні"]) {
-        for (let cp of ["легко","потно","тяжко"]) {
-          if (data.shops && data.shops[c] && data.shops[c][cp]) {
-            total += data.shops[c][cp].length;
-          }
+  // Отримуємо всі номери магазинів у вигляді Set
+  function getAllShopNumbers() {
+    const set = new Set();
+    for (const color of ["білі","сірі","чорні"]) {
+      for (const comp of ["легко","потно","тяжко"]) {
+        for (const num of shops[color][comp]) {
+          set.add(num);
         }
       }
-      return total;
-    } catch(e) { return 0; }
+    }
+    return set;
   }
   
-  // Перевіряємо, чи були видалення (порівняно з останнім зліпком)
-  function wasAnyShopDeleted() {
-    if (!lastLocalSnapshot) return false;
-    const prevTotal = getTotalShopsFromSnapshot(lastLocalSnapshot);
-    const currentTotal = countTotalShops();
-    return currentTotal < prevTotal;
+  // Оновлюємо зліпок (викликається після завантаження/відправки/старту)
+  function updateSnapshot() {
+    lastSnapshotShopsSet = getAllShopNumbers();
   }
-  // ------------------------------------------------------------
+  
+  // Знаходимо ВИДАЛЕНІ магазини (ті, що були в зліпку, але зникли)
+  function getDeletedShops() {
+    const currentSet = getAllShopNumbers();
+    const deleted = [];
+    for (const shop of lastSnapshotShopsSet) {
+      if (!currentSet.has(shop)) {
+        deleted.push(shop);
+      }
+    }
+    return deleted;
+  }
+  
+  // Перевіряємо, чи є ВИДАЛЕННЯ (навіть якщо додано більше ніж видалено)
+  function hasAnyDeletion() {
+    return getDeletedShops().length > 0;
+  }
+  
+  // Перевіряємо, чи є будь-які локальні зміни (для кнопки Завантажити)
+  function hasLocalChanges() {
+    const currentSet = getAllShopNumbers();
+    if (currentSet.size !== lastSnapshotShopsSet.size) return true;
+    for (const shop of currentSet) {
+      if (!lastSnapshotShopsSet.has(shop)) return true;
+    }
+    return false;
+  }
+  // ============================================
+  
+  // Функція для показу кастомного модального вікна
+  function showDeletionWarning(deletedShops, onConfirm, onCancel) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-content">
+        <h3>⚠️ ВАЖЛИВО!</h3>
+        <p>Виявлено ВИДАЛЕННЯ магазинів:</p>
+        <div class="deleted-list">
+          ${deletedShops.map(s => `<span>🏪 ${s}</span>`).join('')}
+        </div>
+        <p>Якщо ви натиснете "Відправити", ці магазини будуть <strong>назавжди видалені</strong> з хмари.</p>
+        <div class="modal-buttons">
+          <button class="btn-cancel">Скасувати</button>
+          <button class="btn-proceed">✅ Все одно відправити</button>
+        </div>
+      </div>
+    `;
+    
+    overlay.querySelector('.btn-cancel').onclick = () => {
+      overlay.remove();
+      if (onCancel) onCancel();
+    };
+    overlay.querySelector('.btn-proceed').onclick = () => {
+      overlay.remove();
+      if (onConfirm) onConfirm();
+    };
+    document.body.appendChild(overlay);
+  }
   
   function saveToLocal() {
     localStorage.setItem("shops", JSON.stringify(shops));
@@ -263,7 +349,6 @@
         shopReasons = JSON.parse(savedReasons);
       } catch(e) {}
     }
-    // Оновлюємо зліпок після завантаження з локального сховища
     updateSnapshot();
     renderGroups();
   }
@@ -292,7 +377,6 @@
       return;
     }
     
-    // *** ПЕРЕВІРКА: якщо є незбережені локальні зміни, показуємо попередження ***
     if (hasLocalChanges()) {
       const userConfirmed = confirm("⚠️ УВАГА! У вас є незбережені зміни (додані/видалені магазини). Якщо ви завантажите з хмари, вони будуть ВТРАЧЕНІ. Продовжити?");
       if (!userConfirmed) {
@@ -312,7 +396,6 @@
           shops = data.record.shops;
           shopReasons = data.record.reasons || {};
           saveToLocal();
-          // ОНОВЛЮЄМО СНАПШОТ після успішного завантаження
           updateSnapshot();
           renderGroups();
           document.getElementById("syncStatus").innerHTML = "✅ Завантажено!";
@@ -333,13 +416,15 @@
       return;
     }
     
-    // *** ОСОБЛИВА ПЕРЕВІРКА: чи був видалений ХОЧА Б ОДИН магазин після останнього завантаження ***
-    if (!force && wasAnyShopDeleted()) {
-      const userWantsToSend = confirm("⚠️ ВАЖЛИВО! Виявлено ВИДАЛЕННЯ магазинів! Відправити зміни до хмари? Якщо так, то хмарні дані будуть оновлені (магазини будуть видалені назавжди). Натисніть OK, щоб відправити, або Скасувати.");
-      if (!userWantsToSend) {
-        document.getElementById("syncStatus").innerHTML = "⏸️ Відправлення скасовано";
-        return;
-      }
+    const deletedShops = getDeletedShops();
+    
+    if (!force && deletedShops.length > 0) {
+      showDeletionWarning(
+        deletedShops,
+        () => upload(true),  // Підтвердження - відправляємо з force=true
+        () => document.getElementById("syncStatus").innerHTML = "⏸️ Відправлення скасовано"
+      );
+      return;
     }
     
     document.getElementById("syncStatus").innerHTML = "📤 Відправка...";
@@ -354,7 +439,6 @@
         body: JSON.stringify(data)
       });
       if (res.ok) {
-        // Після успішної відправки оновлюємо зліпок (тепер стан синхронізований)
         updateSnapshot();
         document.getElementById("syncStatus").innerHTML = "✅ Відправлено!";
       } else {
@@ -363,11 +447,6 @@
     } catch(e) {
       document.getElementById("syncStatus").innerHTML = "❌ Немає інтернету";
     }
-  }
-  
-  // Обгортка для upload, яка викликається кнопкою
-  function handleUploadClick() {
-    upload(false);
   }
   
   function addShop(num, color, comp, reason) {
@@ -531,7 +610,6 @@
       addShop(708, "чорні", "тяжко", "другий_поверх_руками");
       addShop(39, "чорні", "легко", "рокля_підсобка");
       addShop(3039, "білі", "легко", "рокля_підсобка");
-      // Оскільки addShop вже робить saveToLocal, але snapshot треба оновити
     }
   }
   
@@ -539,13 +617,11 @@
   loadConfig();
   initDemo();
   initReasonButtons();
-  
-  // Переконуємось, що snapshot синхронізований після завантаження та демо-даних
   updateSnapshot();
   
   document.getElementById("saveConfigBtn").onclick = saveConfig;
   document.getElementById("syncDownBtn").onclick = download;
-  document.getElementById("syncUpBtn").onclick = handleUploadClick;
+  document.getElementById("syncUpBtn").onclick = () => upload(false);
   document.getElementById("checkShopBtn").onclick = checkShop;
   document.getElementById("addShopBtn").onclick = addFromMobile;
 </script>
