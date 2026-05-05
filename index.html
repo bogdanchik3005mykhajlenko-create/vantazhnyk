@@ -9,318 +9,56 @@
   <meta name="apple-mobile-web-app-title" content="Вантажник">
   <title>Вантажник-водій</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background: #f0f4f8;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-      padding: 16px;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    /* Заголовок */
-    .header {
-      background: #1e4a6b;
-      color: white;
-      padding: 18px 20px;
-      border-radius: 28px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    .header h1 {
-      font-size: 1.7rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .header h1 small {
-      font-size: 0.7rem;
-      background: #2c7da0;
-      padding: 4px 12px;
-      border-radius: 40px;
-      font-weight: normal;
-    }
-    .header p {
-      font-size: 0.8rem;
-      opacity: 0.85;
-      margin-top: 6px;
-    }
-
-    /* Панель синхронізації */
-    .sync-card {
-      background: white;
-      border-radius: 24px;
-      padding: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border: 1px solid #e2e8f0;
-    }
-    .sync-title {
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #1e4a6b;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .sync-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .sync-row input {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 40px;
-      font-size: 0.8rem;
-      background: #f8fafc;
-    }
-    .btn-sm {
-      padding: 10px 18px;
-      border-radius: 40px;
-      border: none;
-      font-weight: 600;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: 0.1s ease;
-    }
-    .btn-save { background: #475569; color: white; }
-    .btn-down { background: #2b6e3c; color: white; }
-    .btn-up { background: #b45309; color: white; }
-    .sync-status {
-      font-size: 0.7rem;
-      color: #3b5e7a;
-      margin-top: 10px;
-    }
-    .sync-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    /* Сітка груп 3x3 */
-    .groups-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    .group-card {
-      background: white;
-      border-radius: 20px;
-      padding: 10px 6px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.1s;
-      border: 2px solid transparent;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    }
-    .group-card.active {
-      border-color: #2c7da0;
-      background: #eef6fc;
-      transform: scale(0.98);
-    }
-    .group-color {
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-    .group-comp {
-      font-size: 0.7rem;
-      color: #4a6272;
-      margin: 4px 0;
-    }
-    .group-count {
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: #e2e8f0;
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 30px;
-    }
-    .white-bg { background: #e9ecef; }
-    .gray-bg { background: #5f6c70; color: white; }
-    .black-bg { background: #1f2a2e; color: white; }
-
-    /* Список магазинів вибраної групи */
-    .shops-panel {
-      background: white;
-      border-radius: 28px;
-      padding: 18px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    .active-header {
-      font-size: 1.2rem;
-      font-weight: 700;
-      text-align: center;
-      padding: 12px;
-      border-radius: 40px;
-      margin-bottom: 16px;
-    }
-    .shop-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      justify-content: center;
-    }
-    .shop-card {
-      background: #f8fafc;
-      border-radius: 60px;
-      padding: 8px 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      border-left: 5px solid;
-    }
-    .shop-number {
-      font-weight: 700;
-      font-size: 1rem;
-    }
-    .shop-reason {
-      font-size: 0.7rem;
-      color: #4a6272;
-      max-width: 160px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .edit-select {
-      font-size: 0.7rem;
-      padding: 4px 8px;
-      border-radius: 30px;
-      background: white;
-      border: 1px solid #cbd5e1;
-    }
-    .delete-btn {
-      background: #ffe0e0;
-      border: none;
-      color: #b91c1c;
-      font-weight: bold;
-      padding: 4px 12px;
-      border-radius: 30px;
-      cursor: pointer;
-    }
-    .empty-msg {
-      text-align: center;
-      color: #8ca3b9;
-      padding: 24px;
-      font-style: italic;
-    }
-
-    /* Панель додавання / перевірки */
-    .action-card {
-      background: white;
-      border-radius: 24px;
-      padding: 18px;
-      margin-bottom: 18px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .action-card h3 {
-      font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 12px;
-      color: #0f3b4f;
-    }
-    .check-group {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .check-group input {
-      flex: 2;
-      padding: 14px;
-      border: 1px solid #cbd5e1;
-      border-radius: 48px;
-      font-size: 1rem;
-    }
-    button {
-      background: #2c7da0;
-      border: none;
-      padding: 12px 22px;
-      border-radius: 48px;
-      font-weight: 600;
-      color: white;
-      cursor: pointer;
-    }
-    button:active { transform: scale(0.97); }
-    .select-row {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin: 12px 0;
-    }
-    .select-row select, .select-row input {
-      padding: 14px;
-      border-radius: 48px;
-      border: 1px solid #cbd5e1;
-      font-size: 1rem;
-      background: white;
-    }
-    .reason-section {
-      margin-top: 16px;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 14px;
-    }
-    .reason-title {
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #1e4a6b;
-      margin-bottom: 12px;
-    }
-    .reason-scroll {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      max-height: 240px;
-      overflow-y: auto;
-      padding: 6px 2px;
-    }
-    .reason-chip {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      padding: 12px 16px;
-      border-radius: 48px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.05s;
-      white-space: nowrap;
-    }
-    .reason-chip.selected {
-      background: #2c7da0;
-      color: white;
-      border-color: #2c7da0;
-    }
-    .check-result {
-      margin-top: 12px;
-      background: #eef3fa;
-      padding: 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      border-left: 4px solid #2c7da0;
-    }
-    footer {
-      text-align: center;
-      font-size: 0.65rem;
-      color: #6b8ea8;
-      margin-top: 20px;
-    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{background:#f0f4f8;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:16px;min-height:100vh}
+    .container{max-width:700px;margin:0 auto}
+    .header{background:#1e4a6b;color:#fff;padding:18px 20px;border-radius:28px;margin-bottom:20px}
+    .header h1{font-size:1.7rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .header h1 small{font-size:.7rem;background:#2c7da0;padding:4px 12px;border-radius:40px;font-weight:400}
+    .header p{font-size:.8rem;opacity:.85;margin-top:6px}
+    .sync-card{background:#fff;border-radius:24px;padding:16px;margin-bottom:20px;border:1px solid #e2e8f0}
+    .sync-title{font-weight:600;font-size:.85rem;color:#1e4a6b;margin-bottom:10px}
+    .sync-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+    .sync-row input{flex:1;padding:12px;border:1px solid #cbd5e1;border-radius:40px;font-size:.8rem;background:#f8fafc}
+    .btn-sm{padding:10px 18px;border-radius:40px;border:none;font-weight:600;font-size:.75rem;cursor:pointer}
+    .btn-save{background:#475569;color:#fff}
+    .btn-down{background:#2b6e3c;color:#fff}
+    .btn-up{background:#b45309;color:#fff}
+    .sync-status{font-size:.7rem;color:#3b5e7a;margin-top:10px}
+    .sync-buttons{display:flex;gap:8px;flex-wrap:wrap}
+    .groups-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+    .group-card{background:#fff;border-radius:20px;padding:10px 6px;text-align:center;cursor:pointer;border:2px solid transparent}
+    .group-card.active{border-color:#2c7da0;background:#eef6fc}
+    .group-color{font-weight:700;font-size:.85rem}
+    .group-comp{font-size:.7rem;color:#4a6272;margin:4px 0}
+    .group-count{font-size:.75rem;font-weight:600;background:#e2e8f0;display:inline-block;padding:2px 8px;border-radius:30px}
+    .white-bg{background:#e9ecef}
+    .gray-bg{background:#5f6c70;color:#fff}
+    .black-bg{background:#1f2a2e;color:#fff}
+    .shops-panel{background:#fff;border-radius:28px;padding:18px;margin-bottom:24px}
+    .active-header{font-size:1.2rem;font-weight:700;text-align:center;padding:12px;border-radius:40px;margin-bottom:16px}
+    .shop-list{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+    .shop-card{background:#f8fafc;border-radius:60px;padding:8px 14px;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;border-left:5px solid}
+    .shop-number{font-weight:700;font-size:1rem}
+    .shop-reason{font-size:.7rem;color:#4a6272;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .edit-select{font-size:.7rem;padding:4px 8px;border-radius:30px;background:#fff;border:1px solid #cbd5e1}
+    .delete-btn{background:#ffe0e0;border:none;color:#b91c1c;font-weight:700;padding:4px 12px;border-radius:30px;cursor:pointer}
+    .empty-msg{text-align:center;color:#8ca3b9;padding:24px;font-style:italic}
+    .action-card{background:#fff;border-radius:24px;padding:18px;margin-bottom:18px}
+    .action-card h3{font-weight:600;font-size:1rem;margin-bottom:12px;color:#0f3b4f}
+    .check-group{display:flex;gap:10px;flex-wrap:wrap}
+    .check-group input{flex:2;padding:14px;border:1px solid #cbd5e1;border-radius:48px;font-size:1rem}
+    button{background:#2c7da0;border:none;padding:12px 22px;border-radius:48px;font-weight:600;color:#fff;cursor:pointer}
+    button:active{transform:scale(.97)}
+    .select-row{display:flex;flex-direction:column;gap:12px;margin:12px 0}
+    .select-row select,.select-row input{padding:14px;border-radius:48px;border:1px solid #cbd5e1;font-size:1rem;background:#fff}
+    .reason-section{margin-top:16px;border-top:1px solid #e2e8f0;padding-top:14px}
+    .reason-title{font-weight:600;font-size:.85rem;color:#1e4a6b;margin-bottom:12px}
+    .reason-scroll{display:flex;flex-wrap:wrap;gap:10px;max-height:280px;overflow-y:auto;padding:6px 2px}
+    .reason-chip{background:#f1f5f9;border:1px solid #cbd5e1;padding:12px 16px;border-radius:48px;font-size:.85rem;font-weight:500;cursor:pointer;white-space:nowrap}
+    .reason-chip.selected{background:#2c7da0;color:#fff;border-color:#2c7da0}
+    .check-result{margin-top:12px;background:#eef3fa;padding:12px;border-radius:20px;font-size:.85rem;border-left:4px solid #2c7da0}
+    footer{text-align:center;font-size:.65rem;color:#6b8ea8;margin-top:20px}
   </style>
 </head>
 <body>
@@ -330,7 +68,6 @@
     <p>Другий поверх, підвали, пандуси – вся логістика в кишені</p>
   </div>
 
-  <!-- Синхронізація -->
   <div class="sync-card">
     <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ (JSONBin.io)</div>
     <div class="sync-row">
@@ -345,16 +82,13 @@
     <div class="sync-status" id="syncStatus">⚙️ Введіть ключі</div>
   </div>
 
-  <!-- Сітка груп 3x3 -->
   <div class="groups-grid" id="groupsGrid"></div>
 
-  <!-- Список магазинів вибраної групи -->
   <div class="shops-panel" id="shopsPanel">
     <div id="activeHeader" class="active-header"></div>
     <div id="activeShopList" class="shop-list"></div>
   </div>
 
-  <!-- Перевірка магазину -->
   <div class="action-card">
     <h3>🔍 Перевірити магазин</h3>
     <div class="check-group">
@@ -364,7 +98,6 @@
     <div id="checkResult" class="check-result">👆 Введіть номер</div>
   </div>
 
-  <!-- Додавання магазину -->
   <div class="action-card">
     <h3>➕ Додати магазин</h3>
     <div class="select-row">
@@ -384,223 +117,166 @@
       <div class="reason-title">📌 Спосіб доставки / причина (коротко):</div>
       <div class="reason-scroll" id="reasonGrid"></div>
     </div>
-    <button id="addShopBtn" style="width:100%; margin-top: 14px;">✅ Додати</button>
+    <button id="addShopBtn" style="width:100%; margin-top:14px;">✅ Додати</button>
   </div>
 
   <footer>⚡ Зміни синхронізуйте через хмару. Дані зберігаються на телефоні.</footer>
 </div>
 
 <script>
-  // ----------------------------- ДАНІ -----------------------------
-  let shops = {
-    "білі": { "легко": [], "ускладнено": [], "тяжко": [] },
-    "сірі": { "легко": [], "ускладнено": [], "тяжко": [] },
-    "чорні": { "легко": [], "ускладнено": [], "тяжко": [] }
-  };
-  let shopReasons = {};
-  let config = { apiKey: "", binId: "" };
-  let selectedReasonKey = "";
-  let currentGroup = "білі_легко";
+  let shops={"білі":{"легко":[],"ускладнено":[],"тяжко":[]},"сірі":{"легко":[],"ускладнено":[],"тяжко":[]},"чорні":{"легко":[],"ускладнено":[],"тяжко":[]}};
+  let shopReasons={};
+  let config={apiKey:"",binId:""};
+  let selectedReasonKey="";
+  let currentGroup="білі_легко";
 
-  // ----------------------------- 44 ПРИЧИНИ -----------------------------
-  const reasonsList = [
-    { key: "рокля_підсобка",        title: "🛒 Рокля до підсобки" },
-    { key: "рокля_далеко",          title: "🚶 Рокля + далеко" },
-    { key: "рокля_гора",            title: "⛰️ Рокля + гора" },
-    { key: "рокля_вузько",          title: "🚫 Рокля + вузько" },
-    { key: "рокля_поріг",           title: "📏 Рокля + поріг" },
-    { key: "розрив_перед_весь",     title: "📦 Розрив перед → весь магазин" },
-    { key: "розрив_перед_коротко",  title: "📦 Розрив перед → коротко" },
-    { key: "розрив_всередині_весь", title: "🏪 Розрив всередині → весь магазин" },
-    { key: "розрив_всередині_коротко", title: "🏪 Розрив всередині → коротко" },
-    { key: "розрив_біля_підсобки",  title: "🚪 Розрив біля підсобки" },
-    { key: "розбір_вулиця",         title: "🌧️ Розбір на вулиці" },
-    { key: "розбір_рампа",          title: "🚛 Розбір на рампі" },
-    { key: "вузький_двір",          title: "🚫 Вузький двір" },
-    { key: "вузька_рампа",          title: "🚫 Вузька рампа" },
-    { key: "немає_пандуса",         title: "🚫 Немає пандуса" },
-    { key: "парковка_далеко",       title: "🚶 Парковка далеко" },
-    { key: "чорний_хід",            title: "🚪 Чорний хід" },
-    { key: "через_вітрину",         title: "🪟 Через вітрину" },
-    { key: "через_поріг",           title: "📏 Через поріг" },
-    { key: "сходи_вверх_мало",      title: "📈 Сходи вверх (1-3)" },
-    { key: "сходи_вниз_мало",       title: "📉 Сходи вниз (1-3)" },
-    { key: "сходи_круті",           title: "📈📈 Круті сходи" },
-    { key: "другий_поверх_руками",  title: "🏢 2й поверх → руками" },
-    { key: "другий_поверх_розрив_знизу", title: "🏢 2й поверх + розрив внизу" },
-    { key: "другий_поверх_розрив_зверху", title: "🏢 2й поверх + розрив зверху" },
-    { key: "підвал_один",           title: "⬇️ Підвал 1 проліт" },
-    { key: "підвал_глибокий",       title: "⬇️⬇️ Глибокий підвал" },
-    { key: "підвал_вузько",         title: "⬇️🚫 Підвал + вузько" },
-    { key: "підвал_далеко",         title: "⬇️🚶 Підвал + далеко" },
-    { key: "ліфт_розбір_внизу_далеко", title: "🛗 Розбір внизу → ліфт → далеко" },
-    { key: "ліфт_розбір_внизу_коротко", title: "🛗 Розбір внизу → ліфт → коротко" },
-    { key: "ліфт_палети_розбір_далеко", title: "🛗 Палети на ліфт → розбір → далеко" },
-    { key: "ліфт_палети_розбір_коротко", title: "🛗 Палети на ліфт → розбір → коротко" },
-    { key: "ліфт_палети_тягнути_далеко", title: "🛗 Палети на ліфт → тягнути далеко" },
-    { key: "ліфт_палети_тягнути_коротко", title: "🛗 Палети на ліфт → тягнути коротко" },
-    { key: "ліфт_палети_рокля",     title: "🛗 Палети на ліфт → рокля" },
-    { key: "ліфт_замалий",          title: "🛗📦 Ліфт замалий" },
-    { key: "немає_вантажного_ліфта",title: "🛗🚫 Немає вантажного ліфта" },
-    { key: "підсобка_кінець_коридору", title: "🚶 Підсобка в кінці коридору" },
-    { key: "підсобка_2й_поверх_окремо", title: "🏢 Підсобка на 2 поверсі" },
-    { key: "підсобка_далеко_2й_поверх", title: "🏢 Підсобка далеко + 2й поверх" },
-    { key: "розрив_сходи",          title: "📦+📈 Розрив + сходи" },
-    { key: "вузький_двір_підвал",   title: "🚫+⬇️ Вузький двір + підвал" },
-    { key: "ліфт_комбо",            title: "🏢+🛗+🚶 2й поверх+ліфт+далеко" }
+  const reasonsList=[
+    {key:"рокля_підсобка",title:"🛒 Рокля до підсобки"},
+    {key:"рокля_далеко",title:"🚶 Рокля + далеко"},
+    {key:"рокля_гора",title:"⛰️ Рокля + гора"},
+    {key:"рокля_вузько",title:"🚫 Рокля + вузько"},
+    {key:"рокля_поріг",title:"📏 Рокля + поріг"},
+    {key:"розрив_перед_весь",title:"📦 Розрив перед → весь магазин"},
+    {key:"розрив_перед_коротко",title:"📦 Розрив перед → коротко"},
+    {key:"розрив_всередині_весь",title:"🏪 Розрив всередині → весь магазин"},
+    {key:"розрив_всередині_коротко",title:"🏪 Розрив всередині → коротко"},
+    {key:"розрив_біля_підсобки",title:"🚪 Розрив біля підсобки"},
+    {key:"розбір_вулиця",title:"🌧️ Розбір на вулиці"},
+    {key:"розбір_рампа",title:"🚛 Розбір на рампі"},
+    {key:"вузький_двір",title:"🚫 Вузький двір"},
+    {key:"вузька_рампа",title:"🚫 Вузька рампа"},
+    {key:"немає_пандуса",title:"🚫 Немає пандуса"},
+    {key:"парковка_далеко",title:"🚶 Парковка далеко"},
+    {key:"чорний_хід",title:"🚪 Чорний хід"},
+    {key:"через_вітрину",title:"🪟 Через вітрину"},
+    {key:"через_поріг",title:"📏 Через поріг"},
+    {key:"сходи_вверх_мало",title:"📈 Сходи вверх (1-3)"},
+    {key:"сходи_вниз_мало",title:"📉 Сходи вниз (1-3)"},
+    {key:"сходи_круті",title:"📈📈 Круті сходи"},
+    {key:"другий_поверх_руками",title:"🏢 2й поверх → руками"},
+    {key:"другий_поверх_розрив_знизу",title:"🏢 2й поверх + розрив внизу"},
+    {key:"другий_поверх_розрив_зверху",title:"🏢 2й поверх + розрив зверху"},
+    {key:"підвал_один",title:"⬇️ Підвал 1 проліт"},
+    {key:"підвал_глибокий",title:"⬇️⬇️ Глибокий підвал"},
+    {key:"підвал_вузько",title:"⬇️🚫 Підвал + вузько"},
+    {key:"підвал_далеко",title:"⬇️🚶 Підвал + далеко"},
+    {key:"ліфт_розбір_внизу_далеко",title:"🛗 Розбір внизу → ліфт → далеко"},
+    {key:"ліфт_розбір_внизу_коротко",title:"🛗 Розбір внизу → ліфт → коротко"},
+    {key:"ліфт_палети_розбір_далеко",title:"🛗 Палети на ліфт → розбір → далеко"},
+    {key:"ліфт_палети_розбір_коротко",title:"🛗 Палети на ліфт → розбір → коротко"},
+    {key:"ліфт_палети_тягнути_далеко",title:"🛗 Палети на ліфт → тягнути далеко"},
+    {key:"ліфт_палети_тягнути_коротко",title:"🛗 Палети на ліфт → тягнути коротко"},
+    {key:"ліфт_палети_рокля",title:"🛗 Палети на ліфт → рокля"},
+    {key:"ліфт_замалий",title:"🛗📦 Ліфт замалий"},
+    {key:"немає_вантажного_ліфта",title:"🛗🚫 Немає вантажного ліфта"},
+    {key:"підсобка_кінець_коридору",title:"🚶 Підсобка в кінці коридору"},
+    {key:"підсобка_2й_поверх_окремо",title:"🏢 Підсобка на 2 поверсі"},
+    {key:"підсобка_далеко_2й_поверх",title:"🏢 Підсобка далеко + 2й поверх"},
+    {key:"розрив_сходи",title:"📦+📈 Розрив + сходи"},
+    {key:"вузький_двір_підвал",title:"🚫+⬇️ Вузький двір + підвал"},
+    {key:"ліфт_комбо",title:"🏢+🛗+🚶 2й поверх+ліфт+далеко"}
   ];
 
-  // ----------------------------- ЛОКАЛЬНЕ ЗБЕРЕЖЕННЯ -----------------------------
-  function saveToLocal() {
-    localStorage.setItem("shops", JSON.stringify(shops));
-    localStorage.setItem("reasons", JSON.stringify(shopReasons));
+  function saveToLocal(){localStorage.setItem("shops",JSON.stringify(shops));localStorage.setItem("reasons",JSON.stringify(shopReasons));}
+  function loadFromLocal(){
+    let s=localStorage.getItem("shops");if(s)try{shops=JSON.parse(s);}catch(e){}
+    let r=localStorage.getItem("reasons");if(r)try{shopReasons=JSON.parse(r);}catch(e){}
+    renderGroupsGrid();renderActiveGroup();
   }
-  function loadFromLocal() {
-    const s = localStorage.getItem("shops");
-    if (s) try { shops = JSON.parse(s); } catch(e) {}
-    const r = localStorage.getItem("reasons");
-    if (r) try { shopReasons = JSON.parse(r); } catch(e) {}
-    renderGroupsGrid();
-    renderActiveGroup();
+  function loadConfig(){
+    let s=localStorage.getItem("sync_cfg");if(s)try{config=JSON.parse(s);document.getElementById("apiKeyInput").value=config.apiKey||"";document.getElementById("binIdInput").value=config.binId||"";}catch(e){}
   }
-
-  function loadConfig() {
-    const saved = localStorage.getItem("sync_cfg");
-    if (saved) try { config = JSON.parse(saved); document.getElementById("apiKeyInput").value = config.apiKey || ""; document.getElementById("binIdInput").value = config.binId || ""; } catch(e) {}
+  function saveConfig(){
+    config.apiKey=document.getElementById("apiKeyInput").value.trim();
+    config.binId=document.getElementById("binIdInput").value.trim();
+    localStorage.setItem("sync_cfg",JSON.stringify(config));
+    document.getElementById("syncStatus").innerHTML="✅ Збережено!";
   }
-  function saveConfig() {
-    config.apiKey = document.getElementById("apiKeyInput").value.trim();
-    config.binId = document.getElementById("binIdInput").value.trim();
-    localStorage.setItem("sync_cfg", JSON.stringify(config));
-    document.getElementById("syncStatus").innerHTML = "✅ Збережено!";
+  async function download(){
+    if(!config.apiKey||!config.binId){document.getElementById("syncStatus").innerHTML="⚠️ Збережіть ключі!";return;}
+    document.getElementById("syncStatus").innerHTML="📥 Завантаження...";
+    try{
+      let res=await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`,{headers:{"X-Master-Key":config.apiKey}});
+      if(res.ok){
+        let data=await res.json();
+        if(data.record&&data.record.shops){
+          shops=data.record.shops;shopReasons=data.record.reasons||{};
+          saveToLocal();renderGroupsGrid();renderActiveGroup();
+          document.getElementById("syncStatus").innerHTML="✅ Завантажено!";
+        }else document.getElementById("syncStatus").innerHTML="⚠️ Хмара порожня";
+      }else document.getElementById("syncStatus").innerHTML="❌ Помилка!";
+    }catch(e){document.getElementById("syncStatus").innerHTML="❌ Немає інтернету";}
   }
-
-  // ----------------------------- СИНХРОНІЗАЦІЯ -----------------------------
-  async function download() {
-    if (!config.apiKey || !config.binId) { document.getElementById("syncStatus").innerHTML = "⚠️ Збережіть ключі!"; return; }
-    document.getElementById("syncStatus").innerHTML = "📥 Завантаження...";
-    try {
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, { headers: { "X-Master-Key": config.apiKey } });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.record && data.record.shops) {
-          shops = data.record.shops;
-          shopReasons = data.record.reasons || {};
-          saveToLocal();
-          renderGroupsGrid();
-          renderActiveGroup();
-          document.getElementById("syncStatus").innerHTML = "✅ Завантажено!";
-        } else document.getElementById("syncStatus").innerHTML = "⚠️ Хмара порожня";
-      } else document.getElementById("syncStatus").innerHTML = "❌ Помилка!";
-    } catch(e) { document.getElementById("syncStatus").innerHTML = "❌ Немає інтернету"; }
+  async function upload(){
+    if(!config.apiKey||!config.binId){document.getElementById("syncStatus").innerHTML="⚠️ Збережіть ключі!";return;}
+    document.getElementById("syncStatus").innerHTML="📤 Відправка...";
+    try{
+      let data={shops:shops,reasons:shopReasons};
+      let res=await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":config.apiKey},body:JSON.stringify(data)});
+      if(res.ok)document.getElementById("syncStatus").innerHTML="✅ Відправлено!";
+      else document.getElementById("syncStatus").innerHTML="❌ Помилка!";
+    }catch(e){document.getElementById("syncStatus").innerHTML="❌ Немає інтернету";}
   }
-  async function upload() {
-    if (!config.apiKey || !config.binId) { document.getElementById("syncStatus").innerHTML = "⚠️ Збережіть ключі!"; return; }
-    document.getElementById("syncStatus").innerHTML = "📤 Відправка...";
-    try {
-      const data = { shops, reasons: shopReasons };
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "X-Master-Key": config.apiKey },
-        body: JSON.stringify(data)
-      });
-      if (res.ok) document.getElementById("syncStatus").innerHTML = "✅ Відправлено!";
-      else document.getElementById("syncStatus").innerHTML = "❌ Помилка!";
-    } catch(e) { document.getElementById("syncStatus").innerHTML = "❌ Немає інтернету"; }
-  }
-
-  // ----------------------------- РОБОТА З МАГАЗИНАМИ -----------------------------
-  function addShop(num, color, comp, reasonKey) {
-    const n = Number(num);
-    if (isNaN(n)) return false;
-    for (let c of ["білі","сірі","чорні"]) for (let cp of ["легко","ускладнено","тяжко"]) 
-      shops[c][cp] = shops[c][cp].filter(i => i !== n);
-    if (!shops[color][comp]) shops[color][comp] = [];
-    shops[color][comp].push(n);
-    shops[color][comp].sort((a,b)=>a-b);
-    if (reasonKey) shopReasons[n] = reasonKey;
-    saveToLocal();
-    renderGroupsGrid();
-    renderActiveGroup();
-    document.getElementById("syncStatus").innerHTML = "✅ Збережено! Натисніть 'Відправити'";
+  function addShop(num,color,comp,reasonKey){
+    let n=Number(num);if(isNaN(n))return false;
+    for(let c of["білі","сірі","чорні"])for(let cp of["легко","ускладнено","тяжко"])shops[c][cp]=shops[c][cp].filter(i=>i!==n);
+    if(!shops[color][comp])shops[color][comp]=[];
+    shops[color][comp].push(n);shops[color][comp].sort((a,b)=>a-b);
+    if(reasonKey)shopReasons[n]=reasonKey;
+    saveToLocal();renderGroupsGrid();renderActiveGroup();
+    document.getElementById("syncStatus").innerHTML="✅ Збережено! Натисніть 'Відправити'";
     return true;
   }
-  function removeShop(n, color, comp) {
-    shops[color][comp] = shops[color][comp].filter(i => i !== n);
+  function removeShop(n,color,comp){
+    shops[color][comp]=shops[color][comp].filter(i=>i!==n);
     delete shopReasons[n];
-    saveToLocal();
-    renderGroupsGrid();
-    renderActiveGroup();
-    document.getElementById("syncStatus").innerHTML = "✅ Видалено! Відправте зміни";
+    saveToLocal();renderGroupsGrid();renderActiveGroup();
+    document.getElementById("syncStatus").innerHTML="✅ Видалено! Відправте зміни";
   }
-  function updateShop(shop, oldColor, oldComp, newColor, newComp) {
-    const reason = shopReasons[shop] || "";
-    shops[oldColor][oldComp] = shops[oldColor][oldComp].filter(i => i !== shop);
-    shops[newColor][newComp].push(shop);
-    shops[newColor][newComp].sort((a,b)=>a-b);
-    saveToLocal();
-    renderGroupsGrid();
-    renderActiveGroup();
-    document.getElementById("syncStatus").innerHTML = "✅ Змінено! Відправте оновлення";
+  function updateShop(shop,oldColor,oldComp,newColor,newComp){
+    let reason=shopReasons[shop]||"";
+    shops[oldColor][oldComp]=shops[oldColor][oldComp].filter(i=>i!==shop);
+    shops[newColor][newComp].push(shop);shops[newColor][newComp].sort((a,b)=>a-b);
+    saveToLocal();renderGroupsGrid();renderActiveGroup();
+    document.getElementById("syncStatus").innerHTML="✅ Змінено! Відправте оновлення";
   }
-  function getReasonTitle(key) {
-    const r = reasonsList.find(r => r.key === key);
-    return r ? r.title : "";
-  }
-
-  // ----------------------------- ВІДОБРАЖЕННЯ -----------------------------
-  function renderGroupsGrid() {
-    const grid = document.getElementById("groupsGrid");
-    if (!grid) return;
-    const colors = ["білі", "сірі", "чорні"];
-    const comps = ["легко", "ускладнено", "тяжко"];
-    const colorNames = { "білі": "⚪ БІЛІ", "сірі": "⚫ СІРІ", "чорні": "⬛ ЧОРНІ" };
-    const compNames = { "легко": "Легко", "ускладнено": "Ускладнено", "тяжко": "Тяжко" };
-    let html = "";
-    for (let c of colors) {
-      for (let cp of comps) {
-        const key = `${c}_${cp}`;
-        const count = shops[c]?.[cp]?.length || 0;
-        const isActive = (currentGroup === key);
-        let bgClass = "";
-        if (c === "білі") bgClass = "white-bg";
-        else if (c === "сірі") bgClass = "gray-bg";
-        else bgClass = "black-bg";
-        html += `<div class="group-card ${isActive ? 'active' : ''}" data-group="${key}" style="background: ${c==='білі'?'#e9ecef':(c==='сірі'?'#5f6c70':'#1f2a2e')}; color: ${c==='білі'?'#1a2a3a':'white'}">
+  function getReasonTitle(key){let r=reasonsList.find(r=>r.key===key);return r?r.title:"";}
+  function renderGroupsGrid(){
+    let grid=document.getElementById("groupsGrid");if(!grid)return;
+    let colors=["білі","сірі","чорні"],comps=["легко","ускладнено","тяжко"];
+    let colorNames={"білі":"⚪ БІЛІ","сірі":"⚫ СІРІ","чорні":"⬛ ЧОРНІ"};
+    let compNames={"легко":"Легко","ускладнено":"Ускладнено","тяжко":"Тяжко"};
+    let html="";
+    for(let c of colors){
+      for(let cp of comps){
+        let key=c+"_"+cp;
+        let count=shops[c]?.[cp]?.length||0;
+        let isActive=(currentGroup===key);
+        html+=`<div class="group-card ${isActive?'active':''}" data-group="${key}" style="background:${c==='білі'?'#e9ecef':(c==='сірі'?'#5f6c70':'#1f2a2e')};color:${c==='білі'?'#1a2a3a':'white'}">
           <div class="group-color">${colorNames[c]}</div>
           <div class="group-comp">${compNames[cp]}</div>
           <div class="group-count">${count}</div>
         </div>`;
       }
     }
-    grid.innerHTML = html;
-    document.querySelectorAll(".group-card").forEach(card => {
-      card.addEventListener("click", () => {
-        currentGroup = card.dataset.group;
-        renderGroupsGrid();
-        renderActiveGroup();
-      });
-    });
+    grid.innerHTML=html;
+    document.querySelectorAll(".group-card").forEach(card=>{card.addEventListener("click",()=>{currentGroup=card.dataset.group;renderGroupsGrid();renderActiveGroup();});});
   }
-
-  function renderActiveGroup() {
-    const [color, comp] = currentGroup.split("_");
-    const items = shops[color]?.[comp] || [];
-    const headerDiv = document.getElementById("activeHeader");
-    const listDiv = document.getElementById("activeShopList");
-    let bgColor = color === "білі" ? "#e9ecef" : (color === "сірі" ? "#5f6c70" : "#1f2a2e");
-    let textColor = color === "білі" ? "#1a2a3a" : "white";
-    headerDiv.innerHTML = `<div style="background: ${bgColor}; color: ${textColor}; padding: 12px; border-radius: 40px; font-weight: bold;">${color.toUpperCase()} / ${comp === "легко" ? "🟢 Легко" : (comp === "ускладнено" ? "⚠️ Ускладнено" : "⛰️ Тяжко")}</div>`;
-    if (items.length === 0) {
-      listDiv.innerHTML = `<div class="empty-msg">✖️ Немає магазинів у цій групі</div>`;
-      return;
-    }
-    let html = "";
-    for (let shop of items) {
-      const reason = getReasonTitle(shopReasons[shop]);
-      html += `<div class="shop-card" style="border-left-color: ${comp === "легко" ? "#48a848" : (comp === "ускладнено" ? "#e98a2e" : "#bc3f31")}">
+  function renderActiveGroup(){
+    let [color,comp]=currentGroup.split("_");
+    let items=shops[color]?.[comp]||[];
+    let headerDiv=document.getElementById("activeHeader");
+    let listDiv=document.getElementById("activeShopList");
+    let bgColor=color==="білі"?"#e9ecef":(color==="сірі"?"#5f6c70":"#1f2a2e");
+    let textColor=color==="білі"?"#1a2a3a":"white";
+    headerDiv.innerHTML=`<div style="background:${bgColor};color:${textColor};padding:12px;border-radius:40px;font-weight:bold;">${color.toUpperCase()} / ${comp==="легко"?"🟢 Легко":(comp==="ускладнено"?"⚠️ Ускладнено":"⛰️ Тяжко")}</div>`;
+    if(items.length===0){listDiv.innerHTML=`<div class="empty-msg">✖️ Немає магазинів у цій групі</div>`;return;}
+    let html="";
+    for(let shop of items){
+      let reason=getReasonTitle(shopReasons[shop]);
+      html+=`<div class="shop-card" style="border-left-color:${comp==="легко"?"#48a848":(comp==="ускладнено"?"#e98a2e":"#bc3f31")}">
         <span class="shop-number">${shop}</span>
-        ${reason ? `<span class="shop-reason">📌 ${reason}</span>` : ''}
+        ${reason?`<span class="shop-reason">📌 ${reason}</span>`:''}
         <select class="edit-select" data-shop="${shop}" data-old-color="${color}" data-old-comp="${comp}">
           <option value="" disabled>🔄 змінити</option>
           <option value="білі_легко">⚪ легко</option><option value="білі_ускладнено">⚪ ускладнено</option><option value="білі_тяжко">⚪ тяжко</option>
@@ -610,91 +286,68 @@
         <button class="delete-btn" data-shop="${shop}" data-color="${color}" data-comp="${comp}">✖</button>
       </div>`;
     }
-    listDiv.innerHTML = html;
-    document.querySelectorAll('.edit-select').forEach(sel => {
-      sel.onchange = () => {
-        let shop = parseInt(sel.dataset.shop);
-        let oldColor = sel.dataset.oldColor;
-        let oldComp = sel.dataset.oldComp;
-        let val = sel.value;
-        if (!val) return;
-        let [newColor, newComp] = val.split('_');
-        if (newColor === oldColor && newComp === oldComp) { sel.value = ""; return; }
-        updateShop(shop, oldColor, oldComp, newColor, newComp);
-      };
-    });
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.onclick = () => {
-        let shop = parseInt(btn.dataset.shop);
-        let color = btn.dataset.color;
-        let comp = btn.dataset.comp;
-        if (confirm(`Видалити магазин ${shop}?`)) removeShop(shop, color, comp);
-      };
-    });
+    listDiv.innerHTML=html;
+    document.querySelectorAll('.edit-select').forEach(sel=>{sel.onchange=()=>{
+      let shop=parseInt(sel.dataset.shop),oldColor=sel.dataset.oldColor,oldComp=sel.dataset.oldComp,val=sel.value;
+      if(!val)return;
+      let[newColor,newComp]=val.split('_');
+      if(newColor===oldColor&&newComp===oldComp){sel.value="";return;}
+      updateShop(shop,oldColor,oldComp,newColor,newComp);
+    }});
+    document.querySelectorAll('.delete-btn').forEach(btn=>{btn.onclick=()=>{
+      let shop=parseInt(btn.dataset.shop),color=btn.dataset.color,comp=btn.dataset.comp;
+      if(confirm(`Видалити магазин ${shop}?`))removeShop(shop,color,comp);
+    }});
   }
-
-  // ----------------------------- ДОДАТКОВІ ФУНКЦІЇ -----------------------------
-  function checkShop() {
-    let v = document.getElementById("checkShopInput").value.trim();
-    if (!v) { document.getElementById("checkResult").innerHTML = "⚠️ Введіть номер"; return; }
-    let num = Number(v);
-    if (isNaN(num)) { document.getElementById("checkResult").innerHTML = "❌ Помилка"; return; }
-    let found = null;
-    for (let c of ["білі","сірі","чорні"]) for (let cp of ["легко","ускладнено","тяжко"]) 
-      if (shops[c][cp].includes(num)) found = { color: c, comp: cp };
-    if (found) {
-      let reason = getReasonTitle(shopReasons[num]);
-      document.getElementById("checkResult").innerHTML = `<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color}, ${found.comp}${reason ? `, ${reason}` : ''}`;
-    } else document.getElementById("checkResult").innerHTML = `<strong>🏪 Магазин ${num}</strong><br>⚠️ Немає даних`;
+  function checkShop(){
+    let v=document.getElementById("checkShopInput").value.trim();
+    if(!v){document.getElementById("checkResult").innerHTML="⚠️ Введіть номер";return;}
+    let num=Number(v);if(isNaN(num)){document.getElementById("checkResult").innerHTML="❌ Помилка";return;}
+    let found=null;
+    for(let c of["білі","сірі","чорні"])for(let cp of["легко","ускладнено","тяжко"])if(shops[c][cp].includes(num))found={color:c,comp:cp};
+    if(found){
+      let reason=getReasonTitle(shopReasons[num]);
+      document.getElementById("checkResult").innerHTML=`<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color}, ${found.comp}${reason?`, ${reason}`:''}`;
+    }else document.getElementById("checkResult").innerHTML=`<strong>🏪 Магазин ${num}</strong><br>⚠️ Немає даних`;
   }
-  function addFromUI() {
-    let num = document.getElementById("newShopNumber").value.trim();
-    if (!num) { alert("Введіть номер"); return; }
-    let color = document.getElementById("newShopColor").value;
-    let comp = document.getElementById("newShopComplexity").value;
-    addShop(Number(num), color, comp, selectedReasonKey);
-    document.getElementById("newShopNumber").value = "";
+  function addFromUI(){
+    let num=document.getElementById("newShopNumber").value.trim();
+    if(!num){alert("Введіть номер");return;}
+    addShop(Number(num),document.getElementById("newShopColor").value,document.getElementById("newShopComplexity").value,selectedReasonKey);
+    document.getElementById("newShopNumber").value="";
   }
-  function initReasonGrid() {
-    const grid = document.getElementById("reasonGrid");
-    if (!grid) return;
-    grid.innerHTML = "";
-    reasonsList.forEach(r => {
-      const chip = document.createElement("div");
-      chip.className = "reason-chip";
-      chip.textContent = r.title;
-      chip.dataset.key = r.key;
-      chip.onclick = () => {
-        document.querySelectorAll(".reason-chip").forEach(c => c.classList.remove("selected"));
+  function initReasonGrid(){
+    let grid=document.getElementById("reasonGrid");
+    if(!grid)return;
+    grid.innerHTML="";
+    reasonsList.forEach(r=>{
+      let chip=document.createElement("div");
+      chip.className="reason-chip";
+      chip.textContent=r.title;
+      chip.dataset.key=r.key;
+      chip.onclick=()=>{
+        document.querySelectorAll(".reason-chip").forEach(c=>c.classList.remove("selected"));
         chip.classList.add("selected");
-        selectedReasonKey = r.key;
+        selectedReasonKey=r.key;
       };
       grid.appendChild(chip);
     });
   }
-  function initDemo() {
-    let hasAny = false;
-    for (let c of ["білі","сірі","чорні"]) for (let cp of ["легко","ускладнено","тяжко"]) if (shops[c][cp].length) hasAny = true;
-    if (!hasAny) {
-      addShop(708, "чорні", "тяжко", "другий_поверх_руками");
-      addShop(39, "чорні", "легко", "рокля_підсобка");
-      addShop(3039, "білі", "легко", "рокля_підсобка");
+  function initDemo(){
+    let hasAny=false;
+    for(let c of["білі","сірі","чорні"])for(let cp of["легко","ускладнено","тяжко"])if(shops[c][cp].length)hasAny=true;
+    if(!hasAny){
+      addShop(708,"чорні","тяжко","другий_поверх_руками");
+      addShop(39,"чорні","легко","рокля_підсобка");
+      addShop(3039,"білі","легко","рокля_підсобка");
     }
   }
-
-  // Ініціалізація
-  loadFromLocal();
-  loadConfig();
-  initDemo();
-  initReasonGrid();
-  renderGroupsGrid();
-  renderActiveGroup();
-
-  document.getElementById("saveConfigBtn").onclick = saveConfig;
-  document.getElementById("syncDownBtn").onclick = download;
-  document.getElementById("syncUpBtn").onclick = upload;
-  document.getElementById("checkShopBtn").onclick = checkShop;
-  document.getElementById("addShopBtn").onclick = addFromUI;
+  loadFromLocal();loadConfig();initDemo();initReasonGrid();renderGroupsGrid();renderActiveGroup();
+  document.getElementById("saveConfigBtn").onclick=saveConfig;
+  document.getElementById("syncDownBtn").onclick=download;
+  document.getElementById("syncUpBtn").onclick=upload;
+  document.getElementById("checkShopBtn").onclick=checkShop;
+  document.getElementById("addShopBtn").onclick=addFromUI;
 </script>
 </body>
 </html>
