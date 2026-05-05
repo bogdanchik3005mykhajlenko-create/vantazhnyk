@@ -77,7 +77,6 @@
   <h1>📦 Вантажник-водій 🚛 <small>синхронізація</small></h1>
   <div class="sub">🏬 Магазини з другим поверхом, підвалами, пандусами</div>
 
-  <!-- Панель синхронізації -->
   <div class="sync-panel">
     <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
     <div class="sync-row">
@@ -142,7 +141,7 @@
 </div>
 
 <script>
-  // ========== ДАНІ ==========
+  // ========== ДАНІ (тільки числа!) ==========
   let shops = {
     "білі": { "легко": [], "потно": [], "тяжко": [] },
     "сірі": { "легко": [], "потно": [], "тяжко": [] },
@@ -152,7 +151,6 @@
   let config = { apiKey: "", binId: "" };
   let selectedReason = "";
 
-  // Завантаження збережених даних
   function loadAllData() {
     const savedConfig = localStorage.getItem("sync_config");
     if (savedConfig) {
@@ -243,35 +241,41 @@
     }
   }
   
-  // Основні функції
+  // Основні функції (працюють з числами)
   function addShop(num, color, comp, reason) {
     const n = Number(num);
     if (isNaN(n)) return;
+    
+    // Видаляємо з усіх місць
     for (let c of ["білі","сірі","чорні"]) {
       for (let cp of ["легко","потно","тяжко"]) {
         shops[c][cp] = shops[c][cp].filter(i => i !== n);
       }
     }
+    // Додаємо
     shops[color][comp].push(n);
     shops[color][comp].sort((a,b) => a-b);
+    
     if (reason) shopReasons[n] = reason;
     saveLocalData();
     renderGroups();
-    document.getElementById("syncStatus").innerHTML = "✅ Зміни збережено! Натисніть 'Відправити в хмару'";
+    document.getElementById("syncStatus").innerHTML = "✅ Збережено! Натисніть 'Відправити в хмару'";
   }
   
   function removeShop(n, color, comp) {
-    shops[color][comp] = shops[color][comp].filter(i => i !== n);
-    delete shopReasons[n];
+    const num = Number(n);
+    shops[color][comp] = shops[color][comp].filter(i => i !== num);
+    delete shopReasons[num];
     saveLocalData();
     renderGroups();
     document.getElementById("syncStatus").innerHTML = "✅ Видалено! Натисніть 'Відправити в хмару'";
   }
   
   function changeShop(shop, oldColor, oldComp, newColor, newComp) {
-    const reason = shopReasons[shop] || "";
-    shops[oldColor][oldComp] = shops[oldColor][oldComp].filter(i => i !== shop);
-    shops[newColor][newComp].push(shop);
+    const num = Number(shop);
+    const reason = shopReasons[num] || "";
+    shops[oldColor][oldComp] = shops[oldColor][oldComp].filter(i => i !== num);
+    shops[newColor][newComp].push(num);
     shops[newColor][newComp].sort((a,b) => a-b);
     saveLocalData();
     renderGroups();
@@ -340,16 +344,22 @@
     }
     container.innerHTML = html;
     
+    // Прив'язка подій
     document.querySelectorAll('.delete-shop').forEach(btn => {
       btn.onclick = () => {
-        if (confirm(`Видалити?`)) removeShop(parseInt(btn.dataset.shop), btn.dataset.color, btn.dataset.comp);
+        if (confirm(`Видалити магазин?`)) {
+          let shop = parseInt(btn.getAttribute('data-shop'));
+          let color = btn.getAttribute('data-color');
+          let comp = btn.getAttribute('data-comp');
+          removeShop(shop, color, comp);
+        }
       };
     });
     document.querySelectorAll('.edit-select').forEach(sel => {
       sel.onchange = () => {
-        let shop = parseInt(sel.dataset.shop);
-        let oldColor = sel.dataset.oldColor;
-        let oldComp = sel.dataset.oldComp;
+        let shop = parseInt(sel.getAttribute('data-shop'));
+        let oldColor = sel.getAttribute('data-old-color');
+        let oldComp = sel.getAttribute('data-old-comp');
         let val = sel.value;
         if (!val) return;
         let [newColor, newComp] = val.split('_');
@@ -373,7 +383,8 @@
     
     if (found) {
       let reason = getReasonText(shopReasons[num]);
-      document.getElementById("checkResult").innerHTML = `<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color==="білі"?"⚪":(found.color==="сірі"?"⚫":"⬛")} ${found.color.toUpperCase()}, ${found.comp}${reason ? `, ${reason}` : ''}`;
+      let colorTxt = found.color === "білі" ? "⚪ Білий" : (found.color === "сірі" ? "⚫ Сірий" : "⬛ Чорний");
+      document.getElementById("checkResult").innerHTML = `<strong>🏪 Магазин ${num}</strong><br>📌 ${colorTxt}, ${found.comp}${reason ? `, ${reason}` : ''}`;
     } else {
       document.getElementById("checkResult").innerHTML = `<strong>🏪 Магазин ${num}</strong><br>⚠️ Немає даних<br>➕ Додайте вручну`;
     }
@@ -393,7 +404,7 @@
       btn.onclick = () => {
         document.querySelectorAll('.reason-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
-        selectedReason = btn.dataset.reason;
+        selectedReason = btn.getAttribute('data-reason');
       };
     });
   }
@@ -402,7 +413,7 @@
     let hasAny = false;
     for (let c of ["білі","сірі","чорні"]) {
       for (let cp of ["легко","потно","тяжко"]) {
-        if (shops[c][cp].length) hasAny = true;
+        if (shops[c][cp].length > 0) hasAny = true;
       }
     }
     if (!hasAny) {
