@@ -146,15 +146,16 @@
     <div class="config-panel" id="configPanel">
       <div style="font-weight: bold; margin-bottom: 8px;">☁️ Налаштування синхронізації (JSONBin.io)</div>
       <input type="text" id="apiKeyInput" placeholder="API ключ JSONBin.io">
-      <input type="text" id="binIdInput" placeholder="ID Bin (зі схововища)">
+      <input type="text" id="binIdInput" placeholder="ID Bin (зі сховища)">
       <button id="saveConfigBtn">💾 Зберегти налаштування</button>
-      <button id="syncNowBtn">🔄 Синхронізувати зараз</button>
+      <button id="syncDownBtn">📥 Завантажити з хмари</button>
+      <button id="syncUpBtn">📤 Відправити в хмару</button>
       <div id="configStatus" style="font-size: 0.7rem; margin-top: 8px; color: #6c757d;"></div>
     </div>
     
     <div class="settings-panel">
       <span class="status-badge" id="onlineStatus">✅ online</span>
-      <span class="sync-status" id="syncStatus">📡 очікує налаштувань</span>
+      <span class="sync-status" id="syncStatus">📡 налаштуйте синхронізацію</span>
       <button id="logoutBtn">🚪 Вийти</button>
     </div>
 
@@ -178,7 +179,7 @@
     </div>
 
     <div class="groups-grid" id="groupsGrid"></div>
-    <footer>💡 Введіть API ключ та ID Bin один раз — і всі телефони синхронізуються!</footer>
+    <footer>💡 Новий користувач: спочатку натисніть "Завантажити з хмари" → потім "Зберегти налаштування"</footer>
   </div>
 </div>
 
@@ -189,7 +190,6 @@
   let shops = { "білі": { "легко": [], "потно": [], "тяжко": [] }, "сірі": { "легко": [], "потно": [], "тяжко": [] }, "чорні": { "легко": [], "потно": [], "тяжко": [] } };
   
   let config = { apiKey: "", binId: "" };
-  let syncTimeout = null;
   
   // ========== ЛОКАЛЬНЕ ЗБЕРЕЖЕННЯ ==========
   function loadConfig() {
@@ -215,17 +215,76 @@
     const saved = localStorage.getItem("shops_data");
     if (saved) {
       try {
-        shops = JSON.parse(saved);
+        const loaded = JSON.parse(saved);
+        // Перевіряємо чи структура правильна
+        if (loaded && loaded["білі"] && loaded["сірі"] && loaded["чорні"]) {
+          shops = loaded;
+        }
       } catch(e) {}
     }
+    renderGroups();
   }
   
   // ========== JSONBin.io СИНХРОНІЗАЦІЯ ==========
-  async function uploadToCloud() {
+  async function downloadFromCloud() {
     if (!config.apiKey || !config.binId) {
-      document.getElementById("syncStatus").innerHTML = "⚠️ налаштуйте синхронізацію";
+      document.getElementById("syncStatus").innerHTML = "⚠️ спочатку збережіть налаштування";
       return false;
     }
+    
+    document.getElementById("syncStatus").innerHTML = "📥 завантаження...";
+    
+    try {
+      const response = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
+        headers: { "X-Master-Key": config.apiKey }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.record && data.record.shops) {
+          shops = data.record.shops;
+          // Перевіряємо структуру
+          for (let c of ["білі", "сірі", "чорні"]) {
+            for (let cp of ["легко", "потно", "тяжко"]) {
+              if (!shops[c] || !shops[c][cp]) {
+                if (!shops[c]) shops[c] = {};
+                shops[c][cp] = shops[c][cp] || [];
+              }
+              shops[c][cp].sort((a,b) => a - b);
+            }
+          }
+          saveLocalData();
+          renderGroups();
+          document.getElementById("syncStatus").innerHTML = "✅ завантажено з хмари";
+          document.getElementById("configStatus").innerHTML = "✅ Дані завантажено!";
+          setTimeout(() => {
+            if (document.getElementById("syncStatus").innerHTML === "✅ завантажено з хмари") {
+              document.getElementById("syncStatus").innerHTML = "📡 синхронізовано";
+            }
+          }, 2000);
+          return true;
+        } else {
+          document.getElementById("syncStatus").innerHTML = "❌ немає даних в хмарі";
+          return false;
+        }
+      } else {
+        document.getElementById("syncStatus").innerHTML = "❌ помилка завантаження";
+        return false;
+      }
+    } catch(e) {
+      console.error("Помилка:", e);
+      document.getElementById("syncStatus").innerHTML = "❌ помилка";
+      return false;
+    }
+  }
+  
+  async function uploadToCloud() {
+    if (!config.apiKey || !config.binId) {
+      document.getElementById("syncStatus").innerHTML = "⚠️ спочатку збережіть налаштування";
+      return false;
+    }
+    
+    document.getElementById("syncStatus").innerHTML = "📤 відправка...";
     
     try {
       const data = { shops: shops, lastUpdated: new Date().toISOString() };
@@ -239,15 +298,19 @@
       });
       
       if (response.ok) {
-        document.getElementById("syncStatus").innerHTML = "✅ синхронізовано";
+        document.getElementById("syncStatus").innerHTML = "✅ відправлено в хмару";
+        document.getElementById("configStatus").innerHTML = "✅ Дані збережено в хмарі!";
         setTimeout(() => {
-          if (document.getElementById("syncStatus").innerHTML === "✅ синхронізовано") {
-            document.getElementById("syncStatus").innerHTML = "📡 дані в хмарі";
+          if (document.getElementById("syncStatus").innerHTML === "✅ відправлено в хмару") {
+            document.getElementById("syncStatus").innerHTML = "📡 синхронізовано";
           }
         }, 2000);
         return true;
       } else {
-        document.getElementById("syncStatus").innerHTML = "❌ помилка запису";
+        const error = await response.text();
+        console.error("Помилка:", error);
+        document.getElementById("syncStatus").innerHTML = "❌ помилка відправки";
+        document.getElementById("configStatus").innerHTML = "❌ Помилка: перевірте API ключ та ID Bin";
         return false;
       }
     } catch(e) {
@@ -255,52 +318,6 @@
       document.getElementById("syncStatus").innerHTML = "❌ помилка";
       return false;
     }
-  }
-  
-  async function downloadFromCloud() {
-    if (!config.apiKey || !config.binId) return false;
-    
-    try {
-      const response = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
-        headers: { "X-Master-Key": config.apiKey }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.record && data.record.shops) {
-          shops = data.record.shops;
-          // Переконаємося, що структура правильна
-          for (let c of ["білі", "сірі", "чорні"]) {
-            for (let cp of ["легко", "потно", "тяжко"]) {
-              if (!shops[c] || !shops[c][cp]) {
-                if (!shops[c]) shops[c] = {};
-                shops[c][cp] = shops[c][cp] || [];
-              }
-              shops[c][cp].sort((a,b) => a - b);
-            }
-          }
-          saveLocalData();
-          renderGroups();
-          document.getElementById("syncStatus").innerHTML = "✅ завантажено";
-          setTimeout(() => {
-            if (document.getElementById("syncStatus").innerHTML === "✅ завантажено") {
-              document.getElementById("syncStatus").innerHTML = "📡 синхронізовано";
-            }
-          }, 2000);
-          return true;
-        }
-      }
-    } catch(e) {
-      console.error("Помилка завантаження:", e);
-    }
-    return false;
-  }
-  
-  function scheduleSync() {
-    if (syncTimeout) clearTimeout(syncTimeout);
-    syncTimeout = setTimeout(() => {
-      uploadToCloud();
-    }, 2000);
   }
   
   // ========== ОСНОВНІ ФУНКЦІЇ ==========
@@ -316,14 +333,14 @@
     shops[color][comp].sort((a,b) => a - b);
     saveLocalData();
     renderGroups();
-    scheduleSync();
+    document.getElementById("syncStatus").innerHTML = "📡 зміни збережено, натисніть 'Відправити в хмару'";
   }
   
   function removeShop(n, color, comp) {
     shops[color][comp] = shops[color][comp].filter(i => i !== n);
     saveLocalData();
     renderGroups();
-    scheduleSync();
+    document.getElementById("syncStatus").innerHTML = "📡 зміни збережено, натисніть 'Відправити в хмару'";
   }
   
   function renderGroups() {
@@ -381,7 +398,7 @@
         shops[newColor][newComp].sort((a,b) => a - b);
         saveLocalData();
         renderGroups();
-        scheduleSync();
+        document.getElementById("syncStatus").innerHTML = "📡 зміни збережено, натисніть 'Відправити в хмару'";
       };
     });
   }
@@ -419,7 +436,6 @@
       document.getElementById("loginScreen").style.display = "none";
       document.getElementById("mainApp").style.display = "block";
       loadLocalData();
-      renderGroups();
       loadConfig();
       if (config.apiKey && config.binId) {
         downloadFromCloud();
@@ -435,24 +451,11 @@
     document.getElementById("mainApp").style.display = "none";
   }
   
-  function saveConfigAndSync() {
+  function saveConfigOnly() {
     config.apiKey = document.getElementById("apiKeyInput").value.trim();
     config.binId = document.getElementById("binIdInput").value.trim();
     saveConfig();
-    document.getElementById("configStatus").innerHTML = "✅ Налаштування збережено!";
-    if (config.apiKey && config.binId) {
-      uploadToCloud().then(() => {
-        document.getElementById("configStatus").innerHTML = "✅ Дані збережено в хмарі! Напарник може синхронізуватися.";
-      });
-    }
-  }
-  
-  function manualSync() {
-    if (config.apiKey && config.binId) {
-      downloadFromCloud();
-    } else {
-      alert("Спочатку збережіть API ключ та ID Bin!");
-    }
+    document.getElementById("configStatus").innerHTML = "✅ Налаштування збережено! Тепер натисніть 'Завантажити з хмари' або 'Відправити в хмару'.";
   }
   
   // ========== ІНІЦІАЛІЗАЦІЯ ==========
@@ -467,8 +470,9 @@
   
   document.getElementById("unlockBtn").onclick = handleLogin;
   document.getElementById("logoutBtn").onclick = handleLogout;
-  document.getElementById("saveConfigBtn").onclick = saveConfigAndSync;
-  document.getElementById("syncNowBtn").onclick = manualSync;
+  document.getElementById("saveConfigBtn").onclick = saveConfigOnly;
+  document.getElementById("syncDownBtn").onclick = downloadFromCloud;
+  document.getElementById("syncUpBtn").onclick = uploadToCloud;
   document.getElementById("checkShopBtn").onclick = checkShop;
   document.getElementById("addShopBtn").onclick = addFromMobile;
   document.getElementById("passwordInput").addEventListener("keypress", e => { if(e.key === "Enter") handleLogin(); });
@@ -477,27 +481,11 @@
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("mainApp").style.display = "block";
     loadLocalData();
-    renderGroups();
     loadConfig();
     if (config.apiKey && config.binId) {
       downloadFromCloud();
     }
   }
-  
-  // Демо-дані
-  (function initDemo() {
-    let hasAny = false;
-    for (let c of ["білі", "сірі", "чорні"]) {
-      for (let cp of ["легко", "потно", "тяжко"]) {
-        if (shops[c][cp].length) hasAny = true;
-      }
-    }
-    if (!hasAny) {
-      addShop(708, "чорні", "тяжко");
-      addShop(39, "чорні", "легко");
-      addShop(3039, "білі", "легко");
-    }
-  })();
 </script>
 </body>
 </html>
