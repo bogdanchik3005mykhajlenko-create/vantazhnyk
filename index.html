@@ -9,302 +9,62 @@
   <meta name="apple-mobile-web-app-title" content="Вантажник">
   <title>Вантажник-водій</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background: linear-gradient(135deg, #e2e9f0 0%, #cfdbe5 100%);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      padding: 12px;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      font-size: 1.6rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 4px;
-      color: #1a3a44;
-    }
-
-    h1 small {
-      font-size: 0.65rem;
-      background: #2c7da0;
-      color: white;
-      padding: 4px 10px;
-      border-radius: 40px;
-    }
-
-    .sub {
-      color: #2c5a6e;
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #aac7d6;
-      font-size: 0.8rem;
-    }
-
-    .action-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    .check-card, .add-card {
-      background: white;
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { background: linear-gradient(135deg, #e2e9f0 0%, #cfdbe5 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 12px; min-height: 100vh; }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { font-size: 1.6rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; color: #1a3a44; }
+    h1 small { font-size: 0.65rem; background: #2c7da0; color: white; padding: 4px 10px; border-radius: 40px; }
+    .sub { color: #2c5a6e; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #aac7d6; font-size: 0.8rem; }
+    
+    .sync-panel {
+      background: #e8f4f8;
       border-radius: 18px;
       padding: 14px 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+      border: 1px solid #b8d4e3;
     }
-
-    h3 {
-      margin-bottom: 10px;
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .check-input-group {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .check-input-group input {
-      flex: 2;
-      padding: 14px;
-      font-size: 1rem;
-      border: 2px solid #cbdae2;
-      border-radius: 30px;
-      outline: none;
-      font-size: 1.1rem;
-    }
-
-    button {
-      background: #2c7da0;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: white;
-      cursor: pointer;
-      min-height: 48px;
-      touch-action: manipulation;
-    }
-
-    button:active {
-      transform: scale(0.96);
-      background: #1f5e7c;
-    }
-
-    .check-result {
-      margin-top: 12px;
-      padding: 12px;
-      background: #eef3fa;
-      border-radius: 16px;
-      font-size: 0.9rem;
-      border-left: 4px solid #2c7da0;
-    }
-
-    .select-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin: 12px 0;
-    }
-
-    .select-group input, .select-group select {
-      padding: 14px;
-      border-radius: 30px;
-      border: 1px solid #bccbd4;
-      font-size: 1rem;
-      background: white;
-      width: 100%;
-    }
-
-    /* Додаткові опції складності */
-    .extra-options {
-      margin-top: 12px;
-      padding-top: 8px;
-      border-top: 1px solid #dee2e6;
-    }
-
-    .extra-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #2c5a6e;
-      margin-bottom: 8px;
-    }
-
-    .reason-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .reason-btn {
-      background: #e9ecef;
-      border: 1px solid #ced4da;
-      padding: 6px 10px;
-      border-radius: 30px;
-      font-size: 0.7rem;
-      cursor: pointer;
-      transition: 0.05s;
-    }
-
-    .reason-btn.selected {
-      background: #2c7da0;
-      color: white;
-      border-color: #2c7da0;
-    }
-
-    .groups-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      margin-top: 16px;
-    }
-
-    .group-col {
-      background: rgba(255,255,255,0.92);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .group-header {
-      padding: 14px;
-      font-size: 1.3rem;
-      font-weight: bold;
-      text-align: center;
-    }
-
+    .sync-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; }
+    .sync-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .sync-row input { flex: 2; padding: 10px 12px; border: 1px solid #cbdae2; border-radius: 30px; font-size: 0.8rem; background: white; }
+    .sync-row button, .sync-buttons button { padding: 8px 16px; font-size: 0.8rem; border-radius: 30px; border: none; font-weight: 600; cursor: pointer; }
+    .btn-save { background: #6c757d; color: white; }
+    .btn-down { background: #28a745; color: white; }
+    .btn-up { background: #ffc107; color: #333; }
+    .sync-status { font-size: 0.7rem; color: #2c5a6e; margin-top: 8px; }
+    .sync-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    
+    .action-panel { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+    .check-card, .add-card { background: white; border-radius: 18px; padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    h3 { margin-bottom: 10px; font-size: 1.1rem; }
+    .check-input-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .check-input-group input { flex: 2; padding: 14px; border: 2px solid #cbdae2; border-radius: 30px; font-size: 1rem; }
+    button { background: #2c7da0; border: none; padding: 12px 20px; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; min-height: 48px; }
+    button:active { transform: scale(0.96); }
+    .check-result { margin-top: 12px; padding: 12px; background: #eef3fa; border-radius: 16px; font-size: 0.9rem; border-left: 4px solid #2c7da0; }
+    .select-group { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+    .select-group input, .select-group select { padding: 14px; border-radius: 30px; border: 1px solid #bccbd4; font-size: 1rem; background: white; width: 100%; }
+    .extra-options { margin-top: 12px; padding-top: 8px; border-top: 1px solid #dee2e6; }
+    .extra-title { font-size: 0.75rem; font-weight: 600; color: #2c5a6e; margin-bottom: 8px; }
+    .reason-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+    .reason-btn { background: #e9ecef; border: 1px solid #ced4da; padding: 8px 12px; border-radius: 30px; font-size: 0.7rem; cursor: pointer; }
+    .reason-btn.selected { background: #2c7da0; color: white; border-color: #2c7da0; }
+    .groups-grid { display: flex; flex-direction: column; gap: 20px; margin-top: 16px; }
+    .group-col { background: rgba(255,255,255,0.92); border-radius: 20px; overflow: hidden; }
+    .group-header { padding: 14px; font-size: 1.3rem; font-weight: bold; text-align: center; }
     .white-header { background: #ced4da; color: #1e2a2e; }
     .gray-header { background: #5f6c70; color: white; }
     .black-header { background: #1f2a2e; color: white; }
-
-    .subgroup {
-      border-bottom: 1px solid #e2e8f0;
-      padding: 12px;
-    }
-
-    .subgroup-title {
-      font-weight: 700;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 0.95rem;
-    }
-
-    .shop-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      min-height: 50px;
-    }
-
-    .shop-item {
-      background: white;
-      border-radius: 40px;
-      padding: 6px 12px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-      border-left: 4px solid;
-      flex-wrap: wrap;
-    }
-
-    .shop-number {
-      font-weight: bold;
-      font-size: 0.95rem;
-    }
-
-    .shop-reason {
-      font-size: 0.65rem;
-      color: #6c757d;
-      font-weight: normal;
-      max-width: 150px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .edit-select {
-      font-size: 0.7rem;
-      padding: 4px 6px;
-      border-radius: 30px;
-      background: #f1f3f5;
-      border: 1px solid #adb5bd;
-      min-width: 90px;
-    }
-
-    .delete-shop {
-      background: #ffe0e0;
-      border: none;
-      color: #b91c1c;
-      font-weight: bold;
-      font-size: 1rem;
-      padding: 2px 8px;
-      border-radius: 30px;
-      min-height: auto;
-      cursor: pointer;
-    }
-
-    .empty-msg {
-      color: #8c9aa8;
-      font-style: italic;
-      font-size: 0.8rem;
-      padding: 6px 0;
-    }
-
-    footer {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 0.65rem;
-      color: #3a6b7c;
-      padding: 12px;
-    }
-
-    .install-guide {
-      background: #ffecd6;
-      padding: 12px;
-      border-radius: 16px;
-      margin-top: 16px;
-      font-size: 0.7rem;
-    }
-
-    .install-guide h4 {
-      margin-bottom: 8px;
-      color: #b45f06;
-    }
-
-    .install-guide ol {
-      margin-left: 20px;
-    }
-
-    .install-guide li {
-      margin: 4px 0;
-    }
-
+    .subgroup { border-bottom: 1px solid #e2e8f0; padding: 12px; }
+    .subgroup-title { font-weight: 700; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.95rem; }
+    .shop-list { display: flex; flex-wrap: wrap; gap: 8px; min-height: 50px; }
+    .shop-item { background: white; border-radius: 40px; padding: 6px 12px; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); border-left: 4px solid; flex-wrap: wrap; }
+    .shop-number { font-weight: bold; font-size: 0.95rem; }
+    .shop-reason { font-size: 0.65rem; color: #6c757d; font-weight: normal; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .edit-select { font-size: 0.7rem; padding: 4px 6px; border-radius: 30px; background: #f1f3f5; border: 1px solid #adb5bd; min-width: 90px; }
+    .delete-shop { background: #ffe0e0; border: none; color: #b91c1c; font-weight: bold; font-size: 1rem; padding: 2px 8px; border-radius: 30px; cursor: pointer; }
+    .empty-msg { color: #8c9aa8; font-style: italic; font-size: 0.8rem; padding: 6px 0; }
+    footer { margin-top: 20px; text-align: center; font-size: 0.65rem; color: #3a6b7c; padding: 12px; }
     @media (min-width: 700px) {
-      body { padding: 20px; }
       .action-panel { flex-direction: row; }
       .select-group { flex-direction: row; align-items: center; }
       .select-group input { flex: 2; }
@@ -314,19 +74,32 @@
 </head>
 <body>
 <div class="container">
-  <h1>📦 Вантажник-водій 🚛 <small>щоденник магазинів</small></h1>
+  <h1>📦 Вантажник-водій 🚛 <small>синхронізація</small></h1>
   <div class="sub">🏬 Магазини з другим поверхом, підвалами, пандусами</div>
+
+  <!-- Панель синхронізації -->
+  <div class="sync-panel">
+    <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
+    <div class="sync-row">
+      <input type="text" id="apiKeyInput" placeholder="API ключ JSONBin.io">
+      <input type="text" id="binIdInput" placeholder="ID Bin">
+      <button id="saveConfigBtn" class="btn-save">💾 Зберегти</button>
+    </div>
+    <div class="sync-buttons">
+      <button id="syncDownBtn" class="btn-down">📥 Завантажити з хмари</button>
+      <button id="syncUpBtn" class="btn-up">📤 Відправити в хмару</button>
+    </div>
+    <div class="sync-status" id="syncStatus">⚙️ Введіть ключі та натисніть "Зберегти"</div>
+  </div>
 
   <div class="action-panel">
     <div class="check-card">
       <h3>🔍 Перевірити магазин</h3>
       <div class="check-input-group">
-        <input type="number" id="checkShopInput" placeholder="Номер, наприклад 708">
+        <input type="number" id="checkShopInput" placeholder="Номер">
         <button id="checkShopBtn">Підказка</button>
       </div>
-      <div id="checkResult" class="check-result">
-        👆 Введіть номер — отримаєте підказку
-      </div>
+      <div id="checkResult" class="check-result">👆 Введіть номер</div>
     </div>
 
     <div class="add-card">
@@ -346,7 +119,7 @@
       </div>
       
       <div class="extra-options">
-        <div class="extra-title">📝 Конкретна причина (не обов'язково):</div>
+        <div class="extra-title">📝 Конкретна причина:</div>
         <div class="reason-buttons" id="reasonButtons">
           <div class="reason-btn" data-reason="рокля_до_підсобки">🛒 Рокля до підсобки</div>
           <div class="reason-btn" data-reason="розрив_перед_магазином">📦 Розрив перед магазином</div>
@@ -355,6 +128,7 @@
           <div class="reason-btn" data-reason="крута_гірка">⛰️ Крута гірка</div>
           <div class="reason-btn" data-reason="другий_поверх">🏢 Другий поверх</div>
           <div class="reason-btn" data-reason="глибокий_підвал">⬇️ Глибокий підвал</div>
+          <div class="reason-btn" data-reason="ліфт_корідор">🛗 Ліфт → коридор → розбір</div>
           <div class="reason-btn" data-reason="носити_руками">💪 Носити руками</div>
         </div>
       </div>
@@ -364,52 +138,147 @@
   </div>
 
   <div class="groups-grid" id="groupsGrid"></div>
-
-  <div class="install-guide" id="installGuide">
-    <h4>📲 Як встановити як додаток на телефон:</h4>
-    <div id="osSpecificGuide"></div>
-  </div>
-
-  <footer>💡 Торкніться номера → змінити категорію. Дані зберігаються автоматично.</footer>
+  <footer>💡 Новий користувач: Зберегти ключі → Завантажити з хмари</footer>
 </div>
 
 <script>
   // ========== ДАНІ ==========
-  // Структура: shops[color][complexity] = [{ number, reason }] або просто числа для сумісності
   let shops = {
     "білі": { "легко": [], "потно": [], "тяжко": [] },
     "сірі": { "легко": [], "потно": [], "тяжко": [] },
     "чорні": { "легко": [], "потно": [], "тяжко": [] }
   };
-  
-  // Додаткові описи магазинів
   let shopReasons = {};
+  let config = { apiKey: "", binId: "" };
+  let selectedReason = "";
 
-  function saveData() { 
-    const dataToSave = { shops, shopReasons };
-    localStorage.setItem("shop_app_data", JSON.stringify(dataToSave)); 
-  }
-  
-  function loadData() {
-    const saved = localStorage.getItem("shop_app_data");
-    if (saved) {
+  // Завантаження збережених даних
+  function loadAllData() {
+    const savedConfig = localStorage.getItem("sync_config");
+    if (savedConfig) {
       try {
-        const data = JSON.parse(saved);
+        config = JSON.parse(savedConfig);
+        document.getElementById("apiKeyInput").value = config.apiKey || "";
+        document.getElementById("binIdInput").value = config.binId || "";
+      } catch(e) {}
+    }
+    
+    const savedShops = localStorage.getItem("shop_app_data");
+    if (savedShops) {
+      try {
+        const data = JSON.parse(savedShops);
         if (data.shops) shops = data.shops;
         if (data.shopReasons) shopReasons = data.shopReasons;
-        // Конвертація старих даних (якщо були просто числа)
-        for (let c of ["білі","сірі","чорні"]) {
-          for (let cp of ["легко","потно","тяжко"]) {
-            if (shops[c][cp].length > 0 && typeof shops[c][cp][0] === 'number') {
-              shops[c][cp] = shops[c][cp].map(n => ({ number: n, reason: shopReasons[n] || "" }));
-            }
-          }
+      } catch(e) {}
+    }
+    renderGroups();
+  }
+  
+  function saveConfig() {
+    config.apiKey = document.getElementById("apiKeyInput").value.trim();
+    config.binId = document.getElementById("binIdInput").value.trim();
+    localStorage.setItem("sync_config", JSON.stringify(config));
+    document.getElementById("syncStatus").innerHTML = "✅ Налаштування збережено!";
+  }
+  
+  function saveLocalData() {
+    localStorage.setItem("shop_app_data", JSON.stringify({ shops, shopReasons }));
+  }
+  
+  // Синхронізація
+  async function downloadFromCloud() {
+    if (!config.apiKey || !config.binId) {
+      document.getElementById("syncStatus").innerHTML = "⚠️ Спочатку збережіть API ключ та ID Bin!";
+      return;
+    }
+    document.getElementById("syncStatus").innerHTML = "📥 Завантаження...";
+    
+    try {
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
+        headers: { "X-Master-Key": config.apiKey }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.record && data.record.shops) {
+          shops = data.record.shops;
+          shopReasons = data.record.shopReasons || {};
+          saveLocalData();
+          renderGroups();
+          document.getElementById("syncStatus").innerHTML = "✅ Дані завантажено!";
+        } else {
+          document.getElementById("syncStatus").innerHTML = "⚠️ Хмара порожня, спочатку відправте дані";
         }
-      } catch(e) { console.log(e); }
+      } else {
+        document.getElementById("syncStatus").innerHTML = "❌ Помилка! Перевірте ключі";
+      }
+    } catch(e) {
+      document.getElementById("syncStatus").innerHTML = "❌ Помилка інтернету";
     }
   }
-
-  function getReasonText(reasonKey) {
+  
+  async function uploadToCloud() {
+    if (!config.apiKey || !config.binId) {
+      document.getElementById("syncStatus").innerHTML = "⚠️ Спочатку збережіть API ключ та ID Bin!";
+      return;
+    }
+    document.getElementById("syncStatus").innerHTML = "📤 Відправка...";
+    
+    try {
+      const data = { shops, shopReasons, updated: new Date().toISOString() };
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": config.apiKey
+        },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        document.getElementById("syncStatus").innerHTML = "✅ Дані відправлено!";
+      } else {
+        document.getElementById("syncStatus").innerHTML = "❌ Помилка відправки!";
+      }
+    } catch(e) {
+      document.getElementById("syncStatus").innerHTML = "❌ Помилка інтернету";
+    }
+  }
+  
+  // Основні функції
+  function addShop(num, color, comp, reason) {
+    const n = Number(num);
+    if (isNaN(n)) return;
+    for (let c of ["білі","сірі","чорні"]) {
+      for (let cp of ["легко","потно","тяжко"]) {
+        shops[c][cp] = shops[c][cp].filter(i => i !== n);
+      }
+    }
+    shops[color][comp].push(n);
+    shops[color][comp].sort((a,b) => a-b);
+    if (reason) shopReasons[n] = reason;
+    saveLocalData();
+    renderGroups();
+    document.getElementById("syncStatus").innerHTML = "✅ Зміни збережено! Натисніть 'Відправити в хмару'";
+  }
+  
+  function removeShop(n, color, comp) {
+    shops[color][comp] = shops[color][comp].filter(i => i !== n);
+    delete shopReasons[n];
+    saveLocalData();
+    renderGroups();
+    document.getElementById("syncStatus").innerHTML = "✅ Видалено! Натисніть 'Відправити в хмару'";
+  }
+  
+  function changeShop(shop, oldColor, oldComp, newColor, newComp) {
+    const reason = shopReasons[shop] || "";
+    shops[oldColor][oldComp] = shops[oldColor][oldComp].filter(i => i !== shop);
+    shops[newColor][newComp].push(shop);
+    shops[newColor][newComp].sort((a,b) => a-b);
+    saveLocalData();
+    renderGroups();
+    document.getElementById("syncStatus").innerHTML = "✅ Змінено! Натисніть 'Відправити в хмару'";
+  }
+  
+  function getReasonText(key) {
     const reasons = {
       "рокля_до_підсобки": "рокля до підсобки",
       "розрив_перед_магазином": "розрив перед магазином",
@@ -418,61 +287,12 @@
       "крута_гірка": "крута гірка",
       "другий_поверх": "другий поверх",
       "глибокий_підвал": "глибокий підвал",
+      "ліфт_корідор": "ліфт → коридор → розбір",
       "носити_руками": "носити руками"
     };
-    return reasons[reasonKey] || "";
+    return reasons[key] || "";
   }
-
-  function addShop(num, targetColor, targetComp, reason) {
-    const n = Number(num);
-    if (isNaN(n)) return false;
-    
-    // Видалити з усіх місць
-    for (let c of ["білі","сірі","чорні"]) {
-      for (let cp of ["легко","потно","тяжко"]) {
-        shops[c][cp] = shops[c][cp].filter(item => item.number !== n);
-      }
-    }
-    
-    // Додати в нове місце
-    shops[targetColor][targetComp].push({ number: n, reason: reason || "" });
-    shops[targetColor][targetComp].sort((a,b) => a.number - b.number);
-    
-    // Зберегти причину
-    if (reason) shopReasons[n] = reason;
-    
-    saveData();
-    renderGroups();
-    return true;
-  }
-
-  function removeShop(num, color, comp) {
-    shops[color][comp] = shops[color][comp].filter(item => item.number !== Number(num));
-    delete shopReasons[Number(num)];
-    saveData();
-    renderGroups();
-  }
-
-  // Отримати опис для підказки
-  function getShopDescription(shopNum) {
-    // Шукаємо в shops
-    for (let c of ["білі","сірі","чорні"]) {
-      for (let cp of ["легко","потно","тяжко"]) {
-        const found = shops[c][cp].find(item => item.number === shopNum);
-        if (found) {
-          const reasonText = getReasonText(found.reason);
-          const colorText = c === "білі" ? "Білий" : (c === "сірі" ? "Сірий" : "Чорний");
-          const compText = cp === "легко" ? "Легко" : (cp === "потно" ? "Потно" : "Тяжко");
-          let desc = `${colorText}, ${compText}`;
-          if (reasonText) desc += `, ${reasonText}`;
-          return { desc, hasData: true, color: c, complexity: cp, reason: reasonText };
-        }
-      }
-    }
-    return { desc: "⚠️ Немає інформації про цей магазин. Додайте вручну.", hasData: false };
-  }
-
-  // ========== РЕНДЕР ==========
+  
   function renderGroups() {
     const container = document.getElementById("groupsGrid");
     if (!container) return;
@@ -492,25 +312,25 @@
         if (items.length === 0) {
           html += `<div class="empty-msg">✖️ немає магазинів</div>`;
         } else {
-          for (let item of items) {
-            let reasonText = getReasonText(item.reason);
+          for (let shop of items) {
+            let reasonText = getReasonText(shopReasons[shop]);
             let border = cp==="легко"?"#48a848":(cp==="потно"?"#e98a2e":"#bc3f31");
             html += `<div class="shop-item" style="border-left-color:${border}">
-              <span class="shop-number">${item.number}</span>
+              <span class="shop-number">${shop}</span>
               ${reasonText ? `<span class="shop-reason">📌 ${reasonText}</span>` : ''}
-              <select class="edit-select" data-shop="${item.number}" data-old-color="${g}" data-old-comp="${cp}">
+              <select class="edit-select" data-shop="${shop}" data-old-color="${g}" data-old-comp="${cp}">
                 <option value="" disabled>🔄 змінити</option>
-                <option value="білі_легко" ${g==="білі" && cp==="легко"?"selected":""}>⚪ білі/легко</option>
-                <option value="білі_потно" ${g==="білі" && cp==="потно"?"selected":""}>⚪ білі/потно</option>
-                <option value="білі_тяжко" ${g==="білі" && cp==="тяжко"?"selected":""}>⚪ білі/тяжко</option>
-                <option value="сірі_легко" ${g==="сірі" && cp==="легко"?"selected":""}>⚫ сірі/легко</option>
-                <option value="сірі_потно" ${g==="сірі" && cp==="потно"?"selected":""}>⚫ сірі/потно</option>
-                <option value="сірі_тяжко" ${g==="сірі" && cp==="тяжко"?"selected":""}>⚫ сірі/тяжко</option>
-                <option value="чорні_легко" ${g==="чорні" && cp==="легко"?"selected":""}>⬛ чорні/легко</option>
-                <option value="чорні_потно" ${g==="чорні" && cp==="потно"?"selected":""}>⬛ чорні/потно</option>
-                <option value="чорні_тяжко" ${g==="чорні" && cp==="тяжко"?"selected":""}>⬛ чорні/тяжко</option>
+                <option value="білі_легко">⚪ білі/легко</option>
+                <option value="білі_потно">⚪ білі/потно</option>
+                <option value="білі_тяжко">⚪ білі/тяжко</option>
+                <option value="сірі_легко">⚫ сірі/легко</option>
+                <option value="сірі_потно">⚫ сірі/потно</option>
+                <option value="сірі_тяжко">⚫ сірі/тяжко</option>
+                <option value="чорні_легко">⬛ чорні/легко</option>
+                <option value="чорні_потно">⬛ чорні/потно</option>
+                <option value="чорні_тяжко">⬛ чорні/тяжко</option>
               </select>
-              <button class="delete-shop" data-shop="${item.number}" data-color="${g}" data-comp="${cp}">✖</button>
+              <button class="delete-shop" data-shop="${shop}" data-color="${g}" data-comp="${cp}">✖</button>
             </div>`;
           }
         }
@@ -519,146 +339,88 @@
       html += `</div>`;
     }
     container.innerHTML = html;
-    attachEvents();
-  }
-
-  function attachEvents() {
+    
     document.querySelectorAll('.delete-shop').forEach(btn => {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        let shop = parseInt(btn.getAttribute('data-shop'));
-        let color = btn.getAttribute('data-color');
-        let comp = btn.getAttribute('data-comp');
-        if (confirm(`Видалити ${shop}?`)) removeShop(shop, color, comp);
+      btn.onclick = () => {
+        if (confirm(`Видалити?`)) removeShop(parseInt(btn.dataset.shop), btn.dataset.color, btn.dataset.comp);
       };
     });
     document.querySelectorAll('.edit-select').forEach(sel => {
       sel.onchange = () => {
-        let shop = parseInt(sel.getAttribute('data-shop'));
-        let oldColor = sel.getAttribute('data-old-color');
-        let oldComp = sel.getAttribute('data-old-comp');
+        let shop = parseInt(sel.dataset.shop);
+        let oldColor = sel.dataset.oldColor;
+        let oldComp = sel.dataset.oldComp;
         let val = sel.value;
         if (!val) return;
         let [newColor, newComp] = val.split('_');
-        if (newColor === oldColor && newComp === oldComp) { sel.value = ""; return; }
-        
-        // Знайти старий reason
-        let oldReason = "";
-        const oldItem = shops[oldColor][oldComp].find(item => item.number === shop);
-        if (oldItem) oldReason = oldItem.reason;
-        
-        // Видалити зі старого
-        shops[oldColor][oldComp] = shops[oldColor][oldComp].filter(item => item.number !== shop);
-        // Додати в нове
-        shops[newColor][newComp].push({ number: shop, reason: oldReason });
-        shops[newColor][newComp].sort((a,b) => a.number - b.number);
-        
-        saveData();
-        renderGroups();
+        changeShop(shop, oldColor, oldComp, newColor, newComp);
       };
     });
   }
-
-  // ========== ПЕРЕВІРКА ==========
+  
   function checkShop() {
-    let inp = document.getElementById("checkShopInput");
-    let v = inp.value.trim();
-    if (!v) { document.getElementById("checkResult").innerHTML = "⚠️ Введіть номер магазину"; return; }
+    let v = document.getElementById("checkShopInput").value.trim();
+    if (!v) { document.getElementById("checkResult").innerHTML = "⚠️ Введіть номер"; return; }
     let num = Number(v);
-    if (isNaN(num)) { document.getElementById("checkResult").innerHTML = "❌ Введіть коректний номер"; return; }
+    if (isNaN(num)) { document.getElementById("checkResult").innerHTML = "❌ Некоректний номер"; return; }
     
-    let info = getShopDescription(num);
-    let html = `<strong>🏪 Магазин ${num}</strong><br>`;
-    
-    if (info.hasData) {
-      html += `📌 ${info.desc}<br>`;
-      html += `<small>✅ Ви можете змінити категорію через випадаючий список біля номера</small>`;
-    } else {
-      html += `⚠️ ${info.desc}<br>`;
-      html += `<small>➕ Додайте магазин вручну вище, обравши категорію</small>`;
+    let found = null;
+    for (let c of ["білі","сірі","чорні"]) {
+      for (let cp of ["легко","потно","тяжко"]) {
+        if (shops[c][cp].includes(num)) found = { color: c, comp: cp };
+      }
     }
     
-    document.getElementById("checkResult").innerHTML = html;
+    if (found) {
+      let reason = getReasonText(shopReasons[num]);
+      document.getElementById("checkResult").innerHTML = `<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color==="білі"?"⚪":(found.color==="сірі"?"⚫":"⬛")} ${found.color.toUpperCase()}, ${found.comp}${reason ? `, ${reason}` : ''}`;
+    } else {
+      document.getElementById("checkResult").innerHTML = `<strong>🏪 Магазин ${num}</strong><br>⚠️ Немає даних<br>➕ Додайте вручну`;
+    }
   }
-
-  // Змінна для вибраної причини
-  let selectedReason = "";
-
+  
   function addFromMobile() {
     let num = document.getElementById("newShopNumber").value.trim();
-    if (!num) { alert("Введіть номер магазину"); return; }
+    if (!num) { alert("Введіть номер"); return; }
     let color = document.getElementById("newShopColor").value;
     let comp = document.getElementById("newShopComplexity").value;
     addShop(Number(num), color, comp, selectedReason);
     document.getElementById("newShopNumber").value = "";
-    // Не очищаємо вибрану причину, щоб можна було додати кілька однакових
   }
-
-  // ========== ІНСТРУКЦІЯ ==========
-  function showInstallGuide() {
-    const guideDiv = document.getElementById("osSpecificGuide");
-    const ua = navigator.userAgent.toLowerCase();
-    let isAndroid = /android/i.test(ua);
-    let isIOS = /iphone|ipad|ipod/i.test(ua);
-    
-    if (isAndroid) {
-      guideDiv.innerHTML = `
-        <ol>
-          <li>Натисніть <strong>три крапки (⋮)</strong> у правому верхньому куті браузера</li>
-          <li>Виберіть <strong>"Встановити додаток"</strong> або <strong>"На головний екран"</strong></li>
-          <li>Натисніть <strong>"Встановити"</strong></li>
-          <li>Іконка 🚛 з'явиться на робочому столі</li>
-        </ol>
-      `;
-    } else if (isIOS) {
-      guideDiv.innerHTML = `
-        <ol>
-          <li>Натисніть <strong>кнопку "Поділитися"</strong> (квадрат зі стрілкою)</li>
-          <li>Виберіть <strong>"На екран "Додому"</strong></li>
-          <li>Натисніть <strong>"Додати"</strong></li>
-        </ol>
-      `;
-    } else {
-      guideDiv.innerHTML = `<p>Відкрийте в Chrome (Android) або Safari (iPhone) → додайте на головний екран</p>`;
-    }
-  }
-
-  // ========== ІНІЦІАЛІЗАЦІЯ ВИБОРУ ПРИЧИН ==========
+  
   function initReasonButtons() {
     document.querySelectorAll('.reason-btn').forEach(btn => {
       btn.onclick = () => {
         document.querySelectorAll('.reason-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
-        selectedReason = btn.getAttribute('data-reason');
+        selectedReason = btn.dataset.reason;
       };
     });
   }
-
-  // ========== ДЕМО-ДАНІ ==========
+  
   function initDemo() {
     let hasAny = false;
-    for (let c of ["білі","сірі","чорні"]) 
-      for (let cp of ["легко","потно","тяжко"]) 
+    for (let c of ["білі","сірі","чорні"]) {
+      for (let cp of ["легко","потно","тяжко"]) {
         if (shops[c][cp].length) hasAny = true;
-    
+      }
+    }
     if (!hasAny) {
       addShop(708, "чорні", "тяжко", "другий_поверх");
       addShop(39, "чорні", "легко", "рокля_до_підсобки");
       addShop(3039, "білі", "легко", "рокля_до_підсобки");
     }
   }
-
-  // ========== СТАРТ ==========
-  loadData();
+  
+  loadAllData();
   initDemo();
-  renderGroups();
-  showInstallGuide();
   initReasonButtons();
   
+  document.getElementById("saveConfigBtn").onclick = saveConfig;
+  document.getElementById("syncDownBtn").onclick = downloadFromCloud;
+  document.getElementById("syncUpBtn").onclick = uploadToCloud;
   document.getElementById("checkShopBtn").onclick = checkShop;
   document.getElementById("addShopBtn").onclick = addFromMobile;
-  document.getElementById("checkShopInput").addEventListener("keypress", e => { if(e.key === "Enter") checkShop(); });
-  document.getElementById("newShopNumber").addEventListener("keypress", e => { if(e.key === "Enter") addFromMobile(); });
 </script>
 </body>
 </html>
