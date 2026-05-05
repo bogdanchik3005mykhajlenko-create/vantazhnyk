@@ -77,7 +77,7 @@
       padding: 14px 8px;
       text-align: center;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 0.9rem;
     }
     .white-header { background: #e3e8ee; color: #1e3a4a; border-bottom: 3px solid #2c7da0; }
     .gray-header { background: #5a6e78; color: white; border-bottom: 3px solid #2c3e42; }
@@ -127,7 +127,7 @@
     }
     .modal-header {
       padding: 18px 20px;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: bold;
       text-align: center;
       border-bottom: 1px solid #e9ecef;
@@ -150,14 +150,14 @@
     }
     .modal-shop-num {
       font-weight: bold;
-      font-size: 1.1rem;
+      font-size: 1rem;
       background: #2c7da0;
       color: white;
       padding: 4px 12px;
       border-radius: 30px;
     }
     .modal-shop-reason {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #6c757d;
       flex: 1;
     }
@@ -172,6 +172,42 @@
       padding: 32px;
       font-style: italic;
     }
+    .delete-shop-modal {
+      background: #ffe0e0;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 30px;
+      color: #b91c1c;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    /* Стилі для попередження про видалення */
+    .warning-modal .modal-header {
+      background: #fff0f0;
+      color: #b91c1c;
+    }
+    .deleted-list {
+      background: #fff0f0;
+      border-radius: 12px;
+      padding: 10px;
+      margin: 10px 0;
+      max-height: 150px;
+      overflow-y: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .deleted-list span {
+      display: inline-block;
+      background: #b91c1c;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+    }
+    .btn-cancel { background: #6c757d; color: white; margin: 0 20px 12px; }
+    .btn-proceed { background: #dc3545; color: white; margin: 0 20px 20px; }
     
     footer { margin-top: 20px; text-align: center; font-size: 0.65rem; color: #3a6b7c; padding: 12px; }
     @media (min-width: 700px) { .action-panel { flex-direction: row; } .select-group { flex-direction: row; } .select-group input { flex: 2; } .select-group select { flex: 1; } }
@@ -292,6 +328,7 @@
   let config = { apiKey: "", binId: "" };
   let selectedReason = "";
   
+  // ========== СИСТЕМА ВІДСТЕЖЕННЯ ВИДАЛЕНЬ ==========
   let lastSnapshotShopsSet = new Set();
   
   function getAllShopNumbers() {
@@ -319,10 +356,6 @@
     return deleted;
   }
   
-  function hasAnyDeletion() {
-    return getDeletedShops().length > 0;
-  }
-  
   function hasLocalChanges() {
     const currentSet = getAllShopNumbers();
     if (currentSet.size !== lastSnapshotShopsSet.size) return true;
@@ -331,26 +364,27 @@
     }
     return false;
   }
+  // ============================================
   
   function showDeletionWarning(deletedShops, onConfirm, onCancel) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header" style="background:#fff0f0; color:#b91c1c;">⚠️ ВИДАЛЕННЯ</div>
+      <div class="modal-content warning-modal">
+        <div class="modal-header">⚠️ ВАЖЛИВО!</div>
         <div class="modal-list">
-          <p style="margin-bottom:12px;">Були видалені магазини:</p>
-          <div style="display:flex; flex-wrap:wrap; gap:8px;">
-            ${deletedShops.map(s => `<span style="background:#b91c1c; color:white; padding:6px 14px; border-radius:30px;">🏪 ${s}</span>`).join('')}
+          <p style="margin-bottom:12px;">Виявлено ВИДАЛЕННЯ магазинів:</p>
+          <div class="deleted-list">
+            ${deletedShops.map(s => `<span>🏪 ${s}</span>`).join('')}
           </div>
           <p style="margin-top:16px; color:#666;">Вони будуть НАЗАВЖДИ видалені з хмари.</p>
         </div>
-        <button class="modal-close btn-cancel" style="background:#6c757d;">Скасувати</button>
-        <button id="proceedBtn" style="background:#dc3545; margin:0 20px 20px;">✅ Все одно відправити</button>
+        <button class="btn-cancel">Скасувати</button>
+        <button class="btn-proceed">✅ Все одно відправити</button>
       </div>
     `;
     overlay.querySelector('.btn-cancel').onclick = () => { overlay.remove(); if(onCancel) onCancel(); };
-    overlay.querySelector('#proceedBtn').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
+    overlay.querySelector('.btn-proceed').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
     document.body.appendChild(overlay);
   }
   
@@ -395,12 +429,14 @@
       document.getElementById("syncStatus").innerHTML = "⚠️ Збережіть ключі!";
       return;
     }
+    
     if (hasLocalChanges()) {
-      if (!confirm("⚠️ Є незбережені зміни! Завантажити з хмари? Локальні зміни будуть втрачені.")) {
-        document.getElementById("syncStatus").innerHTML = "⏸️ Скасовано";
+      if (!confirm("⚠️ УВАГА! У вас є незбережені зміни (додані/видалені магазини). Якщо ви завантажите з хмари, вони будуть ВТРАЧЕНІ. Продовжити?")) {
+        document.getElementById("syncStatus").innerHTML = "⏸️ Завантаження скасовано";
         return;
       }
     }
+    
     document.getElementById("syncStatus").innerHTML = "📥 Завантаження...";
     try {
       const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
@@ -431,13 +467,18 @@
       document.getElementById("syncStatus").innerHTML = "⚠️ Збережіть ключі!";
       return;
     }
+    
     const deletedShops = getDeletedShops();
+    
     if (!force && deletedShops.length > 0) {
-      showDeletionWarning(deletedShops, () => upload(true), () => {
-        document.getElementById("syncStatus").innerHTML = "⏸️ Відправлення скасовано";
-      });
+      showDeletionWarning(
+        deletedShops,
+        () => upload(true),
+        () => document.getElementById("syncStatus").innerHTML = "⏸️ Відправлення скасовано"
+      );
       return;
     }
+    
     document.getElementById("syncStatus").innerHTML = "📤 Відправка...";
     try {
       const data = { shops: shops, reasons: shopReasons };
@@ -481,7 +522,7 @@
     delete shopReasons[n];
     saveToLocal();
     renderCategories();
-    document.getElementById("syncStatus").innerHTML = "✅ Видалено!";
+    document.getElementById("syncStatus").innerHTML = "✅ Видалено! Натисніть 'Відправити'";
   }
   
   function getReasonText(key) {
@@ -489,7 +530,6 @@
     return found ? found.title : "";
   }
   
-  // Відкриття модального вікна зі списком магазинів категорії
   function openCategoryModal(color, complexity) {
     const shopsList = shops[color][complexity] || [];
     const colorNames = { "білі":"⚪ БІЛІ", "сірі":"⚫ СІРІ", "чорні":"⬛ ЧОРНІ" };
@@ -508,7 +548,7 @@
           <div class="modal-shop-item">
             <span class="modal-shop-num">${shop}</span>
             ${reason ? `<span class="modal-shop-reason">📌 ${reason}</span>` : '<span class="modal-shop-reason"></span>'}
-            <button class="delete-shop-modal" data-shop="${shop}" data-color="${color}" data-comp="${complexity}" style="background:#ffe0e0; border:none; padding:6px 12px; border-radius:30px; color:#b91c1c; font-weight:bold;">✖ Видалити</button>
+            <button class="delete-shop-modal" data-shop="${shop}" data-color="${color}" data-comp="${complexity}">✖ Видалити</button>
           </div>
         `;
       }).join('');
@@ -520,13 +560,12 @@
         <div class="modal-list" id="modalShopList">
           ${listHtml}
         </div>
-        <button class="modal-close" id="closeModalBtn" style="background:#6c757d;">Закрити</button>
+        <button class="modal-close" id="closeModalBtn">Закрити</button>
       </div>
     `;
     
     document.body.appendChild(overlay);
     
-    // Обробники видалення всередині модалки
     overlay.querySelectorAll('.delete-shop-modal').forEach(btn => {
       btn.onclick = (e) => {
         e.stopPropagation();
@@ -534,7 +573,7 @@
         if (confirm(`Видалити магазин ${shopNum}?`)) {
           removeShop(shopNum, btn.dataset.color, btn.dataset.comp);
           overlay.remove();
-          openCategoryModal(color, complexity); // перевідкриваємо оновлену модалку
+          openCategoryModal(color, complexity);
         }
       };
     });
@@ -569,7 +608,6 @@
     }
     container.innerHTML = html;
     
-    // Додаємо обробники кліків
     document.querySelectorAll('.category-card').forEach(card => {
       card.onclick = () => {
         const color = card.dataset.color;
