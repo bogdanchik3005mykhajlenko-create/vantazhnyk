@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Вантажник">
-  <title>Закони водіїв</title>
+  <title>Вантажники-водії</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body { background: linear-gradient(135deg, #e2e9f0 0%, #cfdbe5 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 12px; min-height: 100vh; }
@@ -279,8 +279,8 @@
 
 <script>
   // ==================== НАЛАШТУВАННЯ ====================
-  // ⚠️ ЗМІНІТЬ ЦЕЙ ПАРОЛЬ НА СВІЙ ⚠️
-  const ACCESS_PASSWORD = "вантажник2024";
+  // ⚠️ НОВИЙ ПАРОЛЬ: "Закони водіїв" ⚠️
+  const ACCESS_PASSWORD = "Закони водіїв";
   
   // ==================== ОСНОВНИЙ КОД ====================
   const fullReasonsList = [
@@ -762,7 +762,7 @@
     overlay.id = 'loginOverlay';
     overlay.innerHTML = `
       <div class="login-card">
-        <h2>🔐 Вантажник-водій</h2>
+        <h2>🚛 Закони водіїв</h2>
         <p>Введіть пароль для доступу</p>
         <input type="password" id="passwordInput" placeholder="Пароль" autocomplete="off">
         <button id="loginBtn">Увійти</button>
@@ -799,7 +799,7 @@
     const appContainer = document.getElementById('app');
     appContainer.innerHTML = `
       <div class="container">
-        <h1>📦 Вантажник-водій 🚛 <small>синхронізація</small></h1>
+        <h1>🚛 Закони водіїв 📦 <small>синхронізація</small></h1>
         <div class="sub">🏬 Натисніть на категорію для перегляду магазинів</div>
 
         <div class="sync-panel">
