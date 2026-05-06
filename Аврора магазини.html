@@ -247,23 +247,21 @@
 <div id="app"></div>
 
 <script>
-  // БАЗОВИЙ ПАРОЛЬ (для простоти, можна змінити)
-  const BASE_PASSWORD = "вантажник2024";
+  // БАЗОВИЙ ПАРОЛЬ
+  const BASE_PASSWORD = "Закони водіїв";
   
-  // Отримуємо список користувачів з localStorage
   function getUsers() {
     const users = localStorage.getItem("app_users");
     if (users) {
       try { return JSON.parse(users); } catch(e) {}
     }
-    return {}; // { "username": { password: "xxx", data: { shops, reasons, config } } }
+    return {};
   }
   
   function saveUsers(users) {
     localStorage.setItem("app_users", JSON.stringify(users));
   }
   
-  // Поточний активний користувач
   let currentUser = null;
   
   const fullReasonsList = [
@@ -377,7 +375,6 @@
       shopReasons = userData.reasons || {};
       config = userData.config || { apiKey: "", binId: "" };
     } else {
-      // Новий користувач - демо-дані
       shops = {
         "білі": { "легко": [], "потно": [], "тяжко": [] },
         "сірі": { "легко": [], "потно": [], "тяжко": [] },
@@ -390,16 +387,6 @@
     updateSnapshot();
     if (typeof renderCategories === 'function') renderCategories();
     if (typeof updateSavedKeysDisplay === 'function') updateSavedKeysDisplay();
-  }
-  
-  function saveToLocal() {
-    saveUserData();
-  }
-  
-  function loadFromLocal() {
-    if (currentUser) {
-      loadUserData(currentUser);
-    }
   }
   
   function loadConfig() {
@@ -442,10 +429,10 @@
         const keyValue = badge.dataset.keyvalue;
         if (keyType === 'api') {
           document.getElementById("apiKeyInput").value = keyValue;
-          document.getElementById("syncStatus").innerHTML = "✅ API ключ вставлено! Натисніть 'Зберегти'";
+          document.getElementById("syncStatus").innerHTML = "✅ API ключ вставлено!";
         } else if (keyType === 'bin') {
           document.getElementById("binIdInput").value = keyValue;
-          document.getElementById("syncStatus").innerHTML = "✅ Bin ID вставлено! Натисніть 'Зберегти'";
+          document.getElementById("syncStatus").innerHTML = "✅ Bin ID вставлено!";
         }
       };
     });
@@ -586,7 +573,7 @@
     saveUserData();
     if (typeof renderCategories === 'function') renderCategories();
     const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "✅ Магазин додано! Натисніть 'Відправити'";
+    if (statusEl) statusEl.innerHTML = "✅ Магазин додано!";
   }
   
   function removeShop(n, color, comp) {
@@ -776,7 +763,6 @@
     }
   }
   
-  // АВТОРИЗАЦІЯ З ІМ'ЯМ КОРИСТУВАЧА
   let isLoginMode = true;
   
   function showAuthScreen() {
@@ -817,7 +803,6 @@
       const users = getUsers();
       
       if (isLoginMode) {
-        // ВХІД
         if (users[username] && users[username].password === password) {
           currentUser = username;
           localStorage.setItem("app_current_user", username);
@@ -828,7 +813,6 @@
           passwordInput.value = "";
         }
       } else {
-        // РЕЄСТРАЦІЯ
         if (users[username]) {
           authError.textContent = "❌ Користувач з таким ім'ям вже існує";
           return;
@@ -837,7 +821,6 @@
           authError.textContent = `❌ Пароль має бути: "${BASE_PASSWORD}"`;
           return;
         }
-        // Створюємо нового користувача
         users[username] = {
           password: password,
           shops: {
@@ -852,7 +835,6 @@
         currentUser = username;
         localStorage.setItem("app_current_user", username);
         
-        // Додаємо демо-дані для нового користувача
         shops = users[username].shops;
         shopReasons = users[username].reasons;
         config = users[username].config;
@@ -916,7 +898,6 @@
       <footer>💡 Ключі зберігаються на вашому пристрої. Натисніть на маску ключа для швидкого вводу</footer>
     </div>`;
     
-    loadFromLocal();
     loadConfig();
     initReasonButtons();
     updateSnapshot();
@@ -937,7 +918,6 @@
     };
   }
   
-  // Перевіряємо чи є вже авторизований користувач
   const savedUser = localStorage.getItem("app_current_user");
   if (savedUser) {
     const users = getUsers();
