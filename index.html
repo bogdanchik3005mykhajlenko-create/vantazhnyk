@@ -15,6 +15,7 @@
     h1 { font-size: 1.5rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; color: #1a3a44; flex-wrap: wrap; gap: 8px; }
     h1 small { font-size: 0.65rem; background: #2c7da0; color: white; padding: 4px 10px; border-radius: 40px; }
     .sub { color: #2c5a6e; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #aac7d6; font-size: 0.8rem; }
+    .user-greeting { background: #d4edda; color: #155724; padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; display: inline-block; margin-bottom: 10px; }
     
     .sync-panel {
       background: #e8f4f8;
@@ -201,6 +202,7 @@
     .btn-cancel { background: #6c757d; color: white; margin: 0 20px 12px; }
     .btn-proceed { background: #dc3545; color: white; margin: 0 20px 20px; }
     
+    /* СТОРІНКА ВХОДУ / РЕЄСТРАЦІЇ */
     .login-overlay {
       position: fixed;
       top: 0;
@@ -224,8 +226,10 @@
     .login-card h2 { margin-bottom: 8px; color: #1a3a44; font-size: 1.3rem; }
     .login-card p { color: #6c757d; font-size: 0.75rem; margin-bottom: 20px; }
     .login-card input { width: 100%; padding: 14px; border: 2px solid #cbdae2; border-radius: 40px; font-size: 1rem; margin-bottom: 16px; text-align: center; }
-    .login-card button { width: 100%; background: #2c7da0; padding: 14px; font-size: 1rem; }
+    .login-card button { width: 100%; background: #2c7da0; padding: 14px; font-size: 1rem; margin-top: 8px; }
+    .login-card button:active { transform: scale(0.96); }
     .error-msg { color: #dc3545; font-size: 0.75rem; margin-top: 10px; }
+    .switch-mode { margin-top: 16px; font-size: 0.75rem; color: #2c7da0; cursor: pointer; text-decoration: underline; }
     
     footer { margin-top: 20px; text-align: center; font-size: 0.6rem; color: #3a6b7c; padding: 12px; }
     @media (min-width: 700px) { 
@@ -243,7 +247,22 @@
 <div id="app"></div>
 
 <script>
-  const ACCESS_PASSWORD = "Закони водіїв";
+  // БАЗОВИЙ ПАРОЛЬ
+  const BASE_PASSWORD = "Закони водіїв";
+  
+  function getUsers() {
+    const users = localStorage.getItem("app_users");
+    if (users) {
+      try { return JSON.parse(users); } catch(e) {}
+    }
+    return {};
+  }
+  
+  function saveUsers(users) {
+    localStorage.setItem("app_users", JSON.stringify(users));
+  }
+  
+  let currentUser = null;
   
   const fullReasonsList = [
     { key: "рокля_підсобка", title: "🛒 Рокля до підсобки" },
@@ -332,15 +351,30 @@
     return false;
   }
   
-  // ФУНКЦІЯ "ЗАБУТИ ВСЕ"
-  function forgetEverything() {
-    if (confirm("⚠️ ЦЕ ВИДАЛИТЬ ВСІ ДАНІ!\n\n• Збережені API ключі\n• Всі магазини на цьому пристрої\n• Авторизацію\n\nПісля цього сайт буде як новий. Продовжити?")) {
-      localStorage.removeItem("shops");
-      localStorage.removeItem("reasons");
-      localStorage.removeItem("sync_cfg");
-      localStorage.removeItem("app_authorized");
-      
-      // Скидаємо дані в пам'яті
+  function saveUserData() {
+    if (!currentUser) return;
+    const users = getUsers();
+    users[currentUser] = {
+      password: BASE_PASSWORD,
+      shops: shops,
+      reasons: shopReasons,
+      config: config
+    };
+    saveUsers(users);
+  }
+  
+  function loadUserData(username) {
+    const users = getUsers();
+    const userData = users[username];
+    if (userData) {
+      shops = userData.shops || {
+        "білі": { "легко": [], "потно": [], "тяжко": [] },
+        "сірі": { "легко": [], "потно": [], "тяжко": [] },
+        "чорні": { "легко": [], "потно": [], "тяжко": [] }
+      };
+      shopReasons = userData.reasons || {};
+      config = userData.config || { apiKey: "", binId: "" };
+    } else {
       shops = {
         "білі": { "легко": [], "потно": [], "тяжко": [] },
         "сірі": { "легко": [], "потно": [], "тяжко": [] },
@@ -348,60 +382,24 @@
       };
       shopReasons = {};
       config = { apiKey: "", binId: "" };
-      
-      // Додаємо демо-дані
       initDemo();
-      updateSnapshot();
-      
-      // Перезавантажуємо сторінку для повного скидання
-      location.reload();
     }
-  }
-  
-  function showDeletionWarning(deletedShops, onConfirm, onCancel) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-content warning-modal">
-        <div class="modal-header">⚠️ ВАЖЛИВО!</div>
-        <div class="modal-list">
-          <p style="margin-bottom:12px;">Виявлено ВИДАЛЕННЯ магазинів:</p>
-          <div class="deleted-list">${deletedShops.map(s => `<span>🏪 ${s}</span>`).join('')}</div>
-          <p style="margin-top:16px; color:#666;">Вони будуть НАЗАВЖДИ видалені з хмари.</p>
-        </div>
-        <button class="btn-cancel">Скасувати</button>
-        <button class="btn-proceed">✅ Все одно відправити</button>
-      </div>
-    `;
-    overlay.querySelector('.btn-cancel').onclick = () => { overlay.remove(); if(onCancel) onCancel(); };
-    overlay.querySelector('.btn-proceed').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
-    document.body.appendChild(overlay);
-  }
-  
-  function saveToLocal() {
-    localStorage.setItem("shops", JSON.stringify(shops));
-    localStorage.setItem("reasons", JSON.stringify(shopReasons));
-  }
-  
-  function loadFromLocal() {
-    const savedShops = localStorage.getItem("shops");
-    if (savedShops) { try { shops = JSON.parse(savedShops); } catch(e) {} }
-    const savedReasons = localStorage.getItem("reasons");
-    if (savedReasons) { try { shopReasons = JSON.parse(savedReasons); } catch(e) {} }
     updateSnapshot();
     if (typeof renderCategories === 'function') renderCategories();
+    if (typeof updateSavedKeysDisplay === 'function') updateSavedKeysDisplay();
   }
   
   function loadConfig() {
-    const saved = localStorage.getItem("sync_cfg");
-    if (saved) {
-      try {
-        config = JSON.parse(saved);
-        const apiInput = document.getElementById("apiKeyInput");
-        const binInput = document.getElementById("binIdInput");
-        if (apiInput) apiInput.value = config.apiKey || "";
-        if (binInput) binInput.value = config.binId || "";
-      } catch(e) {}
+    if (currentUser) {
+      const users = getUsers();
+      const userData = users[currentUser];
+      if (userData && userData.config) {
+        config = userData.config;
+      }
+      const apiInput = document.getElementById("apiKeyInput");
+      const binInput = document.getElementById("binIdInput");
+      if (apiInput) apiInput.value = config.apiKey || "";
+      if (binInput) binInput.value = config.binId || "";
     }
     updateSavedKeysDisplay();
   }
@@ -410,19 +408,16 @@
     const container = document.getElementById("savedKeysContainer");
     if (!container) return;
     
-    const savedApi = config.apiKey || localStorage.getItem("sync_cfg") ? JSON.parse(localStorage.getItem("sync_cfg") || '{}').apiKey : "";
-    const savedBin = config.binId || localStorage.getItem("sync_cfg") ? JSON.parse(localStorage.getItem("sync_cfg") || '{}').binId : "";
-    
     let html = '';
-    if (savedApi && savedApi.length > 3) {
-      const maskedApi = savedApi.slice(0, 8) + '••••••••';
-      html += `<span class="saved-key-badge" data-keytype="api" data-keyvalue="${savedApi}">🔑 API: ${maskedApi}</span>`;
+    if (config.apiKey && config.apiKey.length > 3) {
+      const maskedApi = config.apiKey.slice(0, 8) + '••••••••';
+      html += `<span class="saved-key-badge" data-keytype="api" data-keyvalue="${config.apiKey}">🔑 API: ${maskedApi}</span>`;
     }
-    if (savedBin && savedBin.length > 3) {
-      const maskedBin = savedBin.slice(0, 6) + '••••••';
-      html += `<span class="saved-key-badge" data-keytype="bin" data-keyvalue="${savedBin}">📦 Bin: ${maskedBin}</span>`;
+    if (config.binId && config.binId.length > 3) {
+      const maskedBin = config.binId.slice(0, 6) + '••••••';
+      html += `<span class="saved-key-badge" data-keytype="bin" data-keyvalue="${config.binId}">📦 Bin: ${maskedBin}</span>`;
     }
-    if (!savedApi && !savedBin) {
+    if (!config.apiKey && !config.binId) {
       html = '<span style="font-size:0.65rem; color:#6c757d;">💾 Немає збережених ключів</span>';
     }
     container.innerHTML = html;
@@ -434,10 +429,10 @@
         const keyValue = badge.dataset.keyvalue;
         if (keyType === 'api') {
           document.getElementById("apiKeyInput").value = keyValue;
-          document.getElementById("syncStatus").innerHTML = "✅ API ключ вставлено! Натисніть 'Зберегти'";
+          document.getElementById("syncStatus").innerHTML = "✅ API ключ вставлено!";
         } else if (keyType === 'bin') {
           document.getElementById("binIdInput").value = keyValue;
-          document.getElementById("syncStatus").innerHTML = "✅ Bin ID вставлено! Натисніть 'Зберегти'";
+          document.getElementById("syncStatus").innerHTML = "✅ Bin ID вставлено!";
         }
       };
     });
@@ -446,7 +441,7 @@
   function saveConfig() {
     config.apiKey = document.getElementById("apiKeyInput").value.trim();
     config.binId = document.getElementById("binIdInput").value.trim();
-    localStorage.setItem("sync_cfg", JSON.stringify(config));
+    saveUserData();
     updateSavedKeysDisplay();
     const statusEl = document.getElementById("syncStatus");
     if (statusEl) {
@@ -462,7 +457,7 @@
     if (confirm("Очистити збережені ключі?")) {
       config.apiKey = "";
       config.binId = "";
-      localStorage.removeItem("sync_cfg");
+      saveUserData();
       document.getElementById("apiKeyInput").value = "";
       document.getElementById("binIdInput").value = "";
       updateSavedKeysDisplay();
@@ -478,6 +473,7 @@
       if (apiKey && binId) {
         config.apiKey = apiKey;
         config.binId = binId;
+        saveUserData();
       } else {
         const statusEl = document.getElementById("syncStatus");
         if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
@@ -504,7 +500,7 @@
         if (data.record && data.record.shops) {
           shops = data.record.shops;
           shopReasons = data.record.reasons || {};
-          saveToLocal();
+          saveUserData();
           updateSnapshot();
           if (typeof renderCategories === 'function') renderCategories();
           if (statusEl) statusEl.innerHTML = "✅ Завантажено!";
@@ -526,6 +522,7 @@
       if (apiKey && binId) {
         config.apiKey = apiKey;
         config.binId = binId;
+        saveUserData();
       } else {
         const statusEl = document.getElementById("syncStatus");
         if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
@@ -573,16 +570,16 @@
     shops[color][comp].push(n);
     shops[color][comp].sort((a,b)=>a-b);
     if (reason) shopReasons[n] = reason;
-    saveToLocal();
+    saveUserData();
     if (typeof renderCategories === 'function') renderCategories();
     const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "✅ Магазин додано! Натисніть 'Відправити'";
+    if (statusEl) statusEl.innerHTML = "✅ Магазин додано!";
   }
   
   function removeShop(n, color, comp) {
     shops[color][comp] = shops[color][comp].filter(i => i !== n);
     delete shopReasons[n];
-    saveToLocal();
+    saveUserData();
     if (typeof renderCategories === 'function') renderCategories();
     const statusEl = document.getElementById("syncStatus");
     if (statusEl) statusEl.innerHTML = "✅ Магазин видалено!";
@@ -730,53 +727,150 @@
       addShop(2719, "білі", "легко", "рокля_підсобка");
       addShop(3067, "білі", "легко", "рокля_підсобка");
       addShop(642, "білі", "потно", "розрив_біля_підсобки");
-      addShop(1, "білі", "легко", "");
-      addShop(2, "білі", "легко", "");
     }
   }
   
-  // АВТОРИЗАЦІЯ
-  function checkAuth() {
-    const isAuthorized = localStorage.getItem("app_authorized") === "true";
-    if (!isAuthorized) showLoginScreen();
-    else showMainApp();
+  function showDeletionWarning(deletedShops, onConfirm, onCancel) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-content warning-modal">
+        <div class="modal-header">⚠️ ВАЖЛИВО!</div>
+        <div class="modal-list">
+          <p style="margin-bottom:12px;">Виявлено ВИДАЛЕННЯ магазинів:</p>
+          <div class="deleted-list">${deletedShops.map(s => `<span>🏪 ${s}</span>`).join('')}</div>
+          <p style="margin-top:16px; color:#666;">Вони будуть НАЗАВЖДИ видалені з хмари.</p>
+        </div>
+        <button class="btn-cancel">Скасувати</button>
+        <button class="btn-proceed">✅ Все одно відправити</button>
+      </div>
+    `;
+    overlay.querySelector('.btn-cancel').onclick = () => { overlay.remove(); if(onCancel) onCancel(); };
+    overlay.querySelector('.btn-proceed').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
+    document.body.appendChild(overlay);
   }
   
-  function showLoginScreen() {
+  function forgetEverything() {
+    if (confirm("⚠️ ВИДАЛИТИ ВСІ ДАНІ КОРИСТУВАЧА? Це видалить всі магазини, ключі та налаштування!")) {
+      if (currentUser) {
+        const users = getUsers();
+        delete users[currentUser];
+        saveUsers(users);
+      }
+      localStorage.removeItem("app_current_user");
+      currentUser = null;
+      location.reload();
+    }
+  }
+  
+  let isLoginMode = true;
+  
+  function showAuthScreen() {
     const overlay = document.createElement('div');
     overlay.className = 'login-overlay';
     overlay.id = 'loginOverlay';
     overlay.innerHTML = `<div class="login-card">
       <h2>🚛 Вантажники-водії</h2>
-      <p>Введіть пароль для доступу</p>
+      <p id="authModeText">${isLoginMode ? "Вхід в систему" : "Створення акаунту"}</p>
+      <input type="text" id="usernameInput" placeholder="Ім'я користувача" autocomplete="off">
       <input type="password" id="passwordInput" placeholder="Пароль" autocomplete="off">
-      <button id="loginBtn">Увійти</button>
-      <div id="loginError" class="error-msg"></div>
+      <button id="authBtn">${isLoginMode ? "Увійти" : "Зареєструватися"}</button>
+      <div class="switch-mode" id="switchModeBtn">${isLoginMode ? "Немає акаунту? Зареєструватися" : "Вже є акаунт? Увійти"}</div>
+      <div id="authError" class="error-msg"></div>
     </div>`;
     document.body.appendChild(overlay);
     
-    const loginBtn = document.getElementById('loginBtn');
+    const authBtn = document.getElementById('authBtn');
+    const usernameInput = document.getElementById('usernameInput');
     const passwordInput = document.getElementById('passwordInput');
-    function attemptLogin() {
-      if (passwordInput.value.trim() === ACCESS_PASSWORD) {
-        localStorage.setItem("app_authorized", "true");
+    const switchBtn = document.getElementById('switchModeBtn');
+    const authModeText = document.getElementById('authModeText');
+    const authError = document.getElementById('authError');
+    
+    function attemptAuth() {
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+      
+      if (!username) {
+        authError.textContent = "❌ Введіть ім'я користувача";
+        return;
+      }
+      if (!password) {
+        authError.textContent = "❌ Введіть пароль";
+        return;
+      }
+      
+      const users = getUsers();
+      
+      if (isLoginMode) {
+        if (users[username] && users[username].password === password) {
+          currentUser = username;
+          localStorage.setItem("app_current_user", username);
+          document.getElementById('loginOverlay')?.remove();
+          showMainApp();
+        } else {
+          authError.textContent = "❌ Невірне ім'я користувача або пароль";
+          passwordInput.value = "";
+        }
+      } else {
+        if (users[username]) {
+          authError.textContent = "❌ Користувач з таким ім'ям вже існує";
+          return;
+        }
+        if (password !== BASE_PASSWORD) {
+          authError.textContent = `❌ Пароль має бути: "${BASE_PASSWORD}"`;
+          return;
+        }
+        users[username] = {
+          password: password,
+          shops: {
+            "білі": { "легко": [], "потно": [], "тяжко": [] },
+            "сірі": { "легко": [], "потно": [], "тяжко": [] },
+            "чорні": { "легко": [], "потно": [], "тяжко": [] }
+          },
+          reasons: {},
+          config: { apiKey: "", binId: "" }
+        };
+        saveUsers(users);
+        currentUser = username;
+        localStorage.setItem("app_current_user", username);
+        
+        shops = users[username].shops;
+        shopReasons = users[username].reasons;
+        config = users[username].config;
+        initDemo();
+        saveUserData();
+        
         document.getElementById('loginOverlay')?.remove();
         showMainApp();
-      } else {
-        const errorEl = document.getElementById('loginError');
-        if (errorEl) errorEl.textContent = "❌ Невірний пароль";
-        passwordInput.value = "";
-        passwordInput.focus();
       }
     }
-    loginBtn.onclick = attemptLogin;
-    passwordInput.onkeypress = (e) => { if (e.key === 'Enter') attemptLogin(); };
+    
+    switchBtn.onclick = () => {
+      isLoginMode = !isLoginMode;
+      authModeText.textContent = isLoginMode ? "Вхід в систему" : "Створення акаунту";
+      authBtn.textContent = isLoginMode ? "Увійти" : "Зареєструватися";
+      switchBtn.textContent = isLoginMode ? "Немає акаунту? Зареєструватися" : "Вже є акаунт? Увійти";
+      authError.textContent = "";
+      if (!isLoginMode) {
+        passwordInput.placeholder = `Пароль (повинен бути "${BASE_PASSWORD}")`;
+      } else {
+        passwordInput.placeholder = "Пароль";
+      }
+    };
+    
+    authBtn.onclick = attemptAuth;
+    usernameInput.onkeypress = (e) => { if (e.key === 'Enter') attemptAuth(); };
+    passwordInput.onkeypress = (e) => { if (e.key === 'Enter') attemptAuth(); };
   }
   
   function showMainApp() {
     const appContainer = document.getElementById('app');
     appContainer.innerHTML = `<div class="container">
-      <h1>🚛 Вантажники-водії 📦 <small>синхронізація</small></h1>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h1>🚛 Вантажники-водії 📦 <small>синхронізація</small></h1>
+        <div class="user-greeting">👤 ${currentUser} <button id="logoutBtn" style="background: none; border: none; color: #dc3545; font-size: 0.7rem; margin-left: 8px;">🚪 Вийти</button></div>
+      </div>
       <div class="sub">🏬 Натисніть на категорію для перегляду магазинів</div>
       <div class="sync-panel">
         <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
@@ -804,9 +898,7 @@
       <footer>💡 Ключі зберігаються на вашому пристрої. Натисніть на маску ключа для швидкого вводу</footer>
     </div>`;
     
-    loadFromLocal();
     loadConfig();
-    initDemo();
     initReasonButtons();
     updateSnapshot();
     renderCategories();
@@ -819,9 +911,26 @@
     document.getElementById("syncUpBtn").onclick = () => upload(false);
     document.getElementById("checkShopBtn").onclick = checkShop;
     document.getElementById("addShopBtn").onclick = addFromMobile;
+    document.getElementById("logoutBtn").onclick = () => {
+      localStorage.removeItem("app_current_user");
+      currentUser = null;
+      location.reload();
+    };
   }
   
-  checkAuth();
+  const savedUser = localStorage.getItem("app_current_user");
+  if (savedUser) {
+    const users = getUsers();
+    if (users[savedUser]) {
+      currentUser = savedUser;
+      loadUserData(currentUser);
+      showMainApp();
+    } else {
+      showAuthScreen();
+    }
+  } else {
+    showAuthScreen();
+  }
 </script>
 </body>
 </html>
