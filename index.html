@@ -813,12 +813,13 @@
           passwordInput.value = "";
         }
       } else {
+        // РЕЄСТРАЦІЯ
         if (users[username]) {
           authError.textContent = "❌ Користувач з таким ім'ям вже існує";
           return;
         }
         if (password !== BASE_PASSWORD) {
-          authError.textContent = `❌ Пароль має бути: "${BASE_PASSWORD}"`;
+          authError.textContent = "❌ Невірний пароль. Зверніться до адміністратора";
           return;
         }
         users[username] = {
