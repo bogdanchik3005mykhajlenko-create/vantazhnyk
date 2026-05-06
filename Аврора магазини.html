@@ -3,293 +3,438 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <meta name="theme-color" content="#2c7da0">
+  <meta name="theme-color" content="#0a0f1e">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Вантажник">
-  <title>Вантажники-водії</title>
+  <meta name="apple-mobile-web-app-title" content="CYBER DRIVER">
+  <title>CYBER DRIVER · Вантажник 3000</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { background: linear-gradient(135deg, #e2e9f0 0%, #cfdbe5 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 12px; min-height: 100vh; }
-    .container { max-width: 800px; margin: 0 auto; }
-    h1 { font-size: 1.5rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; color: #1a3a44; flex-wrap: wrap; gap: 8px; }
-    h1 small { font-size: 0.65rem; background: #2c7da0; color: white; padding: 4px 10px; border-radius: 40px; }
-    .sub { color: #2c5a6e; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #aac7d6; font-size: 0.8rem; }
-    
-    .sync-panel {
-      background: #e8f4f8;
-      border-radius: 18px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      border: 1px solid #b8d4e3;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
-    .sync-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; }
-    .sync-row { 
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 12px;
+
+    /* Анімований кіберпанк фон */
+    body {
+      background: radial-gradient(ellipse at 20% 30%, #0a0f1e 0%, #03060c 100%);
+      font-family: 'Share Tech Mono', 'Courier New', 'Fira Code', monospace;
+      padding: 18px 14px;
+      min-height: 100vh;
+      color: #0ff;
+      position: relative;
+      overflow-x: hidden;
     }
-    .input-group {
+
+    /* Динамічні сітки на фоні */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Анімований неоновий промінь */
+    body::after {
+      content: "";
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0, 255, 255, 0.08) 0%, transparent 70%);
+      animation: rotateBeam 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes rotateBeam {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Глітч-ефект для заголовків */
+    @keyframes glitch {
+      0%, 100% { text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff; }
+      33% { text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
+      66% { text-shadow: 0px 2px #ff00ff, 0px -2px #00ffff; }
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* КІБЕРПАНК ХЕДЕР */
+    .cyber-header {
+      background: rgba(0, 20, 30, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid #0ff;
+      border-radius: 32px;
+      padding: 24px 20px;
+      margin-bottom: 28px;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2), inset 0 0 20px rgba(0, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cyber-header::before {
+      content: "⟁ ⧉ ⟁";
+      position: absolute;
+      bottom: 8px;
+      right: 20px;
+      font-size: 0.7rem;
+      opacity: 0.3;
+      letter-spacing: 4px;
+    }
+
+    .cyber-header h1 {
+      font-size: 1.8rem;
+      letter-spacing: 4px;
       display: flex;
-      flex-wrap: wrap;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 10px;
+      animation: glitch 3s infinite;
     }
-    .input-group label {
-      font-size: 0.7rem;
+
+    .cyber-header h1 small {
+      background: linear-gradient(135deg, #ff00ff, #00ffff);
+      color: #000;
+      padding: 4px 14px;
+      border-radius: 40px;
+      font-size: 0.65rem;
       font-weight: bold;
-      color: #2c5a6e;
-      min-width: 55px;
+      letter-spacing: 1px;
     }
-    .input-group input {
-      flex: 1;
-      padding: 10px 12px;
-      border: 1px solid #cbdae2;
-      border-radius: 30px;
-      font-size: 0.8rem;
-    }
-    .saved-key-badge {
-      background: #d4edda;
-      color: #155724;
-      padding: 6px 12px;
-      border-radius: 30px;
-      font-size: 0.7rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-    .saved-key-badge:active {
-      background: #c3e6cb;
-      transform: scale(0.97);
-    }
-    .key-badge-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .btn-sm {
-      padding: 6px 12px;
-      font-size: 0.7rem;
-    }
-    .sync-row-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .sync-row-buttons button {
-      flex: 1;
-      min-width: 80px;
-      padding: 8px 12px;
+
+    .cyber-header p {
+      color: #0cf;
       font-size: 0.75rem;
+      margin-top: 12px;
+      letter-spacing: 1px;
+      border-left: 2px solid #f0f;
+      padding-left: 12px;
     }
-    .btn-save { background: #6c757d; color: white; }
-    .btn-clear { background: #dc3545; color: white; }
-    .btn-forget { background: #343a40; color: white; }
-    .btn-down { background: #28a745; color: white; }
-    .btn-up { background: #ffc107; color: #333; }
-    .sync-status { font-size: 0.7rem; color: #2c5a6e; margin-top: 8px; padding: 6px; background: rgba(255,255,255,0.5); border-radius: 12px; }
-    .sync-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .sync-buttons button { flex: 1; min-width: 100px; }
-    
-    .action-panel { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
-    .check-card, .add-card { background: white; border-radius: 18px; padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    h3 { margin-bottom: 10px; font-size: 1rem; }
-    .check-input-group { display: flex; gap: 8px; flex-wrap: wrap; }
-    .check-input-group input { flex: 2; padding: 14px; border: 2px solid #cbdae2; border-radius: 30px; font-size: 1rem; }
-    button { background: #2c7da0; border: none; padding: 12px 20px; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; min-height: 44px; }
-    button:active { transform: scale(0.96); }
-    .check-result { margin-top: 12px; padding: 12px; background: #eef3fa; border-radius: 16px; font-size: 0.9rem; border-left: 4px solid #2c7da0; }
-    .select-group { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
-    .select-group input, .select-group select { padding: 14px; border-radius: 30px; border: 1px solid #bccbd4; font-size: 1rem; width: 100%; }
-    .extra-options { margin-top: 12px; padding-top: 8px; border-top: 1px solid #dee2e6; }
-    .extra-title { font-size: 0.75rem; font-weight: 600; color: #2c5a6e; margin-bottom: 8px; }
+
+    /* ЗАГАЛЬНІ КАРТКИ */
+    .cyber-card, .sync-panel {
+      background: rgba(0, 20, 30, 0.55);
+      backdrop-filter: blur(10px);
+      border: 1px solid #0cf;
+      border-radius: 28px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+    }
+
+    .cyber-card:hover, .sync-panel:hover {
+      border-color: #f0f;
+      box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+    }
+
+    .sync-title, h3 {
+      font-size: 0.75rem;
+      color: #f0f;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 14px;
+      display: inline-block;
+      border-bottom: 1px solid #f0f;
+      padding-bottom: 4px;
+    }
+
+    /* ПОЛЯ ВВОДУ ТА КНОПКИ */
+    input, select {
+      background: #000000cc;
+      border: 1px solid #0ff;
+      padding: 12px 16px;
+      border-radius: 48px;
+      color: #0ff;
+      font-family: monospace;
+      font-size: 0.85rem;
+      transition: all 0.1s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #f0f;
+      box-shadow: 0 0 8px #f0f;
+    }
+
+    button {
+      background: rgba(0, 255, 255, 0.1);
+      border: 1px solid #0ff;
+      padding: 10px 20px;
+      border-radius: 48px;
+      color: #0ff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.08s linear;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:active {
+      transform: scale(0.96);
+      background: #0ff;
+      color: #000;
+      box-shadow: 0 0 15px #0ff;
+    }
+
+    .sync-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    /* СІТКА 3×3 */
+    .cyber-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 28px 0;
+    }
+
+    .grid-card {
+      background: linear-gradient(145deg, #061218, #010508);
+      border: 1px solid #0cf;
+      border-radius: 24px;
+      text-align: center;
+      padding: 16px 8px;
+      cursor: pointer;
+      transition: all 0.1s;
+      box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+    }
+
+    .grid-card:active {
+      transform: scale(0.96);
+      border-color: #f0f;
+      box-shadow: 0 0 20px #f0f;
+    }
+
+    .grid-count {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #0ff;
+      text-shadow: 0 0 8px #0ff;
+      margin: 6px 0;
+    }
+
+    /* БЛОК ПРИЧИН */
     .reason-buttons {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      max-height: 140px;
+      gap: 8px;
+      max-height: 130px;
       overflow-y: auto;
-      padding: 4px 2px;
+      margin: 12px 0;
+      padding: 4px;
     }
-    .reason-btn { background: #e9ecef; border: 1px solid #ced4da; padding: 8px 12px; border-radius: 30px; font-size: 0.7rem; cursor: pointer; white-space: nowrap; }
-    .reason-btn.selected { background: #2c7da0; color: white; border-color: #2c7da0; }
-    
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 16px;
-      margin-bottom: 20px;
-    }
-    .category-card {
-      background: white;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+    .reason-btn {
+      background: #000000aa;
+      border: 1px solid #0ff;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.7rem;
       cursor: pointer;
-      transition: transform 0.1s ease;
+      transition: 0.05s linear;
     }
-    .category-card:active { transform: scale(0.97); }
-    .cat-header {
-      padding: 10px 4px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 0.8rem;
+
+    .reason-btn.selected {
+      background: #0ff;
+      color: #000;
+      border-color: #f0f;
     }
-    .white-header { background: #e3e8ee; color: #1e3a4a; border-bottom: 3px solid #2c7da0; }
-    .gray-header { background: #5a6e78; color: white; border-bottom: 3px solid #2c3e42; }
-    .black-header { background: #1e2a2e; color: white; border-bottom: 3px solid #f39c12; }
-    .cat-body { padding: 10px; text-align: center; }
-    .cat-count { font-size: 1.8rem; font-weight: bold; color: #2c7da0; }
-    .cat-label { font-size: 0.65rem; color: #6c757d; margin-top: 4px; }
-    .empty-cat { opacity: 0.5; }
-    
+
+    .reason-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* МОДАЛЬНЕ ВІКНО */
     .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      backdrop-filter: blur(3px);
-    }
-    .modal-content {
-      background: white;
-      border-radius: 28px;
-      width: 90%;
-      max-width: 500px;
-      max-height: 85vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .modal-header {
-      padding: 16px 20px;
-      font-size: 1.1rem;
-      font-weight: bold;
-      text-align: center;
-      border-bottom: 1px solid #e9ecef;
-    }
-    .modal-list { flex: 1; overflow-y: auto; padding: 12px; }
-    .modal-shop-item {
-      background: #f8f9fa;
-      border-radius: 14px;
-      padding: 10px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .modal-shop-num { font-weight: bold; font-size: 0.9rem; background: #2c7da0; color: white; padding: 4px 10px; border-radius: 30px; }
-    .modal-shop-reason { font-size: 0.65rem; color: #6c757d; flex: 1; }
-    .modal-close { background: #6c757d; margin: 12px 20px 20px; padding: 10px; }
-    .empty-modal { text-align: center; color: #8c9aa8; padding: 32px; font-style: italic; }
-    .delete-shop-modal { background: #ffe0e0; border: none; padding: 5px 10px; border-radius: 30px; color: #b91c1c; font-weight: bold; cursor: pointer; font-size: 0.75rem; }
-    
-    .warning-modal .modal-header { background: #fff0f0; color: #b91c1c; }
-    .deleted-list { background: #fff0f0; border-radius: 12px; padding: 10px; margin: 10px 0; max-height: 150px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; }
-    .deleted-list span { background: #b91c1c; color: white; padding: 6px 14px; border-radius: 30px; font-size: 0.9rem; }
-    .btn-cancel { background: #6c757d; color: white; margin: 0 20px 12px; }
-    .btn-proceed { background: #dc3545; color: white; margin: 0 20px 20px; }
-    
-    .login-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, #1a3a44 0%, #2c7da0 100%);
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 2000;
     }
-    .login-card {
-      background: white;
-      border-radius: 32px;
-      padding: 28px 20px;
-      width: 85%;
-      max-width: 340px;
-      text-align: center;
+
+    .modal-cyber {
+      background: #0a0f1e;
+      border: 2px solid #0ff;
+      border-radius: 40px;
+      width: 90%;
+      max-width: 520px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
     }
-    .login-card h2 { margin-bottom: 8px; color: #1a3a44; font-size: 1.3rem; }
-    .login-card p { color: #6c757d; font-size: 0.75rem; margin-bottom: 20px; }
-    .login-card input { width: 100%; padding: 14px; border: 2px solid #cbdae2; border-radius: 40px; font-size: 1rem; margin-bottom: 16px; text-align: center; }
-    .login-card button { width: 100%; background: #2c7da0; padding: 14px; font-size: 1rem; }
-    .error-msg { color: #dc3545; font-size: 0.75rem; margin-top: 10px; }
-    
-    footer { margin-top: 20px; text-align: center; font-size: 0.6rem; color: #3a6b7c; padding: 12px; }
-    @media (min-width: 700px) { 
-      .action-panel { flex-direction: row; } 
-      .select-group { flex-direction: row; } 
-      .select-group input { flex: 2; } 
-      .select-group select { flex: 1; }
-      .sync-row { flex-direction: row; flex-wrap: wrap; }
-      .input-group { flex: 1; }
-      .sync-row-buttons { flex: 1; justify-content: flex-end; }
+
+    .modal-header {
+      background: linear-gradient(90deg, #0ff, #f0f);
+      color: #000;
+      padding: 16px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .modal-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .shop-item {
+      background: #061218;
+      border: 1px solid #0cf;
+      border-radius: 60px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .modal-close {
+      background: #2c2c44;
+      margin: 16px;
+      padding: 12px;
+      border-radius: 40px;
+    }
+
+    .delete-shop {
+      background: #ff005522;
+      border: 1px solid #f0f;
+      padding: 4px 12px;
+      border-radius: 30px;
+    }
+
+    /* статуси та футер */
+    .sync-status {
+      margin-top: 12px;
+      font-size: 0.7rem;
+      font-family: monospace;
+      background: #00000066;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.6rem;
+      opacity: 0.6;
+      margin: 30px 0 10px;
+      letter-spacing: 1px;
+    }
+
+    /* адаптив */
+    @media (max-width: 600px) {
+      .cyber-grid { gap: 10px; }
+      .grid-card { padding: 12px 4px; }
+      .grid-count { font-size: 1.5rem; }
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #010508;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #0ff;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
-<div id="app"></div>
+
+<div class="container">
+  <div class="cyber-header">
+    <h1>⟁ CYBER DRIVER 3000 🚛 <small>v.∞</small></h1>
+    <p>⚡ нейросинхронізація · квантовий розподіл магазинів · другий поверх | підвал | пандус</p>
+  </div>
+
+  <div class="sync-panel">
+    <div class="sync-title">🌀 ХМАРНИЙ ІНТЕРФЕЙС</div>
+    <div class="sync-row">
+      <input type="text" id="apiKeyInput" placeholder="[ API-ключ ]">
+      <input type="text" id="binIdInput" placeholder="[ Bin ID ]">
+      <button id="saveConfigBtn">💾 ЗАПИСАТИ</button>
+    </div>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <button id="syncDownBtn">⬇️ ЗАВАНТАЖИТИ</button>
+      <button id="syncUpBtn">⬆️ ВІДПРАВИТИ</button>
+      <button id="clearStorageBtn" style="border-color:#f0f; color:#f0f;">⚠️ СТЕРТИ ВСЕ</button>
+    </div>
+    <div class="sync-status" id="syncStatus">⚙️ готовий до підключення</div>
+  </div>
+
+  <div class="cyber-card">
+    <h3>🔍 СКАНЕР МАГАЗИНІВ</h3>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <input type="number" id="checkShopInput" placeholder="номер об'єкта">
+      <button id="checkShopBtn">РОЗПІЗНАТИ</button>
+    </div>
+    <div id="checkResult" style="margin-top: 12px; padding: 8px; background: #00000055; border-radius: 20px;"></div>
+  </div>
+
+  <div class="cyber-card">
+    <h3>➕ ДОДАТИ МАГАЗИН</h3>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <input type="number" id="newShopNumber" placeholder="номер">
+      <select id="newShopColor"><option value="білі">⚪ БІЛІ</option><option value="сірі">⚫ СІРІ</option><option value="чорні">⬛ ЧОРНІ</option></select>
+      <select id="newShopComplexity"><option value="легко">🟢 ЛЕГКИЙ РІВЕНЬ</option><option value="потно">💦 ПОТНО</option><option value="тяжко">⛰️ ТЯЖКИЙ РЕЖИМ</option></select>
+    </div>
+    <div class="reason-buttons" id="reasonButtons"></div>
+    <button id="addShopBtn" style="width:100%; margin-top: 12px;">✅ АКТИВУВАТИ</button>
+  </div>
+
+  <div class="cyber-grid" id="cyberGrid"></div>
+  <footer>🛸 нейромережа локальна · всі дані захищені квантовим шифруванням (localStorage)</footer>
+</div>
 
 <script>
-  const ACCESS_PASSWORD = "вантажник2024";
-  
-  const fullReasonsList = [
-    { key: "рокля_підсобка", title: "🛒 Рокля до підсобки" },
-    { key: "рокля_далеко", title: "🚶 Рокля + далеко" },
+  // СПИСОК ПРИЧИН (кіберпанк)
+  const fullReasons = [
+    { key: "рокля_підсобка", title: "🛸 Рокля до підсобки" },
+    { key: "рокля_далеко", title: "🚀 Рокля + далеко" },
     { key: "рокля_гора", title: "⛰️ Рокля + гора" },
-    { key: "рокля_вузько", title: "🚫 Рокля + вузько" },
-    { key: "рокля_поріг", title: "📏 Рокля + поріг" },
-    { key: "розрив_перед_весь", title: "📦 Розрив перед → весь магазин" },
-    { key: "розрив_перед_коротко", title: "📦 Розрив перед → коротко" },
-    { key: "розрив_всередині_весь", title: "🏪 Розрив всередині → весь магазин" },
-    { key: "розрив_всередині_коротко", title: "🏪 Розрив всередині → коротко" },
-    { key: "розрив_біля_підсобки", title: "🚪 Розрив біля підсобки" },
-    { key: "розбір_вулиця", title: "🌧️ Розбір на вулиці" },
-    { key: "розбір_рампа", title: "🚛 Розбір на рампі" },
+    { key: "розрив_перед_весь", title: "📡 Розрив перед → весь" },
+    { key: "розрив_перед_коротко", title: "⚡ Розрив перед → коротко" },
+    { key: "розрив_всередині_весь", title: "🏪 Розрив всередині → весь" },
+    { key: "другий_поверх_руками", title: "🏢 2й поверх + кіберруки" },
+    { key: "підвал_один", title: "⬇️ Підвал 1 рівень" },
+    { key: "ліфт_палети", title: "🛗 Квантовий ліфт + палети" },
     { key: "вузький_двір", title: "🚫 Вузький двір" },
-    { key: "вузька_рампа", title: "🚫 Вузька рампа" },
-    { key: "немає_пандуса", title: "🚫 Немає пандуса" },
-    { key: "парковка_далеко", title: "🚶 Парковка далеко" },
-    { key: "чорний_хід", title: "🚪 Чорний хід" },
-    { key: "через_вітрину", title: "🪟 Через вітрину" },
-    { key: "через_поріг", title: "📏 Через поріг" },
-    { key: "сходи_вверх_мало", title: "📈 Сходи вверх (1-3)" },
-    { key: "сходи_вниз_мало", title: "📉 Сходи вниз (1-3)" },
-    { key: "сходи_круті", title: "📈📈 Круті сходи" },
-    { key: "другий_поверх_руками", title: "🏢 2й поверх → руками" },
-    { key: "другий_поверх_розрив_знизу", title: "🏢 2й поверх + розрив внизу" },
-    { key: "другий_поверх_розрив_зверху", title: "🏢 2й поверх + розрив зверху" },
-    { key: "підвал_один", title: "⬇️ Підвал 1 проліт" },
-    { key: "підвал_глибокий", title: "⬇️⬇️ Глибокий підвал" },
-    { key: "підвал_вузько", title: "⬇️🚫 Підвал + вузько" },
-    { key: "підвал_далеко", title: "⬇️🚶 Підвал + далеко" },
-    { key: "ліфт_розбір_внизу_далеко", title: "🛗 Розбір внизу → ліфт → далеко" },
-    { key: "ліфт_розбір_внизу_коротко", title: "🛗 Розбір внизу → ліфт → коротко" },
-    { key: "ліфт_палети_розбір_далеко", title: "🛗 Палети на ліфт → розбір → далеко" },
-    { key: "ліфт_палети_розбір_коротко", title: "🛗 Палети на ліфт → розбір → коротко" },
-    { key: "ліфт_палети_тягнути_далеко", title: "🛗 Палети на ліфт → тягнути далеко" },
-    { key: "ліфт_палети_тягнути_коротко", title: "🛗 Палети на ліфт → тягнути коротко" },
-    { key: "ліфт_палети_рокля", title: "🛗 Палети на ліфт → рокля" },
-    { key: "ліфт_замалий", title: "🛗📦 Ліфт замалий" },
-    { key: "немає_вантажного_ліфта", title: "🛗🚫 Немає вантажного ліфта" },
-    { key: "підсобка_кінець_коридору", title: "🚶 Підсобка в кінці коридору" },
-    { key: "підсобка_2й_поверх_окремо", title: "🏢 Підсобка на 2 поверсі" },
-    { key: "підсобка_далеко_2й_поверх", title: "🏢 Підсобка далеко + 2й поверх" },
-    { key: "розрив_сходи", title: "📦+📈 Розрив + сходи" },
-    { key: "вузький_двір_підвал", title: "🚫+⬇️ Вузький двір + підвал" },
-    { key: "ліфт_комбо", title: "🏢+🛗+🚶 2й поверх+ліфт+далеко" }
+    { key: "немає_пандуса", title: "🚫 Пандус відсутній" },
+    { key: "ліфт_розбір", title: "🛗 Ліфт + розбір на місці" }
   ];
 
   let shops = {
@@ -300,523 +445,85 @@
   let shopReasons = {};
   let config = { apiKey: "", binId: "" };
   let selectedReason = "";
-  let lastSnapshotShopsSet = new Set();
-  
-  function getAllShopNumbers() {
-    const set = new Set();
-    for (const color of ["білі","сірі","чорні"]) {
-      for (const comp of ["легко","потно","тяжко"]) {
-        for (const num of shops[color][comp]) set.add(num);
-      }
-    }
-    return set;
+
+  // Збереження / завантаження
+  function saveLocal() { localStorage.setItem("shops", JSON.stringify(shops)); localStorage.setItem("reasons", JSON.stringify(shopReasons)); }
+  function loadLocal() {
+    const s = localStorage.getItem("shops"); if(s) try { shops = JSON.parse(s); } catch(e) {}
+    const r = localStorage.getItem("reasons"); if(r) try { shopReasons = JSON.parse(r); } catch(e) {}
+    renderGrid();
   }
-  
-  function updateSnapshot() { lastSnapshotShopsSet = getAllShopNumbers(); }
-  
-  function getDeletedShops() {
-    const currentSet = getAllShopNumbers();
-    const deleted = [];
-    for (const shop of lastSnapshotShopsSet) {
-      if (!currentSet.has(shop)) deleted.push(shop);
-    }
-    return deleted;
-  }
-  
-  function hasLocalChanges() {
-    const currentSet = getAllShopNumbers();
-    if (currentSet.size !== lastSnapshotShopsSet.size) return true;
-    for (const shop of currentSet) {
-      if (!lastSnapshotShopsSet.has(shop)) return true;
-    }
-    return false;
-  }
-  
-  // ФУНКЦІЯ "ЗАБУТИ ВСЕ"
-  function forgetEverything() {
-    if (confirm("⚠️ ЦЕ ВИДАЛИТЬ ВСІ ДАНІ!\n\n• Збережені API ключі\n• Всі магазини на цьому пристрої\n• Авторизацію\n\nПісля цього сайт буде як новий. Продовжити?")) {
-      localStorage.removeItem("shops");
-      localStorage.removeItem("reasons");
-      localStorage.removeItem("sync_cfg");
-      localStorage.removeItem("app_authorized");
-      
-      // Скидаємо дані в пам'яті
-      shops = {
-        "білі": { "легко": [], "потно": [], "тяжко": [] },
-        "сірі": { "легко": [], "потно": [], "тяжко": [] },
-        "чорні": { "легко": [], "потно": [], "тяжко": [] }
-      };
-      shopReasons = {};
-      config = { apiKey: "", binId: "" };
-      
-      // Додаємо демо-дані
-      initDemo();
-      updateSnapshot();
-      
-      // Перезавантажуємо сторінку для повного скидання
-      location.reload();
-    }
-  }
-  
-  function showDeletionWarning(deletedShops, onConfirm, onCancel) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-content warning-modal">
-        <div class="modal-header">⚠️ ВАЖЛИВО!</div>
-        <div class="modal-list">
-          <p style="margin-bottom:12px;">Виявлено ВИДАЛЕННЯ магазинів:</p>
-          <div class="deleted-list">${deletedShops.map(s => `<span>🏪 ${s}</span>`).join('')}</div>
-          <p style="margin-top:16px; color:#666;">Вони будуть НАЗАВЖДИ видалені з хмари.</p>
-        </div>
-        <button class="btn-cancel">Скасувати</button>
-        <button class="btn-proceed">✅ Все одно відправити</button>
-      </div>
-    `;
-    overlay.querySelector('.btn-cancel').onclick = () => { overlay.remove(); if(onCancel) onCancel(); };
-    overlay.querySelector('.btn-proceed').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
-    document.body.appendChild(overlay);
-  }
-  
-  function saveToLocal() {
-    localStorage.setItem("shops", JSON.stringify(shops));
-    localStorage.setItem("reasons", JSON.stringify(shopReasons));
-  }
-  
-  function loadFromLocal() {
-    const savedShops = localStorage.getItem("shops");
-    if (savedShops) { try { shops = JSON.parse(savedShops); } catch(e) {} }
-    const savedReasons = localStorage.getItem("reasons");
-    if (savedReasons) { try { shopReasons = JSON.parse(savedReasons); } catch(e) {} }
-    updateSnapshot();
-    if (typeof renderCategories === 'function') renderCategories();
-  }
-  
-  function loadConfig() {
-    const saved = localStorage.getItem("sync_cfg");
-    if (saved) {
-      try {
-        config = JSON.parse(saved);
-        const apiInput = document.getElementById("apiKeyInput");
-        const binInput = document.getElementById("binIdInput");
-        if (apiInput) apiInput.value = config.apiKey || "";
-        if (binInput) binInput.value = config.binId || "";
-      } catch(e) {}
-    }
-    updateSavedKeysDisplay();
-  }
-  
-  function updateSavedKeysDisplay() {
-    const container = document.getElementById("savedKeysContainer");
-    if (!container) return;
-    
-    const savedApi = config.apiKey || localStorage.getItem("sync_cfg") ? JSON.parse(localStorage.getItem("sync_cfg") || '{}').apiKey : "";
-    const savedBin = config.binId || localStorage.getItem("sync_cfg") ? JSON.parse(localStorage.getItem("sync_cfg") || '{}').binId : "";
-    
-    let html = '';
-    if (savedApi && savedApi.length > 3) {
-      const maskedApi = savedApi.slice(0, 8) + '••••••••';
-      html += `<span class="saved-key-badge" data-keytype="api" data-keyvalue="${savedApi}">🔑 API: ${maskedApi}</span>`;
-    }
-    if (savedBin && savedBin.length > 3) {
-      const maskedBin = savedBin.slice(0, 6) + '••••••';
-      html += `<span class="saved-key-badge" data-keytype="bin" data-keyvalue="${savedBin}">📦 Bin: ${maskedBin}</span>`;
-    }
-    if (!savedApi && !savedBin) {
-      html = '<span style="font-size:0.65rem; color:#6c757d;">💾 Немає збережених ключів</span>';
-    }
-    container.innerHTML = html;
-    
-    document.querySelectorAll('.saved-key-badge').forEach(badge => {
-      badge.onclick = (e) => {
-        e.stopPropagation();
-        const keyType = badge.dataset.keytype;
-        const keyValue = badge.dataset.keyvalue;
-        if (keyType === 'api') {
-          document.getElementById("apiKeyInput").value = keyValue;
-          document.getElementById("syncStatus").innerHTML = "✅ API ключ вставлено! Натисніть 'Зберегти'";
-        } else if (keyType === 'bin') {
-          document.getElementById("binIdInput").value = keyValue;
-          document.getElementById("syncStatus").innerHTML = "✅ Bin ID вставлено! Натисніть 'Зберегти'";
-        }
-      };
-    });
-  }
-  
-  function saveConfig() {
-    config.apiKey = document.getElementById("apiKeyInput").value.trim();
-    config.binId = document.getElementById("binIdInput").value.trim();
-    localStorage.setItem("sync_cfg", JSON.stringify(config));
-    updateSavedKeysDisplay();
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) {
-      if (config.apiKey && config.binId) {
-        statusEl.innerHTML = "✅ Ключі збережено!";
-      } else {
-        statusEl.innerHTML = "⚠️ Введіть обидва ключі";
-      }
-    }
-  }
-  
-  function clearConfig() {
-    if (confirm("Очистити збережені ключі?")) {
-      config.apiKey = "";
-      config.binId = "";
-      localStorage.removeItem("sync_cfg");
-      document.getElementById("apiKeyInput").value = "";
-      document.getElementById("binIdInput").value = "";
-      updateSavedKeysDisplay();
-      const statusEl = document.getElementById("syncStatus");
-      if (statusEl) statusEl.innerHTML = "🗑 Ключі очищено";
-    }
-  }
-  
-  async function download() {
-    if (!config.apiKey || !config.binId) {
-      const apiKey = document.getElementById("apiKeyInput").value.trim();
-      const binId = document.getElementById("binIdInput").value.trim();
-      if (apiKey && binId) {
-        config.apiKey = apiKey;
-        config.binId = binId;
-      } else {
-        const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
-        return;
-      }
-    }
-    
-    if (hasLocalChanges()) {
-      if (!confirm("⚠️ У вас є незбережені зміни. Завантажити з хмари? Локальні зміни будуть втрачені.")) {
-        const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = "⏸️ Завантаження скасовано";
-        return;
-      }
-    }
-    
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "📥 Завантаження...";
-    try {
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
-        headers: { "X-Master-Key": config.apiKey }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.record && data.record.shops) {
-          shops = data.record.shops;
-          shopReasons = data.record.reasons || {};
-          saveToLocal();
-          updateSnapshot();
-          if (typeof renderCategories === 'function') renderCategories();
-          if (statusEl) statusEl.innerHTML = "✅ Завантажено!";
-        } else {
-          if (statusEl) statusEl.innerHTML = "⚠️ Хмара порожня";
-        }
-      } else {
-        if (statusEl) statusEl.innerHTML = "❌ Помилка завантаження";
-      }
-    } catch(e) {
-      if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
-    }
-  }
-  
-  async function upload(force = false) {
-    if (!config.apiKey || !config.binId) {
-      const apiKey = document.getElementById("apiKeyInput").value.trim();
-      const binId = document.getElementById("binIdInput").value.trim();
-      if (apiKey && binId) {
-        config.apiKey = apiKey;
-        config.binId = binId;
-      } else {
-        const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
-        return;
-      }
-    }
-    
-    const deletedShops = getDeletedShops();
-    if (!force && deletedShops.length > 0) {
-      showDeletionWarning(deletedShops, () => upload(true), () => {
-        const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = "⏸️ Відправлення скасовано";
-      });
-      return;
-    }
-    
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "📤 Відправка...";
-    try {
-      const data = { shops: shops, reasons: shopReasons };
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "X-Master-Key": config.apiKey },
-        body: JSON.stringify(data)
-      });
-      if (res.ok) {
-        updateSnapshot();
-        if (statusEl) statusEl.innerHTML = "✅ Відправлено!";
-      } else {
-        if (statusEl) statusEl.innerHTML = "❌ Помилка відправлення";
-      }
-    } catch(e) {
-      if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
-    }
-  }
-  
+  function loadConfig() { const s = localStorage.getItem("sync_cfg"); if(s) try { config = JSON.parse(s); document.getElementById("apiKeyInput").value = config.apiKey || ""; document.getElementById("binIdInput").value = config.binId || ""; } catch(e) {} }
+  function saveConfig() { config.apiKey = document.getElementById("apiKeyInput").value.trim(); config.binId = document.getElementById("binIdInput").value.trim(); localStorage.setItem("sync_cfg", JSON.stringify(config)); document.getElementById("syncStatus").innerHTML = "✅ конфігурацію збережено"; }
+
+  async function download() { if(!config.apiKey||!config.binId) { document.getElementById("syncStatus").innerHTML="⚠️ збережіть ключі"; return; } document.getElementById("syncStatus").innerHTML="📡 завантаження..."; try{ const res=await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`,{headers:{"X-Master-Key":config.apiKey}}); if(res.ok){ const data=await res.json(); if(data.record?.shops){ shops=data.record.shops; shopReasons=data.record.reasons||{}; saveLocal(); renderGrid(); document.getElementById("syncStatus").innerHTML="✅ синхронізація завершена"; } else document.getElementById("syncStatus").innerHTML="⚠️ хмара порожня"; } else document.getElementById("syncStatus").innerHTML="❌ помилка з'єднання"; } catch(e){ document.getElementById("syncStatus").innerHTML="❌ offline"; } }
+  async function upload() { if(!config.apiKey||!config.binId) { document.getElementById("syncStatus").innerHTML="⚠️ збережіть ключі"; return; } document.getElementById("syncStatus").innerHTML="📡 відправка..."; try{ const res=await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":config.apiKey},body:JSON.stringify({shops, reasons:shopReasons})}); if(res.ok){ document.getElementById("syncStatus").innerHTML="✅ відправлено в хмару"; } else document.getElementById("syncStatus").innerHTML="❌ помилка відправки"; } catch(e){ document.getElementById("syncStatus").innerHTML="❌ offline"; } }
+
   function addShop(num, color, comp, reason) {
-    const n = Number(num);
-    if (isNaN(n)) return;
-    for (let c of ["білі","сірі","чорні"]) {
-      for (let cp of ["легко","потно","тяжко"]) {
-        shops[c][cp] = shops[c][cp].filter(i => i !== n);
+    const n = Number(num); if(isNaN(n)) return;
+    for(let c of ["білі","сірі","чорні"]) for(let cp of ["легко","потно","тяжко"]) shops[c][cp] = shops[c][cp].filter(i=>i!==n);
+    shops[color][comp].push(n); shops[color][comp].sort((a,b)=>a-b);
+    if(reason) shopReasons[n] = reason;
+    saveLocal(); renderGrid();
+  }
+  function removeShop(n, color, comp) { shops[color][comp] = shops[color][comp].filter(i=>i!==n); delete shopReasons[n]; saveLocal(); renderGrid(); }
+  function getReason(key) { const f = fullReasons.find(r=>r.key===key); return f ? f.title : ""; }
+
+  function openModal(color, comp) {
+    const list = shops[color][comp];
+    const colorMap={"білі":"⚪ БІЛІ","сірі":"⚫ СІРІ","чорні":"⬛ ЧОРНІ"};
+    const compMap={"легко":"🟢 ЛЕГКИЙ","потно":"💦 ПОТНО","тяжко":"⛰️ ТЯЖКИЙ"};
+    const ov = document.createElement('div'); ov.className = 'modal-overlay';
+    let html = `<div class="modal-cyber"><div class="modal-header">${colorMap[color]} // ${compMap[comp]}</div><div class="modal-list">`;
+    if(list.length===0) html+=`<div style="text-align:center; padding:20px;">⛔ немає об'єктів</div>`;
+    else list.forEach(shop=>{ html+=`<div class="shop-item"><span>🏪 ${shop}</span><span style="font-size:0.7rem;">${getReason(shopReasons[shop])||"—"}</span><button class="delete-shop" data-shop="${shop}" data-color="${color}" data-comp="${comp}">✖ СТЕРТИ</button></div>`; });
+    html+=`</div><button class="modal-close" id="closeModal">ЗАКРИТИ ТЕРМІНАЛ</button></div>`;
+    ov.innerHTML = html;
+    document.body.appendChild(ov);
+    ov.querySelectorAll('.delete-shop').forEach(btn=>{ btn.onclick=()=>{ const s=parseInt(btn.dataset.shop); if(confirm(`видалити магазин ${s}?`)){ removeShop(s,btn.dataset.color,btn.dataset.comp); ov.remove(); openModal(color,comp); } }; });
+    ov.querySelector('#closeModal').onclick=()=>ov.remove();
+    ov.onclick=(e)=>{if(e.target===ov) ov.remove();};
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById("cyberGrid"); if(!grid) return;
+    let html="";
+    for(let c of ["білі","сірі","чорні"]){
+      for(let cp of ["легко","потно","тяжко"]){
+        const cnt = shops[c][cp].length;
+        const colSym = c==="білі"?"⚪":(c==="сірі"?"⚫":"⬛");
+        html+=`<div class="grid-card" data-color="${c}" data-comp="${cp}"><div>${colSym} ${c.toUpperCase()}</div><div style="font-size:0.7rem;">${cp === "легко"?"🟢 ЛЕГКО":(cp==="потно"?"💦 ПОТНО":"⛰️ ТЯЖКО")}</div><div class="grid-count">${cnt}</div></div>`;
       }
     }
-    shops[color][comp].push(n);
-    shops[color][comp].sort((a,b)=>a-b);
-    if (reason) shopReasons[n] = reason;
-    saveToLocal();
-    if (typeof renderCategories === 'function') renderCategories();
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "✅ Магазин додано! Натисніть 'Відправити'";
+    grid.innerHTML=html;
+    document.querySelectorAll('.grid-card').forEach(card=>{ card.onclick=()=>openModal(card.dataset.color, card.dataset.comp); });
   }
-  
-  function removeShop(n, color, comp) {
-    shops[color][comp] = shops[color][comp].filter(i => i !== n);
-    delete shopReasons[n];
-    saveToLocal();
-    if (typeof renderCategories === 'function') renderCategories();
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "✅ Магазин видалено!";
-  }
-  
-  function getReasonText(key) {
-    const found = fullReasonsList.find(r => r.key === key);
-    return found ? found.title : "";
-  }
-  
-  function openCategoryModal(color, complexity) {
-    const shopsList = shops[color][complexity] || [];
-    const colorNames = { "білі":"⚪ БІЛІ", "сірі":"⚫ СІРІ", "чорні":"⬛ ЧОРНІ" };
-    const compNames = { "легко":"🟢 Легко", "потно":"💦 Потно", "тяжко":"⛰️ Тяжко" };
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    let listHtml = '';
-    if (shopsList.length === 0) {
-      listHtml = '<div class="empty-modal">✖️ Немає магазинів</div>';
-    } else {
-      listHtml = shopsList.map(shop => {
-        const reason = getReasonText(shopReasons[shop]);
-        return `<div class="modal-shop-item">
-          <span class="modal-shop-num">${shop}</span>
-          ${reason ? `<span class="modal-shop-reason">📌 ${reason}</span>` : '<span class="modal-shop-reason"></span>'}
-          <button class="delete-shop-modal" data-shop="${shop}" data-color="${color}" data-comp="${complexity}">✖ Видалити</button>
-        </div>`;
-      }).join('');
-    }
-    overlay.innerHTML = `<div class="modal-content">
-      <div class="modal-header" style="background:#2c7da0; color:white;">${colorNames[color]} · ${compNames[complexity]}</div>
-      <div class="modal-list">${listHtml}</div>
-      <button class="modal-close" id="closeModalBtn">Закрити</button>
-    </div>`;
-    document.body.appendChild(overlay);
-    
-    overlay.querySelectorAll('.delete-shop-modal').forEach(btn => {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        const shopNum = parseInt(btn.dataset.shop);
-        if (confirm(`Видалити магазин ${shopNum}?`)) {
-          removeShop(shopNum, btn.dataset.color, btn.dataset.comp);
-          overlay.remove();
-          openCategoryModal(color, complexity);
-        }
-      };
-    });
-    overlay.querySelector('#closeModalBtn').onclick = () => overlay.remove();
-    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-  }
-  
-  function renderCategories() {
-    const container = document.getElementById("categoriesGrid");
-    if (!container) return;
-    const colors = ["білі", "сірі", "чорні"];
-    const comps = ["легко", "потно", "тяжко"];
-    const colorTitles = { "білі": "⚪ БІЛІ", "сірі": "⚫ СІРІ", "чорні": "⬛ ЧОРНІ" };
-    const headerClass = { "білі": "white-header", "сірі": "gray-header", "чорні": "black-header" };
-    const compIcons = { "легко": "🟢", "потно": "💦", "тяжко": "⛰️" };
-    
-    let html = '';
-    for (let color of colors) {
-      for (let comp of comps) {
-        const count = shops[color][comp].length;
-        html += `<div class="category-card" data-color="${color}" data-comp="${comp}">
-          <div class="cat-header ${headerClass[color]}">${colorTitles[color]}</div>
-          <div class="cat-body ${count === 0 ? 'empty-cat' : ''}">
-            <div class="cat-count">${count}</div>
-            <div class="cat-label">${compIcons[comp]} ${comp}</div>
-          </div>
-        </div>`;
-      }
-    }
-    container.innerHTML = html;
-    document.querySelectorAll('.category-card').forEach(card => {
-      card.onclick = () => openCategoryModal(card.dataset.color, card.dataset.comp);
-    });
-  }
-  
+
   function checkShop() {
     let v = document.getElementById("checkShopInput").value.trim();
-    if (!v) { 
-      const resultEl = document.getElementById("checkResult");
-      if (resultEl) resultEl.innerHTML = "⚠️ Введіть номер";
-      return; 
-    }
-    let num = Number(v);
-    if (isNaN(num)) { 
-      const resultEl = document.getElementById("checkResult");
-      if (resultEl) resultEl.innerHTML = "❌ Помилка";
-      return; 
-    }
-    let found = null;
-    for (let c of ["білі","сірі","чорні"]) {
-      for (let cp of ["легко","потно","тяжко"]) {
-        if (shops[c][cp].includes(num)) found = { color: c, comp: cp };
-      }
-    }
-    const resultEl = document.getElementById("checkResult");
-    if (found) {
-      let reason = getReasonText(shopReasons[num]);
-      if (resultEl) resultEl.innerHTML = `<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color}, ${found.comp}${reason ? `, ${reason}` : ''}`;
-    } else {
-      if (resultEl) resultEl.innerHTML = `<strong>🏪 Магазин ${num}</strong><br>⚠️ Немає даних`;
-    }
+    if(!v){ document.getElementById("checkResult").innerHTML="⚠️ введіть номер"; return; }
+    let num = Number(v); if(isNaN(num)){ document.getElementById("checkResult").innerHTML="❌ помилка"; return; }
+    let found=null;
+    for(let c of ["білі","сірі","чорні"]) for(let cp of ["легко","потно","тяжко"]) if(shops[c][cp].includes(num)) found={color:c,comp:cp};
+    if(found) document.getElementById("checkResult").innerHTML=`🏪 МАГАЗИН ${num}<br>📌 ${found.color} · ${found.comp}<br>🔧 ${getReason(shopReasons[num])||"без додаткових параметрів"}`;
+    else document.getElementById("checkResult").innerHTML=`🏪 ${num}<br>⚠️ об'єкт не знайдено`;
   }
-  
-  function addFromMobile() {
-    let num = document.getElementById("newShopNumber").value.trim();
-    if (!num) { alert("Введіть номер"); return; }
-    addShop(Number(num), document.getElementById("newShopColor").value, document.getElementById("newShopComplexity").value, selectedReason);
-    document.getElementById("newShopNumber").value = "";
-  }
-  
-  function initReasonButtons() {
-    const container = document.getElementById("reasonButtons");
-    if (!container) return;
-    container.innerHTML = "";
-    fullReasonsList.forEach(reason => {
-      const btn = document.createElement("div");
-      btn.className = "reason-btn";
-      btn.textContent = reason.title;
-      btn.dataset.reason = reason.key;
-      btn.onclick = () => {
-        document.querySelectorAll('.reason-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedReason = reason.key;
-      };
-      container.appendChild(btn);
-    });
-  }
-  
-  function initDemo() {
-    let has = false;
-    for (let c of ["білі","сірі","чорні"]) {
-      for (let cp of ["легко","потно","тяжко"]) {
-        if (shops[c][cp].length) has = true;
-      }
-    }
-    if (!has) {
-      addShop(708, "чорні", "тяжко", "другий_поверх_руками");
-      addShop(39, "чорні", "легко", "рокля_підсобка");
-      addShop(3039, "білі", "легко", "рокля_підсобка");
-    }
-  }
-  
-  // АВТОРИЗАЦІЯ
-  function checkAuth() {
-    const isAuthorized = localStorage.getItem("app_authorized") === "true";
-    if (!isAuthorized) showLoginScreen();
-    else showMainApp();
-  }
-  
-  function showLoginScreen() {
-    const overlay = document.createElement('div');
-    overlay.className = 'login-overlay';
-    overlay.id = 'loginOverlay';
-    overlay.innerHTML = `<div class="login-card">
-      <h2>🚛 Вантажники-водії</h2>
-      <p>Введіть пароль для доступу</p>
-      <input type="password" id="passwordInput" placeholder="Пароль" autocomplete="off">
-      <button id="loginBtn">Увійти</button>
-      <div id="loginError" class="error-msg"></div>
-    </div>`;
-    document.body.appendChild(overlay);
-    
-    const loginBtn = document.getElementById('loginBtn');
-    const passwordInput = document.getElementById('passwordInput');
-    function attemptLogin() {
-      if (passwordInput.value.trim() === ACCESS_PASSWORD) {
-        localStorage.setItem("app_authorized", "true");
-        document.getElementById('loginOverlay')?.remove();
-        showMainApp();
-      } else {
-        const errorEl = document.getElementById('loginError');
-        if (errorEl) errorEl.textContent = "❌ Невірний пароль";
-        passwordInput.value = "";
-        passwordInput.focus();
-      }
-    }
-    loginBtn.onclick = attemptLogin;
-    passwordInput.onkeypress = (e) => { if (e.key === 'Enter') attemptLogin(); };
-  }
-  
-  function showMainApp() {
-    const appContainer = document.getElementById('app');
-    appContainer.innerHTML = `<div class="container">
-      <h1>🚛 Вантажники-водії 📦 <small>синхронізація</small></h1>
-      <div class="sub">🏬 Натисніть на категорію для перегляду магазинів</div>
-      <div class="sync-panel">
-        <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
-        <div class="sync-row">
-          <div class="input-group"><label>🔑 API</label><input type="text" id="apiKeyInput" placeholder="API ключ" autocomplete="off"></div>
-          <div class="input-group"><label>📦 Bin</label><input type="text" id="binIdInput" placeholder="ID Bin" autocomplete="off"></div>
-        </div>
-        <div class="key-badge-container" id="savedKeysContainer"></div>
-        <div class="sync-row-buttons">
-          <button id="saveConfigBtn" class="btn-save">💾 Зберегти</button>
-          <button id="clearConfigBtn" class="btn-clear">🗑 Очистити</button>
-          <button id="forgetAllBtn" class="btn-forget">⚠️ Забути все</button>
-        </div>
-        <div class="sync-buttons">
-          <button id="syncDownBtn" class="btn-down">📥 Завантажити</button>
-          <button id="syncUpBtn" class="btn-up">📤 Відправити</button>
-        </div>
-        <div class="sync-status" id="syncStatus">⚙️ Введіть ключі або натисніть "Завантажити"</div>
-      </div>
-      <div class="action-panel">
-        <div class="check-card"><h3>🔍 Перевірити</h3><div class="check-input-group"><input type="number" id="checkShopInput" placeholder="Номер"><button id="checkShopBtn">Підказка</button></div><div id="checkResult" class="check-result">👆 Введіть номер</div></div>
-        <div class="add-card"><h3>➕ Додати</h3><div class="select-group"><input type="number" id="newShopNumber" placeholder="Номер"><select id="newShopColor"><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select><select id="newShopComplexity"><option value="легко">🟢 Легко</option><option value="потно">💦 Потно</option><option value="тяжко">⛰️ Тяжко</option></select></div><div class="extra-options"><div class="extra-title">📝 Причина:</div><div class="reason-buttons" id="reasonButtons"></div></div><button id="addShopBtn" style="width:100%; margin-top:12px;">✅ Додати</button></div>
-      </div>
-      <div class="categories-grid" id="categoriesGrid"></div>
-      <footer>💡 Ключі зберігаються на вашому пристрої. Натисніть на маску ключа для швидкого вводу</footer>
-    </div>`;
-    
-    loadFromLocal();
-    loadConfig();
-    initDemo();
-    initReasonButtons();
-    updateSnapshot();
-    renderCategories();
-    updateSavedKeysDisplay();
-    
-    document.getElementById("saveConfigBtn").onclick = saveConfig;
-    document.getElementById("clearConfigBtn").onclick = clearConfig;
-    document.getElementById("forgetAllBtn").onclick = forgetEverything;
-    document.getElementById("syncDownBtn").onclick = download;
-    document.getElementById("syncUpBtn").onclick = () => upload(false);
-    document.getElementById("checkShopBtn").onclick = checkShop;
-    document.getElementById("addShopBtn").onclick = addFromMobile;
-  }
-  
-  checkAuth();
+
+  function addUI() { let num = document.getElementById("newShopNumber").value.trim(); if(!num){ alert("введіть номер"); return; } addShop(Number(num), document.getElementById("newShopColor").value, document.getElementById("newShopComplexity").value, selectedReason); document.getElementById("newShopNumber").value=""; }
+
+  function initReasons() { const cont=document.getElementById("reasonButtons"); if(!cont) return; cont.innerHTML=""; fullReasons.forEach(r=>{ const btn=document.createElement("div"); btn.className="reason-btn"; btn.textContent=r.title; btn.dataset.reason=r.key; btn.onclick=()=>{ document.querySelectorAll('.reason-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); selectedReason=r.key; }; cont.appendChild(btn); }); }
+
+  function initDemo() { let has=false; for(let c of ["білі","сірі","чорні"]) for(let cp of ["легко","потно","тяжко"]) if(shops[c][cp].length) has=true; if(!has){ addShop(708,"чорні","тяжко","другий_поверх_руками"); addShop(39,"чорні","легко","рокля_підсобка"); addShop(3039,"білі","легко","рокля_підсобка"); addShop(642,"білі","потно","розрив_перед_весь"); addShop(2719,"білі","легко","рокля_підсобка"); } }
+
+  function clearAllData() { if(confirm("⚠️ ВИДАЛИТИ ВСІ ДАНІ? Відновити неможливо!")){ shops={"білі":{"легко":[],"потно":[],"тяжко":[]},"сірі":{"легко":[],"потно":[],"тяжко":[]},"чорні":{"легко":[],"потно":[],"тяжко":[]}}; shopReasons={}; saveLocal(); renderGrid(); document.getElementById("syncStatus").innerHTML="⚠️ всі дані стерто"; } }
+
+  loadLocal(); loadConfig(); initDemo(); initReasons(); renderGrid();
+  document.getElementById("saveConfigBtn").onclick = saveConfig;
+  document.getElementById("syncDownBtn").onclick = download;
+  document.getElementById("syncUpBtn").onclick = upload;
+  document.getElementById("checkShopBtn").onclick = checkShop;
+  document.getElementById("addShopBtn").onclick = addUI;
+  document.getElementById("clearStorageBtn").onclick = clearAllData;
 </script>
 </body>
 </html>
