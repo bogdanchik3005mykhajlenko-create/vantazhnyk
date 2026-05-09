@@ -103,26 +103,8 @@
     button { background: #2c7da0; border: none; padding: 12px 20px; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; min-height: 44px; }
     button:active { transform: scale(0.96); }
     .check-result { margin-top: 12px; padding: 12px; background: #eef3fa; border-radius: 16px; font-size: 0.9rem; border-left: 4px solid #2c7da0; }
-    .select-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin: 12px 0;
-    }
-    .select-group input {
-      padding: 14px;
-      border-radius: 30px;
-      border: 1px solid #bccbd4;
-      font-size: 1rem;
-      width: 100%;
-    }
-    .select-group select {
-      padding: 14px;
-      border-radius: 30px;
-      border: 1px solid #bccbd4;
-      font-size: 1rem;
-      width: 100%;
-    }
+    .select-group { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+    .select-group input, .select-group select { padding: 14px; border-radius: 30px; border: 1px solid #bccbd4; font-size: 1rem; width: 100%; }
     .extra-options { margin-top: 12px; padding-top: 8px; border-top: 1px solid #dee2e6; }
     .extra-title { font-size: 0.75rem; font-weight: 600; color: #2c5a6e; margin-bottom: 8px; }
     .reason-buttons {
@@ -132,19 +114,9 @@
       max-height: 140px;
       overflow-y: auto;
       padding: 4px 2px;
-      margin-bottom: 12px;
     }
     .reason-btn { background: #e9ecef; border: 1px solid #ced4da; padding: 8px 12px; border-radius: 30px; font-size: 0.7rem; cursor: pointer; white-space: nowrap; }
     .reason-btn.selected { background: #2c7da0; color: white; border-color: #2c7da0; }
-    textarea {
-      width: 100%;
-      padding: 12px;
-      border-radius: 20px;
-      border: 1px solid #bccbd4;
-      font-family: inherit;
-      font-size: 0.9rem;
-      resize: vertical;
-    }
     
     .categories-grid {
       display: grid;
@@ -204,6 +176,7 @@
       font-size: 1.1rem;
       font-weight: bold;
       text-align: center;
+      border-bottom: 1px solid #e9ecef;
     }
     .modal-list { flex: 1; overflow-y: auto; padding: 12px; }
     .modal-shop-item {
@@ -218,19 +191,18 @@
       gap: 6px;
     }
     .modal-shop-num { font-weight: bold; font-size: 0.9rem; background: #2c7da0; color: white; padding: 4px 10px; border-radius: 30px; }
-    .modal-shop-info { flex: 2; }
-    .modal-shop-reason { font-size: 0.65rem; color: #2c7da0; }
-    .modal-shop-details { font-size: 0.65rem; color: #6c757d; }
-    .modal-close { background: #6c757d; margin: 12px 20px 20px; padding: 10px; border-radius: 40px; text-align: center; cursor: pointer; }
+    .modal-shop-reason { font-size: 0.65rem; color: #6c757d; flex: 1; }
+    .modal-close { background: #6c757d; margin: 12px 20px 20px; padding: 10px; }
     .empty-modal { text-align: center; color: #8c9aa8; padding: 32px; font-style: italic; }
     .delete-shop-modal { background: #ffe0e0; border: none; padding: 5px 10px; border-radius: 30px; color: #b91c1c; font-weight: bold; cursor: pointer; font-size: 0.75rem; }
     
     .warning-modal .modal-header { background: #fff0f0; color: #b91c1c; }
     .deleted-list { background: #fff0f0; border-radius: 12px; padding: 10px; margin: 10px 0; max-height: 150px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; }
     .deleted-list span { background: #b91c1c; color: white; padding: 6px 14px; border-radius: 30px; font-size: 0.9rem; }
-    .btn-cancel { background: #6c757d; color: white; margin: 0 20px 12px; padding: 10px; border-radius: 40px; text-align: center; cursor: pointer; }
-    .btn-proceed { background: #dc3545; color: white; margin: 0 20px 20px; padding: 10px; border-radius: 40px; text-align: center; cursor: pointer; }
+    .btn-cancel { background: #6c757d; color: white; margin: 0 20px 12px; }
+    .btn-proceed { background: #dc3545; color: white; margin: 0 20px 20px; }
     
+    /* СТОРІНКА ВХОДУ / РЕЄСТРАЦІЇ */
     .login-overlay {
       position: fixed;
       top: 0;
@@ -254,7 +226,7 @@
     .login-card h2 { margin-bottom: 8px; color: #1a3a44; font-size: 1.3rem; }
     .login-card p { color: #6c757d; font-size: 0.75rem; margin-bottom: 20px; }
     .login-card input { width: 100%; padding: 14px; border: 2px solid #cbdae2; border-radius: 40px; font-size: 1rem; margin-bottom: 16px; text-align: center; }
-    .login-card button { width: 100%; background: #2c7da0; padding: 14px; font-size: 1rem; margin-top: 8px; border-radius: 40px; }
+    .login-card button { width: 100%; background: #2c7da0; padding: 14px; font-size: 1rem; margin-top: 8px; }
     .login-card button:active { transform: scale(0.96); }
     .error-msg { color: #dc3545; font-size: 0.75rem; margin-top: 10px; }
     .switch-mode { margin-top: 16px; font-size: 0.75rem; color: #2c7da0; cursor: pointer; text-decoration: underline; }
@@ -275,87 +247,690 @@
 <div id="app"></div>
 
 <script>
-const BASE_PASSWORD = "Закони водіїв";
+  // БАЗОВИЙ ПАРОЛЬ
+  const BASE_PASSWORD = "Закони водіїв";
+  
+  function getUsers() {
+    const users = localStorage.getItem("app_users");
+    if (users) {
+      try { return JSON.parse(users); } catch(e) {}
+    }
+    return {};
+  }
+  
+  function saveUsers(users) {
+    localStorage.setItem("app_users", JSON.stringify(users));
+  }
+  
+  let currentUser = null;
+  
+  const fullReasonsList = [
+    { key: "рокля_підсобка", title: "🛒 Рокля до підсобки" },
+    { key: "рокля_далеко", title: "🚶 Рокля + далеко" },
+    { key: "рокля_гора", title: "⛰️ Рокля + гора" },
+    { key: "рокля_вузько", title: "🚫 Рокля + вузько" },
+    { key: "рокля_поріг", title: "📏 Рокля + поріг" },
+    { key: "розрив_перед_весь", title: "📦 Розрив перед → весь магазин" },
+    { key: "розрив_перед_коротко", title: "📦 Розрив перед → коротко" },
+    { key: "розрив_всередині_весь", title: "🏪 Розрив всередині → весь магазин" },
+    { key: "розрив_всередині_коротко", title: "🏪 Розрив всередині → коротко" },
+    { key: "розрив_біля_підсобки", title: "🚪 Розрив біля підсобки" },
+    { key: "розбір_вулиця", title: "🌧️ Розбір на вулиці" },
+    { key: "розбір_рампа", title: "🚛 Розбір на рампі" },
+    { key: "вузький_двір", title: "🚫 Вузький двір" },
+    { key: "вузька_рампа", title: "🚫 Вузька рампа" },
+    { key: "немає_пандуса", title: "🚫 Немає пандуса" },
+    { key: "парковка_далеко", title: "🚶 Парковка далеко" },
+    { key: "чорний_хід", title: "🚪 Чорний хід" },
+    { key: "через_вітрину", title: "🪟 Через вітрину" },
+    { key: "через_поріг", title: "📏 Через поріг" },
+    { key: "сходи_вверх_мало", title: "📈 Сходи вверх (1-3)" },
+    { key: "сходи_вниз_мало", title: "📉 Сходи вниз (1-3)" },
+    { key: "сходи_круті", title: "📈📈 Круті сходи" },
+    { key: "другий_поверх_руками", title: "🏢 2й поверх → руками" },
+    { key: "другий_поверх_розрив_знизу", title: "🏢 2й поверх + розрив внизу" },
+    { key: "другий_поверх_розрив_зверху", title: "🏢 2й поверх + розрив зверху" },
+    { key: "підвал_один", title: "⬇️ Підвал 1 проліт" },
+    { key: "підвал_глибокий", title: "⬇️⬇️ Глибокий підвал" },
+    { key: "підвал_вузько", title: "⬇️🚫 Підвал + вузько" },
+    { key: "підвал_далеко", title: "⬇️🚶 Підвал + далеко" },
+    { key: "ліфт_розбір_внизу_далеко", title: "🛗 Розбір внизу → ліфт → далеко" },
+    { key: "ліфт_розбір_внизу_коротко", title: "🛗 Розбір внизу → ліфт → коротко" },
+    { key: "ліфт_палети_розбір_далеко", title: "🛗 Палети на ліфт → розбір → далеко" },
+    { key: "ліфт_палети_розбір_коротко", title: "🛗 Палети на ліфт → розбір → коротко" },
+    { key: "ліфт_палети_тягнути_далеко", title: "🛗 Палети на ліфт → тягнути далеко" },
+    { key: "ліфт_палети_тягнути_коротко", title: "🛗 Палети на ліфт → тягнути коротко" },
+    { key: "ліфт_палети_рокля", title: "🛗 Палети на ліфт → рокля" },
+    { key: "ліфт_замалий", title: "🛗📦 Ліфт замалий" },
+    { key: "немає_вантажного_ліфта", title: "🛗🚫 Немає вантажного ліфта" },
+    { key: "підсобка_кінець_коридору", title: "🚶 Підсобка в кінці коридору" },
+    { key: "підсобка_2й_поверх_окремо", title: "🏢 Підсобка на 2 поверсі" },
+    { key: "підсобка_далеко_2й_поверх", title: "🏢 Підсобка далеко + 2й поверх" },
+    { key: "розрив_сходи", title: "📦+📈 Розрив + сходи" },
+    { key: "вузький_двір_підвал", title: "🚫+⬇️ Вузький двір + підвал" },
+    { key: "ліфт_комбо", title: "🏢+🛗+🚶 2й поверх+ліфт+далеко" }
+  ];
 
-const fullReasonsList = [
-  {key:"рокля_підсобка", title:"🛒 Рокля до підсобки"},
-  {key:"рокля_далеко", title:"🚶 Рокля + далеко"},
-  {key:"рокля_гора", title:"⛰️ Рокля + гора"},
-  {key:"рокля_вузько", title:"🚫 Рокля + вузько"},
-  {key:"рокля_поріг", title:"📏 Рокля + поріг"},
-  {key:"розрив_перед_весь", title:"📦 Розрив перед → весь"},
-  {key:"розрив_перед_коротко", title:"📦 Розрив перед → коротко"},
-  {key:"розрив_всередині_весь", title:"🏪 Розрив всередині → весь"},
-  {key:"розрив_всередині_коротко", title:"🏪 Розрив всередині → коротко"},
-  {key:"розрив_біля_підсобки", title:"🚪 Розрив біля підсобки"},
-  {key:"розбір_вулиця", title:"🌧️ Розбір на вулиці"},
-  {key:"розбір_рампа", title:"🚛 Розбір на рампі"},
-  {key:"вузький_двір", title:"🚫 Вузький двір"},
-  {key:"вузька_рампа", title:"🚫 Вузька рампа"},
-  {key:"немає_пандуса", title:"🚫 Немає пандуса"},
-  {key:"парковка_далеко", title:"🚶 Парковка далеко"},
-  {key:"чорний_хід", title:"🚪 Чорний хід"},
-  {key:"другий_поверх_руками", title:"🏢 2й поверх → руками"},
-  {key:"підвал_один", title:"⬇️ Підвал 1 проліт"},
-  {key:"підвал_глибокий", title:"⬇️⬇️ Глибокий підвал"}
-];
-
-function getUsers(){const u=localStorage.getItem("app_users");if(u){try{return JSON.parse(u)}catch(e){}}return {}}
-function saveUsers(u){localStorage.setItem("app_users",JSON.stringify(u))}
-
-let currentUser=null;
-let shops={"білі":[],"сірі":[],"чорні":[]};
-let shopReasons={};
-let shopDetails={};
-let config={apiKey:"",binId:""};
-let selectedReason="";
-let lastSnapshotShopsSet=new Set();
-
-function getAllShopNumbers(){const s=new Set();for(let c of["білі","сірі","чорні"])for(let n of shops[c])s.add(n);return s}
-function updateSnapshot(){lastSnapshotShopsSet=getAllShopNumbers()}
-function getDeletedShops(){const cur=getAllShopNumbers(),del=[];for(let s of lastSnapshotShopsSet)if(!cur.has(s))del.push(s);return del}
-function hasLocalChanges(){const cur=getAllShopNumbers();if(cur.size!==lastSnapshotShopsSet.size)return true;for(let s of cur)if(!lastSnapshotShopsSet.has(s))return true;return false}
-
-function saveUserData(){if(!currentUser)return;const u=getUsers();u[currentUser]={password:BASE_PASSWORD,shops:shops,reasons:shopReasons,details:shopDetails,config:config};saveUsers(u)}
-function loadUserData(n){const u=getUsers(),d=u[n];if(d){shops=d.shops||{"білі":[],"сірі":[],"чорні":[]};shopReasons=d.reasons||{};shopDetails=d.details||{};config=d.config||{apiKey:"",binId:""}}else{shops={"білі":[],"сірі":[],"чорні":[]};shopReasons={};shopDetails={};config={apiKey:"",binId:""};initDemo()}updateSnapshot();if(typeof renderCategories==='function')renderCategories();if(typeof updateSavedKeysDisplay==='function')updateSavedKeysDisplay()}
-
-function loadConfig(){if(currentUser){const a=document.getElementById("apiKeyInput"),b=document.getElementById("binIdInput");if(a)a.value=config.apiKey||"";if(b)b.value=config.binId||""}updateSavedKeysDisplay()}
-
-function updateSavedKeysDisplay(){const c=document.getElementById("savedKeysContainer");if(!c)return;let h="";if(config.apiKey&&config.apiKey.length>3){h+=`<span class="saved-key-badge" data-keytype="api" data-keyvalue="${config.apiKey}">🔑 API: ${config.apiKey.slice(0,8)}••••••••</span>`}if(config.binId&&config.binId.length>3){h+=`<span class="saved-key-badge" data-keytype="bin" data-keyvalue="${config.binId}">📦 Bin: ${config.binId.slice(0,6)}••••••</span>`}if(!config.apiKey&&!config.binId)h='<span style="font-size:0.65rem;color:#6c757d;">💾 Немає збережених ключів</span>';c.innerHTML=h;document.querySelectorAll('.saved-key-badge').forEach(b=>{b.onclick=e=>{e.stopPropagation();if(b.dataset.keytype==='api'){document.getElementById("apiKeyInput").value=b.dataset.keyvalue;document.getElementById("syncStatus").innerHTML="✅ API ключ вставлено!"}else if(b.dataset.keytype==='bin'){document.getElementById("binIdInput").value=b.dataset.keyvalue;document.getElementById("syncStatus").innerHTML="✅ Bin ID вставлено!"}}})}
-
-function saveConfig(){config.apiKey=document.getElementById("apiKeyInput").value.trim();config.binId=document.getElementById("binIdInput").value.trim();saveUserData();updateSavedKeysDisplay();const s=document.getElementById("syncStatus");if(s)s.innerHTML=(config.apiKey&&config.binId)?"✅ Ключі збережено!":"⚠️ Введіть обидва ключі"}
-function clearConfig(){if(confirm("Очистити збережені ключі?")){config.apiKey="";config.binId="";saveUserData();document.getElementById("apiKeyInput").value="";document.getElementById("binIdInput").value="";updateSavedKeysDisplay();const s=document.getElementById("syncStatus");if(s)s.innerHTML="🗑 Ключі очищено"}}
-
-async function download(){if(!config.apiKey||!config.binId){const a=document.getElementById("apiKeyInput").value.trim(),b=document.getElementById("binIdInput").value.trim();if(a&&b){config.apiKey=a;config.binId=b;saveUserData()}else{const s=document.getElementById("syncStatus");if(s)s.innerHTML="⚠️ Введіть API ключ та ID Bin!";return}}if(hasLocalChanges()){if(!confirm("⚠️ У вас є незбережені зміни. Завантажити з хмари? Локальні зміни будуть втрачені.")){const s=document.getElementById("syncStatus");if(s)s.innerHTML="⏸️ Завантаження скасовано";return}}const s=document.getElementById("syncStatus");if(s)s.innerHTML="📥 Завантаження...";try{const r=await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`,{headers:{"X-Master-Key":config.apiKey}});if(r.ok){const d=await r.json();if(d.record&&d.record.shops){shops=d.record.shops;shopReasons=d.record.reasons||{};shopDetails=d.record.details||{};saveUserData();updateSnapshot();if(typeof renderCategories==='function')renderCategories();if(s)s.innerHTML="✅ Завантажено!"}else{if(s)s.innerHTML="⚠️ Хмара порожня"}}else{if(s)s.innerHTML="❌ Помилка завантаження"}}catch(e){if(s)s.innerHTML="❌ Немає інтернету"}}
-
-async function upload(force=false){if(!config.apiKey||!config.binId){const a=document.getElementById("apiKeyInput").value.trim(),b=document.getElementById("binIdInput").value.trim();if(a&&b){config.apiKey=a;config.binId=b;saveUserData()}else{const s=document.getElementById("syncStatus");if(s)s.innerHTML="⚠️ Введіть API ключ та ID Bin!";return}}const del=getDeletedShops();if(!force&&del.length>0){showDeletionWarning(del,()=>upload(true),()=>{const s=document.getElementById("syncStatus");if(s)s.innerHTML="⏸️ Відправлення скасовано"});return}const s=document.getElementById("syncStatus");if(s)s.innerHTML="📤 Відправка...";try{const res=await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":config.apiKey},body:JSON.stringify({shops:shops,reasons:shopReasons,details:shopDetails})});if(res.ok){updateSnapshot();if(s)s.innerHTML="✅ Відправлено!"}else{if(s)s.innerHTML="❌ Помилка відправлення"}}catch(e){if(s)s.innerHTML="❌ Немає інтернету"}}
-
-function addShop(num,color,reason,details){const n=Number(num);if(isNaN(n))return;for(let c of["білі","сірі","чорні"])shops[c]=shops[c].filter(i=>i!==n);shops[color].push(n);shops[color].sort((a,b)=>a-b);if(reason)shopReasons[n]=reason;else delete shopReasons[n];if(details)shopDetails[n]=details;else delete shopDetails[n];saveUserData();renderCategories();const s=document.getElementById("syncStatus");if(s)s.innerHTML="✅ Магазин додано!"}
-function removeShop(n,color){shops[color]=shops[color].filter(i=>i!==n);delete shopReasons[n];delete shopDetails[n];saveUserData();renderCategories();const s=document.getElementById("syncStatus");if(s)s.innerHTML="✅ Магазин видалено!"}
-function getReasonText(key){const f=fullReasonsList.find(r=>r.key===key);return f?f.title:""}
-
-function openCategoryModal(color){const list=shops[color]||[];const colorNames={"білі":"⚪ БІЛІ","сірі":"⚫ СІРІ","чорні":"⬛ ЧОРНІ"};const headerBg={"білі":"#2c7da0","сірі":"#5a6e78","чорні":"#1e2a2e"};const ov=document.createElement('div');ov.className='modal-overlay';let html='';if(list.length===0){html='<div class="empty-modal">✖️ Немає магазинів</div>'}else{html=list.map(shop=>{const r=getReasonText(shopReasons[shop]);const d=shopDetails[shop]||"";return`<div class="modal-shop-item"><span class="modal-shop-num">${shop}</span><div class="modal-shop-info">${r?`<div class="modal-shop-reason">📌 ${r}</div>`:''}${d?`<div class="modal-shop-details">📝 ${d}</div>`:''}</div><button class="delete-shop-modal" data-shop="${shop}" data-color="${color}">✖</button></div>`}).join('')}ov.innerHTML=`<div class="modal-content"><div class="modal-header" style="background:${headerBg[color]};color:white;">${colorNames[color]}</div><div class="modal-list">${html}</div><div class="modal-close" id="closeModalBtn">Закрити</div></div>`;document.body.appendChild(ov);ov.querySelectorAll('.delete-shop-modal').forEach(btn=>{btn.onclick=(e)=>{e.stopPropagation();const s=parseInt(btn.dataset.shop);if(confirm(`Видалити магазин ${s}?`)){removeShop(s,btn.dataset.color);ov.remove();openCategoryModal(color)}}});ov.querySelector('#closeModalBtn').onclick=()=>ov.remove();ov.onclick=(e)=>{if(e.target===ov)ov.remove()}}
-
-function renderCategories(){const c=document.getElementById("categoriesGrid");if(!c)return;const cols=["білі","сірі","чорні"],titles={"білі":"⚪ БІЛІ","сірі":"⚫ СІРІ","чорні":"⬛ ЧОРНІ"},hclass={"білі":"white-header","сірі":"gray-header","чорні":"black-header"};let h="";for(let col of cols){const cnt=shops[col].length;h+=`<div class="category-card" data-color="${col}"><div class="cat-header ${hclass[col]}">${titles[col]}</div><div class="cat-body ${cnt===0?'empty-cat':''}"><div class="cat-count">${cnt}</div><div class="cat-label">магазинів</div></div></div>`}c.innerHTML=h;document.querySelectorAll('.category-card').forEach(card=>{card.onclick=()=>openCategoryModal(card.dataset.color)})}
-
-function checkShop(){let v=document.getElementById("checkShopInput").value.trim();if(!v){const r=document.getElementById("checkResult");if(r)r.innerHTML="⚠️ Введіть номер";return}let num=Number(v);if(isNaN(num)){const r=document.getElementById("checkResult");if(r)r.innerHTML="❌ Помилка";return}let found=null;for(let c of["білі","сірі","чорні"])if(shops[c].includes(num))found=c;const r=document.getElementById("checkResult");if(found){const reason=getReasonText(shopReasons[num]);const details=shopDetails[num]||"";if(r)r.innerHTML=`<strong>🏪 Магазин ${num}</strong><br>📌 ${found}${reason?`<br>📌 ${reason}`:''}${details?`<br>📝 ${details}`:''}`}else{if(r)r.innerHTML=`<strong>🏪 Магазин ${num}</strong><br>⚠️ Немає даних`}}
-
-function addFromMobile(){let n=document.getElementById("newShopNumber").value.trim();if(!n){alert("Введіть номер");return}let d=document.getElementById("detailsInput").value.trim();addShop(Number(n),document.getElementById("newShopColor").value,selectedReason,d);document.getElementById("newShopNumber").value="";document.getElementById("detailsInput").value="";selectedReason="";document.querySelectorAll('.reason-btn').forEach(b=>b.classList.remove('selected'))}
-
-function initReasonButtons(){const c=document.getElementById("reasonButtons");if(!c)return;c.innerHTML="";fullReasonsList.forEach(r=>{const btn=document.createElement("div");btn.className="reason-btn";btn.textContent=r.title;btn.dataset.reason=r.key;btn.onclick=()=>{document.querySelectorAll('.reason-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selectedReason=r.key};c.appendChild(btn)})}
-
-function initDemo(){let has=false;for(let c of["білі","сірі","чорні"])if(shops[c].length)has=true;if(!has){addShop(708,"чорні","другий_поверх_руками","Ключ у охоронця, вхід з торця");addShop(39,"чорні","рокля_підсобка","Вузький прохід");addShop(3039,"білі","рокля_підсобка","");addShop(2719,"білі","рокля_далеко","Парковка за 100м");addShop(3067,"білі","розрив_перед_весь","");addShop(642,"білі","розрив_біля_підсобки","Розвантаження 8-12")}}
-
-function showDeletionWarning(del,onOk,onCancel){const ov=document.createElement('div');ov.className='modal-overlay';ov.innerHTML=`<div class="modal-content warning-modal"><div class="modal-header">⚠️ ВАЖЛИВО!</div><div class="modal-list"><p>Виявлено ВИДАЛЕННЯ магазинів:</p><div class="deleted-list">${del.map(s=>`<span>🏪 ${s}</span>`).join('')}</div><p>Вони будуть НАЗАВЖДИ видалені з хмари.</p></div><div class="btn-cancel">Скасувати</div><div class="btn-proceed">✅ Все одно відправити</div></div>`;ov.querySelector('.btn-cancel').onclick=()=>{ov.remove();if(onCancel)onCancel()};ov.querySelector('.btn-proceed').onclick=()=>{ov.remove();if(onOk)onOk()};document.body.appendChild(ov)}
-
-function forgetEverything(){if(confirm("⚠️ ВИДАЛИТИ ВСІ ДАНІ?")){if(currentUser){const u=getUsers();delete u[currentUser];saveUsers(u)}localStorage.removeItem("app_current_user");currentUser=null;location.reload()}}
-
-let isLoginMode=true;
-function showAuthScreen(){const ov=document.createElement('div');ov.className='login-overlay';ov.id='loginOverlay';ov.innerHTML=`<div class="login-card"><h2>🚛 Вантажники-водії</h2><p id="authModeText">${isLoginMode?"Вхід в систему":"Створення акаунту"}</p><input type="text" id="usernameInput" placeholder="Ім'я користувача"><input type="password" id="passwordInput" placeholder="Пароль"><button id="authBtn">${isLoginMode?"Увійти":"Зареєструватися"}</button><div class="switch-mode" id="switchModeBtn">${isLoginMode?"Немає акаунту? Зареєструватися":"Вже є акаунт? Увійти"}</div><div id="authError" class="error-msg"></div></div>`;document.body.appendChild(ov);const btn=document.getElementById('authBtn'),userInp=document.getElementById('usernameInput'),passInp=document.getElementById('passwordInput'),switchBtn=document.getElementById('switchModeBtn'),modeText=document.getElementById('authModeText'),err=document.getElementById('authError');function attempt(){const u=userInp.value.trim(),p=passInp.value.trim();if(!u){err.textContent="❌ Введіть ім'я";return}if(!p){err.textContent="❌ Введіть пароль";return}const users=getUsers();if(isLoginMode){if(users[u]&&users[u].password===p){currentUser=u;localStorage.setItem("app_current_user",u);document.getElementById('loginOverlay')?.remove();showMainApp()}else{err.textContent="❌ Невірне ім'я або пароль";passInp.value=""}}else{if(users[u]){err.textContent="❌ Користувач вже існує";return}if(p!==BASE_PASSWORD){err.textContent="❌ Невірний пароль. Зверніться до адміністратора";return}users[u]={password:p,shops:{"білі":[],"сірі":[],"чорні":[]},reasons:{},details:{},config:{apiKey:"",binId:""}};saveUsers(users);currentUser=u;localStorage.setItem("app_current_user",u);shops=users[u].shops;shopReasons=users[u].reasons;shopDetails=users[u].details;config=users[u].config;initDemo();saveUserData();document.getElementById('loginOverlay')?.remove();showMainApp()}}switchBtn.onclick=()=>{isLoginMode=!isLoginMode;modeText.textContent=isLoginMode?"Вхід в систему":"Створення акаунту";btn.textContent=isLoginMode?"Увійти":"Зареєструватися";switchBtn.textContent=isLoginMode?"Немає акаунту? Зареєструватися":"Вже є акаунт? Увійти";err.textContent="";passInp.placeholder=isLoginMode?"Пароль":"Пароль (дізнайтеся у адміністратора)"};btn.onclick=attempt;userInp.onkeypress=e=>{if(e.key==='Enter')attempt()};passInp.onkeypress=e=>{if(e.key==='Enter')attempt()}}
-
-function showMainApp(){const app=document.getElementById('app');app.innerHTML=`<div class="container"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><h1>🚛 Вантажники-водії 📦 <small>синхронізація</small></h1><div class="user-greeting">👤 ${currentUser} <button id="logoutBtn" style="background:none;border:none;color:#dc3545;font-size:0.7rem;">🚪 Вийти</button></div></div><div class="sub">🏬 Натисніть на категорію</div><div class="sync-panel"><div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div><div class="sync-row"><div class="input-group"><label>🔑 API</label><input type="text" id="apiKeyInput" placeholder="API ключ"></div><div class="input-group"><label>📦 Bin</label><input type="text" id="binIdInput" placeholder="ID Bin"></div></div><div class="key-badge-container" id="savedKeysContainer"></div><div class="sync-row-buttons"><button id="saveConfigBtn" class="btn-save">💾 Зберегти</button><button id="clearConfigBtn" class="btn-clear">🗑 Очистити</button><button id="forgetAllBtn" class="btn-forget">⚠️ Забути все</button></div><div class="sync-buttons"><button id="syncDownBtn" class="btn-down">📥 Завантажити</button><button id="syncUpBtn" class="btn-up">📤 Відправити</button></div><div class="sync-status" id="syncStatus">⚙️ Введіть ключі</div></div><div class="action-panel"><div class="check-card"><h3>🔍 Перевірити</h3><div class="check-input-group"><input type="number" id="checkShopInput" placeholder="Номер"><button id="checkShopBtn">Підказка</button></div><div id="checkResult" class="check-result">👆 Введіть номер</div></div><div class="add-card"><h3>➕ Додати</h3><div class="select-group"><input type="number" id="newShopNumber" placeholder="Номер магазину"><select id="newShopColor"><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select></div><div class="extra-options"><div class="extra-title">📌 Коротка причина:</div><div class="reason-buttons" id="reasonButtons"></div><div class="extra-title" style="margin-top:10px;">📝 Деталі (важливо)</div><textarea id="detailsInput" rows="2" placeholder="Додаткова інформація: код від дверей, поверх, де шукати ключі..."></textarea></div><button id="addShopBtn" style="width:100%;margin-top:12px;">✅ Додати</button></div></div><div class="categories-grid" id="categoriesGrid"></div><footer>💡 Натисніть на маску ключа для швидкого вводу</footer></div>`;loadConfig();initReasonButtons();renderCategories();updateSavedKeysDisplay();document.getElementById("saveConfigBtn").onclick=saveConfig;document.getElementById("clearConfigBtn").onclick=clearConfig;document.getElementById("forgetAllBtn").onclick=forgetEverything;document.getElementById("syncDownBtn").onclick=download;document.getElementById("syncUpBtn").onclick=()=>upload(false);document.getElementById("checkShopBtn").onclick=checkShop;document.getElementById("addShopBtn").onclick=addFromMobile;document.getElementById("logoutBtn").onclick=()=>{localStorage.removeItem("app_current_user");currentUser=null;location.reload()}}
-
-const savedUser=localStorage.getItem("app_current_user");if(savedUser){const u=getUsers();if(u[savedUser]){currentUser=savedUser;loadUserData(currentUser);showMainApp()}else showAuthScreen()}else showAuthScreen();
+  let shops = {
+    "білі": { "легко": [], "потно": [], "тяжко": [] },
+    "сірі": { "легко": [], "потно": [], "тяжко": [] },
+    "чорні": { "легко": [], "потно": [], "тяжко": [] }
+  };
+  let shopReasons = {};
+  let config = { apiKey: "", binId: "" };
+  let selectedReason = "";
+  let lastSnapshotShopsSet = new Set();
+  
+  function getAllShopNumbers() {
+    const set = new Set();
+    for (const color of ["білі","сірі","чорні"]) {
+      for (const comp of ["легко","потно","тяжко"]) {
+        for (const num of shops[color][comp]) set.add(num);
+      }
+    }
+    return set;
+  }
+  
+  function updateSnapshot() { lastSnapshotShopsSet = getAllShopNumbers(); }
+  
+  function getDeletedShops() {
+    const currentSet = getAllShopNumbers();
+    const deleted = [];
+    for (const shop of lastSnapshotShopsSet) {
+      if (!currentSet.has(shop)) deleted.push(shop);
+    }
+    return deleted;
+  }
+  
+  function hasLocalChanges() {
+    const currentSet = getAllShopNumbers();
+    if (currentSet.size !== lastSnapshotShopsSet.size) return true;
+    for (const shop of currentSet) {
+      if (!lastSnapshotShopsSet.has(shop)) return true;
+    }
+    return false;
+  }
+  
+  function saveUserData() {
+    if (!currentUser) return;
+    const users = getUsers();
+    users[currentUser] = {
+      password: BASE_PASSWORD,
+      shops: shops,
+      reasons: shopReasons,
+      config: config
+    };
+    saveUsers(users);
+  }
+  
+  function loadUserData(username) {
+    const users = getUsers();
+    const userData = users[username];
+    if (userData) {
+      shops = userData.shops || {
+        "білі": { "легко": [], "потно": [], "тяжко": [] },
+        "сірі": { "легко": [], "потно": [], "тяжко": [] },
+        "чорні": { "легко": [], "потно": [], "тяжко": [] }
+      };
+      shopReasons = userData.reasons || {};
+      config = userData.config || { apiKey: "", binId: "" };
+    } else {
+      shops = {
+        "білі": { "легко": [], "потно": [], "тяжко": [] },
+        "сірі": { "легко": [], "потно": [], "тяжко": [] },
+        "чорні": { "легко": [], "потно": [], "тяжко": [] }
+      };
+      shopReasons = {};
+      config = { apiKey: "", binId: "" };
+      initDemo();
+    }
+    updateSnapshot();
+    if (typeof renderCategories === 'function') renderCategories();
+    if (typeof updateSavedKeysDisplay === 'function') updateSavedKeysDisplay();
+  }
+  
+  function loadConfig() {
+    if (currentUser) {
+      const users = getUsers();
+      const userData = users[currentUser];
+      if (userData && userData.config) {
+        config = userData.config;
+      }
+      const apiInput = document.getElementById("apiKeyInput");
+      const binInput = document.getElementById("binIdInput");
+      if (apiInput) apiInput.value = config.apiKey || "";
+      if (binInput) binInput.value = config.binId || "";
+    }
+    updateSavedKeysDisplay();
+  }
+  
+  function updateSavedKeysDisplay() {
+    const container = document.getElementById("savedKeysContainer");
+    if (!container) return;
+    
+    let html = '';
+    if (config.apiKey && config.apiKey.length > 3) {
+      const maskedApi = config.apiKey.slice(0, 8) + '••••••••';
+      html += `<span class="saved-key-badge" data-keytype="api" data-keyvalue="${config.apiKey}">🔑 API: ${maskedApi}</span>`;
+    }
+    if (config.binId && config.binId.length > 3) {
+      const maskedBin = config.binId.slice(0, 6) + '••••••';
+      html += `<span class="saved-key-badge" data-keytype="bin" data-keyvalue="${config.binId}">📦 Bin: ${maskedBin}</span>`;
+    }
+    if (!config.apiKey && !config.binId) {
+      html = '<span style="font-size:0.65rem; color:#6c757d;">💾 Немає збережених ключів</span>';
+    }
+    container.innerHTML = html;
+    
+    document.querySelectorAll('.saved-key-badge').forEach(badge => {
+      badge.onclick = (e) => {
+        e.stopPropagation();
+        const keyType = badge.dataset.keytype;
+        const keyValue = badge.dataset.keyvalue;
+        if (keyType === 'api') {
+          document.getElementById("apiKeyInput").value = keyValue;
+          document.getElementById("syncStatus").innerHTML = "✅ API ключ вставлено!";
+        } else if (keyType === 'bin') {
+          document.getElementById("binIdInput").value = keyValue;
+          document.getElementById("syncStatus").innerHTML = "✅ Bin ID вставлено!";
+        }
+      };
+    });
+  }
+  
+  function saveConfig() {
+    config.apiKey = document.getElementById("apiKeyInput").value.trim();
+    config.binId = document.getElementById("binIdInput").value.trim();
+    saveUserData();
+    updateSavedKeysDisplay();
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) {
+      if (config.apiKey && config.binId) {
+        statusEl.innerHTML = "✅ Ключі збережено!";
+      } else {
+        statusEl.innerHTML = "⚠️ Введіть обидва ключі";
+      }
+    }
+  }
+  
+  function clearConfig() {
+    if (confirm("Очистити збережені ключі?")) {
+      config.apiKey = "";
+      config.binId = "";
+      saveUserData();
+      document.getElementById("apiKeyInput").value = "";
+      document.getElementById("binIdInput").value = "";
+      updateSavedKeysDisplay();
+      const statusEl = document.getElementById("syncStatus");
+      if (statusEl) statusEl.innerHTML = "🗑 Ключі очищено";
+    }
+  }
+  
+  async function download() {
+    if (!config.apiKey || !config.binId) {
+      const apiKey = document.getElementById("apiKeyInput").value.trim();
+      const binId = document.getElementById("binIdInput").value.trim();
+      if (apiKey && binId) {
+        config.apiKey = apiKey;
+        config.binId = binId;
+        saveUserData();
+      } else {
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
+        return;
+      }
+    }
+    
+    if (hasLocalChanges()) {
+      if (!confirm("⚠️ У вас є незбережені зміни. Завантажити з хмари? Локальні зміни будуть втрачені.")) {
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = "⏸️ Завантаження скасовано";
+        return;
+      }
+    }
+    
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) statusEl.innerHTML = "📥 Завантаження...";
+    try {
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
+        headers: { "X-Master-Key": config.apiKey }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.record && data.record.shops) {
+          shops = data.record.shops;
+          shopReasons = data.record.reasons || {};
+          saveUserData();
+          updateSnapshot();
+          if (typeof renderCategories === 'function') renderCategories();
+          if (statusEl) statusEl.innerHTML = "✅ Завантажено!";
+        } else {
+          if (statusEl) statusEl.innerHTML = "⚠️ Хмара порожня";
+        }
+      } else {
+        if (statusEl) statusEl.innerHTML = "❌ Помилка завантаження";
+      }
+    } catch(e) {
+      if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
+    }
+  }
+  
+  async function upload(force = false) {
+    if (!config.apiKey || !config.binId) {
+      const apiKey = document.getElementById("apiKeyInput").value.trim();
+      const binId = document.getElementById("binIdInput").value.trim();
+      if (apiKey && binId) {
+        config.apiKey = apiKey;
+        config.binId = binId;
+        saveUserData();
+      } else {
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
+        return;
+      }
+    }
+    
+    const deletedShops = getDeletedShops();
+    if (!force && deletedShops.length > 0) {
+      showDeletionWarning(deletedShops, () => upload(true), () => {
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = "⏸️ Відправлення скасовано";
+      });
+      return;
+    }
+    
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) statusEl.innerHTML = "📤 Відправка...";
+    try {
+      const data = { shops: shops, reasons: shopReasons };
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-Master-Key": config.apiKey },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        updateSnapshot();
+        if (statusEl) statusEl.innerHTML = "✅ Відправлено!";
+      } else {
+        if (statusEl) statusEl.innerHTML = "❌ Помилка відправлення";
+      }
+    } catch(e) {
+      if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
+    }
+  }
+  
+  function addShop(num, color, comp, reason) {
+    const n = Number(num);
+    if (isNaN(n)) return;
+    for (let c of ["білі","сірі","чорні"]) {
+      for (let cp of ["легко","потно","тяжко"]) {
+        shops[c][cp] = shops[c][cp].filter(i => i !== n);
+      }
+    }
+    shops[color][comp].push(n);
+    shops[color][comp].sort((a,b)=>a-b);
+    if (reason) shopReasons[n] = reason;
+    saveUserData();
+    if (typeof renderCategories === 'function') renderCategories();
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) statusEl.innerHTML = "✅ Магазин додано!";
+  }
+  
+  function removeShop(n, color, comp) {
+    shops[color][comp] = shops[color][comp].filter(i => i !== n);
+    delete shopReasons[n];
+    saveUserData();
+    if (typeof renderCategories === 'function') renderCategories();
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) statusEl.innerHTML = "✅ Магазин видалено!";
+  }
+  
+  function getReasonText(key) {
+    const found = fullReasonsList.find(r => r.key === key);
+    return found ? found.title : "";
+  }
+  
+  function openCategoryModal(color, complexity) {
+    const shopsList = shops[color][complexity] || [];
+    const colorNames = { "білі":"⚪ БІЛІ", "сірі":"⚫ СІРІ", "чорні":"⬛ ЧОРНІ" };
+    const compNames = { "легко":"🟢 Легко", "потно":"💦 Потно", "тяжко":"⛰️ Тяжко" };
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    let listHtml = '';
+    if (shopsList.length === 0) {
+      listHtml = '<div class="empty-modal">✖️ Немає магазинів</div>';
+    } else {
+      listHtml = shopsList.map(shop => {
+        const reason = getReasonText(shopReasons[shop]);
+        return `<div class="modal-shop-item">
+          <span class="modal-shop-num">${shop}</span>
+          ${reason ? `<span class="modal-shop-reason">📌 ${reason}</span>` : '<span class="modal-shop-reason"></span>'}
+          <button class="delete-shop-modal" data-shop="${shop}" data-color="${color}" data-comp="${complexity}">✖ Видалити</button>
+        </div>`;
+      }).join('');
+    }
+    overlay.innerHTML = `<div class="modal-content">
+      <div class="modal-header" style="background:#2c7da0; color:white;">${colorNames[color]} · ${compNames[complexity]}</div>
+      <div class="modal-list">${listHtml}</div>
+      <button class="modal-close" id="closeModalBtn">Закрити</button>
+    </div>`;
+    document.body.appendChild(overlay);
+    
+    overlay.querySelectorAll('.delete-shop-modal').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const shopNum = parseInt(btn.dataset.shop);
+        if (confirm(`Видалити магазин ${shopNum}?`)) {
+          removeShop(shopNum, btn.dataset.color, btn.dataset.comp);
+          overlay.remove();
+          openCategoryModal(color, complexity);
+        }
+      };
+    });
+    overlay.querySelector('#closeModalBtn').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  }
+  
+  function renderCategories() {
+    const container = document.getElementById("categoriesGrid");
+    if (!container) return;
+    const colors = ["білі", "сірі", "чорні"];
+    const comps = ["легко", "потно", "тяжко"];
+    const colorTitles = { "білі": "⚪ БІЛІ", "сірі": "⚫ СІРІ", "чорні": "⬛ ЧОРНІ" };
+    const headerClass = { "білі": "white-header", "сірі": "gray-header", "чорні": "black-header" };
+    const compIcons = { "легко": "🟢", "потно": "💦", "тяжко": "⛰️" };
+    
+    let html = '';
+    for (let color of colors) {
+      for (let comp of comps) {
+        const count = shops[color][comp].length;
+        html += `<div class="category-card" data-color="${color}" data-comp="${comp}">
+          <div class="cat-header ${headerClass[color]}">${colorTitles[color]}</div>
+          <div class="cat-body ${count === 0 ? 'empty-cat' : ''}">
+            <div class="cat-count">${count}</div>
+            <div class="cat-label">${compIcons[comp]} ${comp}</div>
+          </div>
+        </div>`;
+      }
+    }
+    container.innerHTML = html;
+    document.querySelectorAll('.category-card').forEach(card => {
+      card.onclick = () => openCategoryModal(card.dataset.color, card.dataset.comp);
+    });
+  }
+  
+  function checkShop() {
+    let v = document.getElementById("checkShopInput").value.trim();
+    if (!v) { 
+      const resultEl = document.getElementById("checkResult");
+      if (resultEl) resultEl.innerHTML = "⚠️ Введіть номер";
+      return; 
+    }
+    let num = Number(v);
+    if (isNaN(num)) { 
+      const resultEl = document.getElementById("checkResult");
+      if (resultEl) resultEl.innerHTML = "❌ Помилка";
+      return; 
+    }
+    let found = null;
+    for (let c of ["білі","сірі","чорні"]) {
+      for (let cp of ["легко","потно","тяжко"]) {
+        if (shops[c][cp].includes(num)) found = { color: c, comp: cp };
+      }
+    }
+    const resultEl = document.getElementById("checkResult");
+    if (found) {
+      let reason = getReasonText(shopReasons[num]);
+      if (resultEl) resultEl.innerHTML = `<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color}, ${found.comp}${reason ? `, ${reason}` : ''}`;
+    } else {
+      if (resultEl) resultEl.innerHTML = `<strong>🏪 Магазин ${num}</strong><br>⚠️ Немає даних`;
+    }
+  }
+  
+  function addFromMobile() {
+    let num = document.getElementById("newShopNumber").value.trim();
+    if (!num) { alert("Введіть номер"); return; }
+    addShop(Number(num), document.getElementById("newShopColor").value, document.getElementById("newShopComplexity").value, selectedReason);
+    document.getElementById("newShopNumber").value = "";
+  }
+  
+  function initReasonButtons() {
+    const container = document.getElementById("reasonButtons");
+    if (!container) return;
+    container.innerHTML = "";
+    fullReasonsList.forEach(reason => {
+      const btn = document.createElement("div");
+      btn.className = "reason-btn";
+      btn.textContent = reason.title;
+      btn.dataset.reason = reason.key;
+      btn.onclick = () => {
+        document.querySelectorAll('.reason-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedReason = reason.key;
+      };
+      container.appendChild(btn);
+    });
+  }
+  
+  function initDemo() {
+    let has = false;
+    for (let c of ["білі","сірі","чорні"]) {
+      for (let cp of ["легко","потно","тяжко"]) {
+        if (shops[c][cp].length) has = true;
+      }
+    }
+    if (!has) {
+      addShop(708, "чорні", "тяжко", "другий_поверх_руками");
+      addShop(39, "чорні", "легко", "рокля_підсобка");
+      addShop(3039, "білі", "легко", "рокля_підсобка");
+      addShop(2719, "білі", "легко", "рокля_підсобка");
+      addShop(3067, "білі", "легко", "рокля_підсобка");
+      addShop(642, "білі", "потно", "розрив_біля_підсобки");
+    }
+  }
+  
+  function showDeletionWarning(deletedShops, onConfirm, onCancel) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-content warning-modal">
+        <div class="modal-header">⚠️ ВАЖЛИВО!</div>
+        <div class="modal-list">
+          <p style="margin-bottom:12px;">Виявлено ВИДАЛЕННЯ магазинів:</p>
+          <div class="deleted-list">${deletedShops.map(s => `<span>🏪 ${s}</span>`).join('')}</div>
+          <p style="margin-top:16px; color:#666;">Вони будуть НАЗАВЖДИ видалені з хмари.</p>
+        </div>
+        <button class="btn-cancel">Скасувати</button>
+        <button class="btn-proceed">✅ Все одно відправити</button>
+      </div>
+    `;
+    overlay.querySelector('.btn-cancel').onclick = () => { overlay.remove(); if(onCancel) onCancel(); };
+    overlay.querySelector('.btn-proceed').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
+    document.body.appendChild(overlay);
+  }
+  
+  function forgetEverything() {
+    if (confirm("⚠️ ВИДАЛИТИ ВСІ ДАНІ КОРИСТУВАЧА? Це видалить всі магазини, ключі та налаштування!")) {
+      if (currentUser) {
+        const users = getUsers();
+        delete users[currentUser];
+        saveUsers(users);
+      }
+      localStorage.removeItem("app_current_user");
+      currentUser = null;
+      location.reload();
+    }
+  }
+  
+  let isLoginMode = true;
+  
+  function showAuthScreen() {
+    const overlay = document.createElement('div');
+    overlay.className = 'login-overlay';
+    overlay.id = 'loginOverlay';
+    overlay.innerHTML = `<div class="login-card">
+      <h2>🚛 Вантажники-водії</h2>
+      <p id="authModeText">${isLoginMode ? "Вхід в систему" : "Створення акаунту"}</p>
+      <input type="text" id="usernameInput" placeholder="Ім'я користувача" autocomplete="off">
+      <input type="password" id="passwordInput" placeholder="Пароль" autocomplete="off">
+      <button id="authBtn">${isLoginMode ? "Увійти" : "Зареєструватися"}</button>
+      <div class="switch-mode" id="switchModeBtn">${isLoginMode ? "Немає акаунту? Зареєструватися" : "Вже є акаунт? Увійти"}</div>
+      <div id="authError" class="error-msg"></div>
+    </div>`;
+    document.body.appendChild(overlay);
+    
+    const authBtn = document.getElementById('authBtn');
+    const usernameInput = document.getElementById('usernameInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const switchBtn = document.getElementById('switchModeBtn');
+    const authModeText = document.getElementById('authModeText');
+    const authError = document.getElementById('authError');
+    
+    function attemptAuth() {
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+      
+      if (!username) {
+        authError.textContent = "❌ Введіть ім'я користувача";
+        return;
+      }
+      if (!password) {
+        authError.textContent = "❌ Введіть пароль";
+        return;
+      }
+      
+      const users = getUsers();
+      
+      if (isLoginMode) {
+        if (users[username] && users[username].password === password) {
+          currentUser = username;
+          localStorage.setItem("app_current_user", username);
+          document.getElementById('loginOverlay')?.remove();
+          showMainApp();
+        } else {
+          authError.textContent = "❌ Невірне ім'я користувача або пароль";
+          passwordInput.value = "";
+        }
+      } else {
+        if (users[username]) {
+          authError.textContent = "❌ Користувач з таким ім'ям вже існує";
+          return;
+        }
+        if (password !== BASE_PASSWORD) {
+          authError.textContent = `❌ Пароль має бути: "${BASE_PASSWORD}"`;
+          return;
+        }
+        users[username] = {
+          password: password,
+          shops: {
+            "білі": { "легко": [], "потно": [], "тяжко": [] },
+            "сірі": { "легко": [], "потно": [], "тяжко": [] },
+            "чорні": { "легко": [], "потно": [], "тяжко": [] }
+          },
+          reasons: {},
+          config: { apiKey: "", binId: "" }
+        };
+        saveUsers(users);
+        currentUser = username;
+        localStorage.setItem("app_current_user", username);
+        
+        shops = users[username].shops;
+        shopReasons = users[username].reasons;
+        config = users[username].config;
+        initDemo();
+        saveUserData();
+        
+        document.getElementById('loginOverlay')?.remove();
+        showMainApp();
+      }
+    }
+    
+    switchBtn.onclick = () => {
+      isLoginMode = !isLoginMode;
+      authModeText.textContent = isLoginMode ? "Вхід в систему" : "Створення акаунту";
+      authBtn.textContent = isLoginMode ? "Увійти" : "Зареєструватися";
+      switchBtn.textContent = isLoginMode ? "Немає акаунту? Зареєструватися" : "Вже є акаунт? Увійти";
+      authError.textContent = "";
+      if (!isLoginMode) {
+        passwordInput.placeholder = `Пароль (повинен бути "${BASE_PASSWORD}")`;
+      } else {
+        passwordInput.placeholder = "Пароль";
+      }
+    };
+    
+    authBtn.onclick = attemptAuth;
+    usernameInput.onkeypress = (e) => { if (e.key === 'Enter') attemptAuth(); };
+    passwordInput.onkeypress = (e) => { if (e.key === 'Enter') attemptAuth(); };
+  }
+  
+  function showMainApp() {
+    const appContainer = document.getElementById('app');
+    appContainer.innerHTML = `<div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h1>🚛 Вантажники-водії 📦 <small>синхронізація</small></h1>
+        <div class="user-greeting">👤 ${currentUser} <button id="logoutBtn" style="background: none; border: none; color: #dc3545; font-size: 0.7rem; margin-left: 8px;">🚪 Вийти</button></div>
+      </div>
+      <div class="sub">🏬 Натисніть на категорію для перегляду магазинів</div>
+      <div class="sync-panel">
+        <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
+        <div class="sync-row">
+          <div class="input-group"><label>🔑 API</label><input type="text" id="apiKeyInput" placeholder="API ключ" autocomplete="off"></div>
+          <div class="input-group"><label>📦 Bin</label><input type="text" id="binIdInput" placeholder="ID Bin" autocomplete="off"></div>
+        </div>
+        <div class="key-badge-container" id="savedKeysContainer"></div>
+        <div class="sync-row-buttons">
+          <button id="saveConfigBtn" class="btn-save">💾 Зберегти</button>
+          <button id="clearConfigBtn" class="btn-clear">🗑 Очистити</button>
+          <button id="forgetAllBtn" class="btn-forget">⚠️ Забути все</button>
+        </div>
+        <div class="sync-buttons">
+          <button id="syncDownBtn" class="btn-down">📥 Завантажити</button>
+          <button id="syncUpBtn" class="btn-up">📤 Відправити</button>
+        </div>
+        <div class="sync-status" id="syncStatus">⚙️ Введіть ключі або натисніть "Завантажити"</div>
+      </div>
+      <div class="action-panel">
+        <div class="check-card"><h3>🔍 Перевірити</h3><div class="check-input-group"><input type="number" id="checkShopInput" placeholder="Номер"><button id="checkShopBtn">Підказка</button></div><div id="checkResult" class="check-result">👆 Введіть номер</div></div>
+        <div class="add-card"><h3>➕ Додати</h3><div class="select-group"><input type="number" id="newShopNumber" placeholder="Номер"><select id="newShopColor"><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select><select id="newShopComplexity"><option value="легко">🟢 Легко</option><option value="потно">💦 Потно</option><option value="тяжко">⛰️ Тяжко</option></select></div><div class="extra-options"><div class="extra-title">📝 Причина:</div><div class="reason-buttons" id="reasonButtons"></div></div><button id="addShopBtn" style="width:100%; margin-top:12px;">✅ Додати</button></div>
+      </div>
+      <div class="categories-grid" id="categoriesGrid"></div>
+      <footer>💡 Ключі зберігаються на вашому пристрої. Натисніть на маску ключа для швидкого вводу</footer>
+    </div>`;
+    
+    loadConfig();
+    initReasonButtons();
+    updateSnapshot();
+    renderCategories();
+    updateSavedKeysDisplay();
+    
+    document.getElementById("saveConfigBtn").onclick = saveConfig;
+    document.getElementById("clearConfigBtn").onclick = clearConfig;
+    document.getElementById("forgetAllBtn").onclick = forgetEverything;
+    document.getElementById("syncDownBtn").onclick = download;
+    document.getElementById("syncUpBtn").onclick = () => upload(false);
+    document.getElementById("checkShopBtn").onclick = checkShop;
+    document.getElementById("addShopBtn").onclick = addFromMobile;
+    document.getElementById("logoutBtn").onclick = () => {
+      localStorage.removeItem("app_current_user");
+      currentUser = null;
+      location.reload();
+    };
+  }
+  
+  const savedUser = localStorage.getItem("app_current_user");
+  if (savedUser) {
+    const users = getUsers();
+    if (users[savedUser]) {
+      currentUser = savedUser;
+      loadUserData(currentUser);
+      showMainApp();
+    } else {
+      showAuthScreen();
+    }
+  } else {
+    showAuthScreen();
+  }
 </script>
 </body>
 </html>
