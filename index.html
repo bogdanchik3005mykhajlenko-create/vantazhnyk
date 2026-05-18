@@ -105,8 +105,6 @@
     .check-result { margin-top: 12px; padding: 12px; background: #eef3fa; border-radius: 16px; font-size: 0.9rem; border-left: 4px solid #2c7da0; }
     .select-group { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
     .select-group input, .select-group select { padding: 14px; border-radius: 30px; border: 1px solid #bccbd4; font-size: 1rem; width: 100%; }
-    .extra-options { margin-top: 12px; padding-top: 8px; border-top: 1px solid #dee2e6; }
-    .extra-title { font-size: 0.75rem; font-weight: 600; color: #2c5a6e; margin-bottom: 8px; }
     
     .delivery-methods {
       margin-top: 12px;
@@ -116,21 +114,37 @@
       font-weight: 600;
       color: #2c5a6e;
       margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     .delivery-buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 12px;
-      max-height: 120px;
+      max-height: 150px;
       overflow-y: auto;
       padding: 4px 2px;
+      border: 1px solid #e9ecef;
+      border-radius: 16px;
+      background: #fafbfc;
+    }
+    .delivery-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #e9ecef;
+      border: 1px solid #ced4da;
+      border-radius: 30px;
+      overflow: hidden;
     }
     .delivery-btn {
       background: #e9ecef;
-      border: 1px solid #ced4da;
+      border: none;
       padding: 8px 12px;
-      border-radius: 30px;
       font-size: 0.7rem;
       cursor: pointer;
       white-space: nowrap;
@@ -138,7 +152,19 @@
     .delivery-btn.selected {
       background: #2c7da0;
       color: white;
-      border-color: #2c7da0;
+    }
+    .delete-delivery-btn {
+      background: #dc3545;
+      border: none;
+      padding: 8px 10px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+      min-height: auto;
+    }
+    .delete-delivery-btn:active {
+      transform: scale(0.95);
     }
     .add-delivery-row {
       display: flex;
@@ -348,7 +374,6 @@
   const BASE_PASSWORD = "Закони водіїв";
   
   // ГЛОБАЛЬНИЙ СПИСОК СПОСОБІВ ДОСТАВКИ (синхронізується між усіма користувачами)
-  // Цей список зберігається в JSONBin і ВСІ користувачі бачать однакові варіанти!
   let globalDeliveryMethodsList = [
     { key: "рокля_до_підсобки", title: "🛒 Рокля до підсобки" },
     { key: "рокля_далеко", title: "🚶 Рокля + далеко" },
@@ -431,7 +456,6 @@
   }
   
   function saveGlobalDeliveryMethodsToCloud() {
-    // Ця функція оновлює deliveryMethodsList у хмарі
     if (!config.apiKey || !config.binId) return;
     
     fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
@@ -600,7 +624,6 @@
           shops = data.record.shops;
           shopDeliveries = data.record.deliveries || {};
           shopDescriptions = data.record.descriptions || {};
-          // ЗАВАНТАЖУЄМО ГЛОБАЛЬНИЙ СПИСОК СПОСОБІВ ДОСТАВКИ
           if (data.record.deliveryMethods && Array.isArray(data.record.deliveryMethods)) {
             globalDeliveryMethodsList = data.record.deliveryMethods;
           }
@@ -610,7 +633,6 @@
           if (typeof initDeliveryButtons === 'function') initDeliveryButtons();
           if (statusEl) statusEl.innerHTML = "✅ Завантажено!";
         } else {
-          // Якщо хмара порожня, ініціалізуємо з поточним списком
           await upload(true);
           if (statusEl) statusEl.innerHTML = "✅ Ініціалізовано!";
         }
@@ -653,7 +675,7 @@
         shops: shops, 
         deliveries: shopDeliveries,
         descriptions: shopDescriptions,
-        deliveryMethods: globalDeliveryMethodsList  // ЗБЕРІГАЄМО ГЛОБАЛЬНИЙ СПИСОК
+        deliveryMethods: globalDeliveryMethodsList
       };
       const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
         method: "PUT",
@@ -717,7 +739,6 @@
       return;
     }
     
-    // Перевірка на дублікат
     const exists = globalDeliveryMethodsList.some(d => d.title === newTitle);
     if (exists) {
       alert("Такий спосіб доставки вже існує!");
@@ -730,14 +751,41 @@
     initDeliveryButtons();
     input.value = "";
     
-    // Автоматично синхронізуємо новий спосіб доставки з хмарою
     if (config.apiKey && config.binId) {
       saveGlobalDeliveryMethodsToCloud();
       const statusEl = document.getElementById("syncStatus");
-      if (statusEl) statusEl.innerHTML = `✅ Додано новий спосіб доставки: ${newTitle} (синхронізовано з хмарою)`;
+      if (statusEl) statusEl.innerHTML = `✅ Додано новий спосіб доставки: ${newTitle} (синхронізовано)`;
     } else {
       const statusEl = document.getElementById("syncStatus");
-      if (statusEl) statusEl.innerHTML = `✅ Додано новий спосіб доставки: ${newTitle} (не синхронізовано - немає ключів)`;
+      if (statusEl) statusEl.innerHTML = `✅ Додано новий спосіб доставки: ${newTitle}`;
+    }
+  }
+  
+  function deleteDeliveryMethod(key, title) {
+    if (confirm(`⚠️ Видалити спосіб доставки "${title}"?\n\nУвага! Якщо цей спосіб використовується для якихось магазинів, у них зникне спосіб доставки.`)) {
+      globalDeliveryMethodsList = globalDeliveryMethodsList.filter(d => d.key !== key);
+      
+      for (const shop in shopDeliveries) {
+        if (shopDeliveries[shop] === key) {
+          delete shopDeliveries[shop];
+        }
+      }
+      
+      saveUserData();
+      initDeliveryButtons();
+      
+      if (selectedDelivery === key) {
+        selectedDelivery = "";
+      }
+      
+      if (config.apiKey && config.binId) {
+        saveGlobalDeliveryMethodsToCloud();
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = `🗑 Видалено спосіб доставки: ${title} (синхронізовано)`;
+      } else {
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = `🗑 Видалено спосіб доставки: ${title}`;
+      }
     }
   }
   
@@ -808,7 +856,10 @@
     const currentDescription = shopDescriptions[shopNum] || "";
     
     let deliveryButtonsHtml = globalDeliveryMethodsList.map(d => 
-      `<div class="delivery-btn ${currentDelivery === d.key ? 'selected' : ''}" data-delivery="${d.key}">${d.title}</div>`
+      `<div class="delivery-item">
+        <div class="delivery-btn ${currentDelivery === d.key ? 'selected' : ''}" data-delivery="${d.key}">${d.title}</div>
+        <button class="delete-delivery-btn" data-delkey="${d.key}" data-deltitle="${d.title}">✖</button>
+      </div>`
     ).join('');
     
     overlay.innerHTML = `<div class="modal-content">
@@ -817,6 +868,10 @@
         <div class="delivery-methods">
           <div class="delivery-title">🚚 Спосіб доставки:</div>
           <div class="delivery-buttons" id="editDeliveryButtons">${deliveryButtonsHtml}</div>
+          <div class="add-delivery-row">
+            <input type="text" id="editNewDeliveryInput" placeholder="Новий спосіб доставки...">
+            <button id="editAddDeliveryBtn">➕ Додати</button>
+          </div>
         </div>
         <div class="shop-description-area">
           <div class="delivery-title">📋 Короткий опис магазину:</div>
@@ -830,13 +885,61 @@
     
     let selectedEditDelivery = currentDelivery;
     
-    overlay.querySelectorAll('#editDeliveryButtons .delivery-btn').forEach(btn => {
-      btn.onclick = () => {
-        overlay.querySelectorAll('#editDeliveryButtons .delivery-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedEditDelivery = btn.dataset.delivery;
-      };
-    });
+    function refreshEditDeliveryButtons() {
+      const container = overlay.querySelector('#editDeliveryButtons');
+      if (!container) return;
+      let newHtml = globalDeliveryMethodsList.map(d => 
+        `<div class="delivery-item">
+          <div class="delivery-btn ${selectedEditDelivery === d.key ? 'selected' : ''}" data-delivery="${d.key}">${d.title}</div>
+          <button class="delete-delivery-btn" data-delkey="${d.key}" data-deltitle="${d.title}">✖</button>
+        </div>`
+      ).join('');
+      container.innerHTML = newHtml;
+      
+      container.querySelectorAll('.delivery-btn').forEach(btn => {
+        btn.onclick = () => {
+          container.querySelectorAll('.delivery-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedEditDelivery = btn.dataset.delivery;
+        };
+      });
+      
+      container.querySelectorAll('.delete-delivery-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const delKey = btn.dataset.delkey;
+          const delTitle = btn.dataset.deltitle;
+          if (confirm(`⚠️ Видалити спосіб доставки "${delTitle}"?`)) {
+            globalDeliveryMethodsList = globalDeliveryMethodsList.filter(d => d.key !== delKey);
+            if (selectedEditDelivery === delKey) selectedEditDelivery = "";
+            saveUserData();
+            refreshEditDeliveryButtons();
+            if (config.apiKey && config.binId) saveGlobalDeliveryMethodsToCloud();
+          }
+        };
+      });
+    }
+    
+    overlay.querySelector('#editAddDeliveryBtn').onclick = () => {
+      const newTitle = overlay.querySelector('#editNewDeliveryInput').value.trim();
+      if (!newTitle) {
+        alert("Введіть назву способу доставки");
+        return;
+      }
+      const exists = globalDeliveryMethodsList.some(d => d.title === newTitle);
+      if (exists) {
+        alert("Такий спосіб доставки вже існує!");
+        return;
+      }
+      const newKey = "custom_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+      globalDeliveryMethodsList.push({ key: newKey, title: newTitle });
+      saveUserData();
+      if (config.apiKey && config.binId) saveGlobalDeliveryMethodsToCloud();
+      overlay.querySelector('#editNewDeliveryInput').value = "";
+      refreshEditDeliveryButtons();
+    };
+    
+    refreshEditDeliveryButtons();
     
     overlay.querySelector('#saveEditBtn').onclick = () => {
       const description = overlay.querySelector('#editShopDescription').value;
@@ -931,6 +1034,9 @@
     if (!container) return;
     container.innerHTML = "";
     globalDeliveryMethodsList.forEach(delivery => {
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "delivery-item";
+      
       const btn = document.createElement("div");
       btn.className = "delivery-btn";
       btn.textContent = delivery.title;
@@ -940,7 +1046,18 @@
         btn.classList.add('selected');
         selectedDelivery = delivery.key;
       };
-      container.appendChild(btn);
+      
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-delivery-btn";
+      deleteBtn.textContent = "✖";
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteDeliveryMethod(delivery.key, delivery.title);
+      };
+      
+      itemDiv.appendChild(btn);
+      itemDiv.appendChild(deleteBtn);
+      container.appendChild(itemDiv);
     });
   }
   
@@ -1135,7 +1252,9 @@
             <select id="newShopComplexity"><option value="легко">🟢 Легко</option><option value="потно">💦 Потно</option><option value="тяжко">⛰️ Тяжко</option></select>
           </div>
           <div class="delivery-methods">
-            <div class="delivery-title">🚚 Спосіб доставки:</div>
+            <div class="delivery-title">
+              <span>🚚 Спосіб доставки:</span>
+            </div>
             <div class="delivery-buttons" id="deliveryButtons"></div>
             <div class="add-delivery-row">
               <input type="text" id="newDeliveryInput" placeholder="Новий спосіб доставки...">
@@ -1150,7 +1269,7 @@
         </div>
       </div>
       <div class="categories-grid" id="categoriesGrid"></div>
-      <footer>💡 Ключі зберігаються на вашому пристрої. Натисніть на маску ключа для швидкого вводу</footer>
+      <footer>💡 Ключі зберігаються на вашому пристрої. Натисніть на маску ключа для швидкого вводу<br>✖ — видалити спосіб доставки (синхронізується з усіма користувачами)</footer>
     </div>`;
     
     loadConfig();
