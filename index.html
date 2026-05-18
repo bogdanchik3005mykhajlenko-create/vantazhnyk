@@ -109,45 +109,64 @@
     .delivery-methods {
       margin-top: 12px;
     }
+    .delivery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
     .delivery-title {
       font-size: 0.75rem;
       font-weight: 600;
       color: #2c5a6e;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
+    }
+    .edit-mode-btn {
+      background: #6c757d;
+      padding: 6px 12px;
+      font-size: 0.65rem;
+      min-height: auto;
+    }
+    .edit-mode-btn.active {
+      background: #dc3545;
     }
     .delivery-buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 12px;
-      max-height: 150px;
-      overflow-y: auto;
-      padding: 4px 2px;
-      border: 1px solid #e9ecef;
+      padding: 8px;
+      background: #f8f9fa;
       border-radius: 16px;
-      background: #fafbfc;
+      min-height: 60px;
     }
     .delivery-item {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 0;
       background: #e9ecef;
       border: 1px solid #ced4da;
       border-radius: 30px;
       overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    .delivery-item.edit-mode {
+      background: #fff0f0;
+      border-color: #dc3545;
     }
     .delivery-btn {
       background: #e9ecef;
       border: none;
       padding: 8px 12px;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       cursor: pointer;
       white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .delivery-item.edit-mode .delivery-btn {
+      background: #fff0f0;
+      padding-right: 4px;
     }
     .delivery-btn.selected {
       background: #2c7da0;
@@ -162,6 +181,15 @@
       color: white;
       font-weight: bold;
       min-height: auto;
+      width: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    .delivery-item.edit-mode .delete-delivery-btn {
+      width: auto;
+      opacity: 1;
+      padding: 8px 10px;
     }
     .delete-delivery-btn:active {
       transform: scale(0.95);
@@ -370,10 +398,8 @@
 <div id="app"></div>
 
 <script>
-  // БАЗОВИЙ ПАРОЛЬ
   const BASE_PASSWORD = "Закони водіїв";
   
-  // ГЛОБАЛЬНИЙ СПИСОК СПОСОБІВ ДОСТАВКИ (синхронізується між усіма користувачами)
   let globalDeliveryMethodsList = [
     { key: "рокля_до_підсобки", title: "🛒 Рокля до підсобки" },
     { key: "рокля_далеко", title: "🚶 Рокля + далеко" },
@@ -400,6 +426,7 @@
   let currentShopDescription = "";
   let lastSnapshotShopsSet = new Set();
   let lastSnapshotDeliveriesHash = "";
+  let isEditMode = false;
   
   function getAllShopNumbers() {
     const set = new Set();
@@ -457,7 +484,6 @@
   
   function saveGlobalDeliveryMethodsToCloud() {
     if (!config.apiKey || !config.binId) return;
-    
     fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", "X-Master-Key": config.apiKey },
@@ -467,7 +493,7 @@
         descriptions: shopDescriptions,
         deliveryMethods: globalDeliveryMethodsList
       })
-    }).catch(e => console.error("Помилка збереження способів доставки:", e));
+    }).catch(e => console.error("Помилка збереження:", e));
   }
   
   function getUsers() {
@@ -530,7 +556,6 @@
   function updateSavedKeysDisplay() {
     const container = document.getElementById("savedKeysContainer");
     if (!container) return;
-    
     let html = '';
     if (config.apiKey && config.apiKey.length > 3) {
       const maskedApi = config.apiKey.slice(0, 8) + '••••••••';
@@ -544,7 +569,6 @@
       html = '<span style="font-size:0.65rem; color:#6c757d;">💾 Немає збережених ключів</span>';
     }
     container.innerHTML = html;
-    
     document.querySelectorAll('.saved-key-badge').forEach(badge => {
       badge.onclick = (e) => {
         e.stopPropagation();
@@ -603,7 +627,6 @@
         return;
       }
     }
-    
     if (hasLocalChanges()) {
       if (!confirm("⚠️ У вас є незбережені зміни. Завантажити з хмари? Локальні зміни будуть втрачені.")) {
         const statusEl = document.getElementById("syncStatus");
@@ -611,7 +634,6 @@
         return;
       }
     }
-    
     const statusEl = document.getElementById("syncStatus");
     if (statusEl) statusEl.innerHTML = "📥 Завантаження...";
     try {
@@ -658,7 +680,6 @@
         return;
       }
     }
-    
     const deletedShops = getDeletedShops();
     if (!force && deletedShops.length > 0) {
       showDeletionWarning(deletedShops, () => upload(true), () => {
@@ -667,7 +688,6 @@
       });
       return;
     }
-    
     const statusEl = document.getElementById("syncStatus");
     if (statusEl) statusEl.innerHTML = "📤 Відправка...";
     try {
@@ -738,19 +758,16 @@
       alert("Введіть назву способу доставки");
       return;
     }
-    
     const exists = globalDeliveryMethodsList.some(d => d.title === newTitle);
     if (exists) {
       alert("Такий спосіб доставки вже існує!");
       return;
     }
-    
     const newKey = "custom_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
     globalDeliveryMethodsList.push({ key: newKey, title: newTitle });
     saveUserData();
     initDeliveryButtons();
     input.value = "";
-    
     if (config.apiKey && config.binId) {
       saveGlobalDeliveryMethodsToCloud();
       const statusEl = document.getElementById("syncStatus");
@@ -764,20 +781,16 @@
   function deleteDeliveryMethod(key, title) {
     if (confirm(`⚠️ Видалити спосіб доставки "${title}"?\n\nУвага! Якщо цей спосіб використовується для якихось магазинів, у них зникне спосіб доставки.`)) {
       globalDeliveryMethodsList = globalDeliveryMethodsList.filter(d => d.key !== key);
-      
       for (const shop in shopDeliveries) {
         if (shopDeliveries[shop] === key) {
           delete shopDeliveries[shop];
         }
       }
-      
       saveUserData();
       initDeliveryButtons();
-      
       if (selectedDelivery === key) {
         selectedDelivery = "";
       }
-      
       if (config.apiKey && config.binId) {
         saveGlobalDeliveryMethodsToCloud();
         const statusEl = document.getElementById("syncStatus");
@@ -789,11 +802,25 @@
     }
   }
   
+  function toggleEditMode() {
+    isEditMode = !isEditMode;
+    const editBtn = document.getElementById("toggleEditModeBtn");
+    if (editBtn) {
+      if (isEditMode) {
+        editBtn.textContent = "✅ Готово";
+        editBtn.classList.add("active");
+      } else {
+        editBtn.textContent = "✏️ Редагувати способи";
+        editBtn.classList.remove("active");
+      }
+    }
+    initDeliveryButtons();
+  }
+  
   function openCategoryModal(color, complexity) {
     const shopsList = shops[color][complexity] || [];
     const colorNames = { "білі":"⚪ БІЛІ", "сірі":"⚫ СІРІ", "чорні":"⬛ ЧОРНІ" };
     const compNames = { "легко":"🟢 Легко", "потно":"💦 Потно", "тяжко":"⛰️ Тяжко" };
-    
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     let listHtml = '';
@@ -822,7 +849,6 @@
       <button class="modal-close" id="closeModalBtn">Закрити</button>
     </div>`;
     document.body.appendChild(overlay);
-    
     overlay.querySelectorAll('.delete-shop-modal').forEach(btn => {
       btn.onclick = (e) => {
         e.stopPropagation();
@@ -834,7 +860,6 @@
         }
       };
     });
-    
     overlay.querySelectorAll('.edit-shop-modal').forEach(btn => {
       btn.onclick = (e) => {
         e.stopPropagation();
@@ -843,7 +868,6 @@
         openEditShopModal(shopNum, btn.dataset.color, btn.dataset.comp);
       };
     });
-    
     overlay.querySelector('#closeModalBtn').onclick = () => overlay.remove();
     overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
   }
@@ -851,27 +875,19 @@
   function openEditShopModal(shopNum, color, comp) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    
     const currentDelivery = shopDeliveries[shopNum] || "";
     const currentDescription = shopDescriptions[shopNum] || "";
-    
     let deliveryButtonsHtml = globalDeliveryMethodsList.map(d => 
       `<div class="delivery-item">
         <div class="delivery-btn ${currentDelivery === d.key ? 'selected' : ''}" data-delivery="${d.key}">${d.title}</div>
-        <button class="delete-delivery-btn" data-delkey="${d.key}" data-deltitle="${d.title}">✖</button>
       </div>`
     ).join('');
-    
     overlay.innerHTML = `<div class="modal-content">
       <div class="modal-header" style="background:#2c7da0; color:white;">✏️ Редагувати магазин ${shopNum}</div>
       <div class="modal-list">
         <div class="delivery-methods">
           <div class="delivery-title">🚚 Спосіб доставки:</div>
           <div class="delivery-buttons" id="editDeliveryButtons">${deliveryButtonsHtml}</div>
-          <div class="add-delivery-row">
-            <input type="text" id="editNewDeliveryInput" placeholder="Новий спосіб доставки...">
-            <button id="editAddDeliveryBtn">➕ Додати</button>
-          </div>
         </div>
         <div class="shop-description-area">
           <div class="delivery-title">📋 Короткий опис магазину:</div>
@@ -882,72 +898,20 @@
       <button id="cancelEditBtn" style="margin: 0 20px 20px; background: #6c757d;">Скасувати</button>
     </div>`;
     document.body.appendChild(overlay);
-    
     let selectedEditDelivery = currentDelivery;
-    
-    function refreshEditDeliveryButtons() {
-      const container = overlay.querySelector('#editDeliveryButtons');
-      if (!container) return;
-      let newHtml = globalDeliveryMethodsList.map(d => 
-        `<div class="delivery-item">
-          <div class="delivery-btn ${selectedEditDelivery === d.key ? 'selected' : ''}" data-delivery="${d.key}">${d.title}</div>
-          <button class="delete-delivery-btn" data-delkey="${d.key}" data-deltitle="${d.title}">✖</button>
-        </div>`
-      ).join('');
-      container.innerHTML = newHtml;
-      
-      container.querySelectorAll('.delivery-btn').forEach(btn => {
-        btn.onclick = () => {
-          container.querySelectorAll('.delivery-btn').forEach(b => b.classList.remove('selected'));
-          btn.classList.add('selected');
-          selectedEditDelivery = btn.dataset.delivery;
-        };
-      });
-      
-      container.querySelectorAll('.delete-delivery-btn').forEach(btn => {
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          const delKey = btn.dataset.delkey;
-          const delTitle = btn.dataset.deltitle;
-          if (confirm(`⚠️ Видалити спосіб доставки "${delTitle}"?`)) {
-            globalDeliveryMethodsList = globalDeliveryMethodsList.filter(d => d.key !== delKey);
-            if (selectedEditDelivery === delKey) selectedEditDelivery = "";
-            saveUserData();
-            refreshEditDeliveryButtons();
-            if (config.apiKey && config.binId) saveGlobalDeliveryMethodsToCloud();
-          }
-        };
-      });
-    }
-    
-    overlay.querySelector('#editAddDeliveryBtn').onclick = () => {
-      const newTitle = overlay.querySelector('#editNewDeliveryInput').value.trim();
-      if (!newTitle) {
-        alert("Введіть назву способу доставки");
-        return;
-      }
-      const exists = globalDeliveryMethodsList.some(d => d.title === newTitle);
-      if (exists) {
-        alert("Такий спосіб доставки вже існує!");
-        return;
-      }
-      const newKey = "custom_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
-      globalDeliveryMethodsList.push({ key: newKey, title: newTitle });
-      saveUserData();
-      if (config.apiKey && config.binId) saveGlobalDeliveryMethodsToCloud();
-      overlay.querySelector('#editNewDeliveryInput').value = "";
-      refreshEditDeliveryButtons();
-    };
-    
-    refreshEditDeliveryButtons();
-    
+    overlay.querySelectorAll('#editDeliveryButtons .delivery-btn').forEach(btn => {
+      btn.onclick = () => {
+        overlay.querySelectorAll('#editDeliveryButtons .delivery-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedEditDelivery = btn.dataset.delivery;
+      };
+    });
     overlay.querySelector('#saveEditBtn').onclick = () => {
       const description = overlay.querySelector('#editShopDescription').value;
       updateShop(shopNum, color, comp, selectedEditDelivery, description);
       overlay.remove();
       openCategoryModal(color, comp);
     };
-    
     overlay.querySelector('#cancelEditBtn').onclick = () => {
       overlay.remove();
       openCategoryModal(color, comp);
@@ -962,7 +926,6 @@
     const colorTitles = { "білі": "⚪ БІЛІ", "сірі": "⚫ СІРІ", "чорні": "⬛ ЧОРНІ" };
     const headerClass = { "білі": "white-header", "сірі": "gray-header", "чорні": "black-header" };
     const compIcons = { "легко": "🟢", "потно": "💦", "тяжко": "⛰️" };
-    
     let html = '';
     for (let color of colors) {
       for (let comp of comps) {
@@ -1036,25 +999,27 @@
     globalDeliveryMethodsList.forEach(delivery => {
       const itemDiv = document.createElement("div");
       itemDiv.className = "delivery-item";
-      
+      if (isEditMode) itemDiv.classList.add("edit-mode");
       const btn = document.createElement("div");
       btn.className = "delivery-btn";
       btn.textContent = delivery.title;
       btn.dataset.delivery = delivery.key;
       btn.onclick = () => {
-        document.querySelectorAll('#deliveryButtons .delivery-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedDelivery = delivery.key;
+        if (!isEditMode) {
+          document.querySelectorAll('#deliveryButtons .delivery-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedDelivery = delivery.key;
+        }
       };
-      
       const deleteBtn = document.createElement("button");
       deleteBtn.className = "delete-delivery-btn";
       deleteBtn.textContent = "✖";
       deleteBtn.onclick = (e) => {
         e.stopPropagation();
-        deleteDeliveryMethod(delivery.key, delivery.title);
+        if (isEditMode) {
+          deleteDeliveryMethod(delivery.key, delivery.title);
+        }
       };
-      
       itemDiv.appendChild(btn);
       itemDiv.appendChild(deleteBtn);
       container.appendChild(itemDiv);
@@ -1129,18 +1094,15 @@
       <div id="authError" class="error-msg"></div>
     </div>`;
     document.body.appendChild(overlay);
-    
     const authBtn = document.getElementById('authBtn');
     const usernameInput = document.getElementById('usernameInput');
     const passwordInput = document.getElementById('passwordInput');
     const switchBtn = document.getElementById('switchModeBtn');
     const authModeText = document.getElementById('authModeText');
     const authError = document.getElementById('authError');
-    
     function attemptAuth() {
       const username = usernameInput.value.trim();
       const password = passwordInput.value.trim();
-      
       if (!username) {
         authError.textContent = "❌ Введіть ім'я користувача";
         return;
@@ -1149,9 +1111,7 @@
         authError.textContent = "❌ Введіть пароль";
         return;
       }
-      
       const users = getUsers();
-      
       if (isLoginMode) {
         if (users[username] && users[username].password === password) {
           currentUser = username;
@@ -1185,19 +1145,16 @@
         saveUsers(users);
         currentUser = username;
         localStorage.setItem("app_current_user", username);
-        
         shops = users[username].shops;
         shopDeliveries = users[username].deliveries;
         shopDescriptions = users[username].descriptions;
         config = users[username].config;
         initDemo();
         saveUserData();
-        
         document.getElementById('loginOverlay')?.remove();
         showMainApp();
       }
     }
-    
     switchBtn.onclick = () => {
       isLoginMode = !isLoginMode;
       authModeText.textContent = isLoginMode ? "Вхід в систему" : "Створення акаунту";
@@ -1210,7 +1167,6 @@
         passwordInput.placeholder = "Пароль";
       }
     };
-    
     authBtn.onclick = attemptAuth;
     usernameInput.onkeypress = (e) => { if (e.key === 'Enter') attemptAuth(); };
     passwordInput.onkeypress = (e) => { if (e.key === 'Enter') attemptAuth(); };
@@ -1252,8 +1208,9 @@
             <select id="newShopComplexity"><option value="легко">🟢 Легко</option><option value="потно">💦 Потно</option><option value="тяжко">⛰️ Тяжко</option></select>
           </div>
           <div class="delivery-methods">
-            <div class="delivery-title">
-              <span>🚚 Спосіб доставки:</span>
+            <div class="delivery-header">
+              <span class="delivery-title">🚚 Спосіб доставки:</span>
+              <button id="toggleEditModeBtn" class="edit-mode-btn">✏️ Редагувати способи</button>
             </div>
             <div class="delivery-buttons" id="deliveryButtons"></div>
             <div class="add-delivery-row">
@@ -1269,15 +1226,13 @@
         </div>
       </div>
       <div class="categories-grid" id="categoriesGrid"></div>
-      <footer>💡 Ключі зберігаються на вашому пристрої. Натисніть на маску ключа для швидкого вводу<br>✖ — видалити спосіб доставки (синхронізується з усіма користувачами)</footer>
+      <footer>💡 Ключі зберігаються на вашому пристрої. Натисніть "Редагувати способи" → з'являться хрестики для видалення</footer>
     </div>`;
-    
     loadConfig();
     initDeliveryButtons();
     updateSnapshot();
     renderCategories();
     updateSavedKeysDisplay();
-    
     document.getElementById("saveConfigBtn").onclick = saveConfig;
     document.getElementById("clearConfigBtn").onclick = clearConfig;
     document.getElementById("forgetAllBtn").onclick = forgetEverything;
@@ -1286,12 +1241,12 @@
     document.getElementById("checkShopBtn").onclick = checkShop;
     document.getElementById("addShopBtn").onclick = addFromMobile;
     document.getElementById("addDeliveryBtn").onclick = addNewDeliveryMethod;
+    document.getElementById("toggleEditModeBtn").onclick = toggleEditMode;
     document.getElementById("logoutBtn").onclick = () => {
       localStorage.removeItem("app_current_user");
       currentUser = null;
       location.reload();
     };
-    
     const descInput = document.getElementById("shopDescriptionInput");
     if (descInput) {
       descInput.oninput = (e) => { currentShopDescription = e.target.value; };
