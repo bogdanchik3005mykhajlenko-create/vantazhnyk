@@ -102,6 +102,7 @@
     .check-input-group input { flex: 2; padding: 14px; border: 2px solid #cbdae2; border-radius: 30px; font-size: 1rem; }
     button { background: #2c7da0; border: none; padding: 12px 20px; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; min-height: 44px; }
     button:active { transform: scale(0.96); }
+    button:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
     .check-result { margin-top: 12px; padding: 12px; background: #eef3fa; border-radius: 16px; font-size: 0.9rem; border-left: 4px solid #2c7da0; }
     .select-group { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
     .select-group input, .select-group select { padding: 14px; border-radius: 30px; border: 1px solid #bccbd4; font-size: 1rem; width: 100%; }
@@ -172,26 +173,32 @@
       background: #2c7da0;
       color: white;
     }
-    .delete-delivery-btn {
-      background: #dc3545;
+    .delivery-action-btn {
+      background: none;
       border: none;
-      padding: 8px 10px;
+      padding: 8px 8px;
       font-size: 0.7rem;
       cursor: pointer;
-      color: white;
-      font-weight: bold;
       min-height: auto;
       width: 0;
       opacity: 0;
       overflow: hidden;
       transition: all 0.2s ease;
     }
-    .delivery-item.edit-mode .delete-delivery-btn {
+    .delivery-item.edit-mode .delivery-action-btn {
       width: auto;
       opacity: 1;
-      padding: 8px 10px;
+      padding: 8px 8px;
     }
-    .delete-delivery-btn:active {
+    .edit-delivery-btn {
+      background: #ffc107;
+      color: #333;
+    }
+    .delete-delivery-btn {
+      background: #dc3545;
+      color: white;
+    }
+    .delivery-action-btn:active {
       transform: scale(0.95);
     }
     .add-delivery-row {
@@ -255,6 +262,16 @@
     .cat-count { font-size: 1.8rem; font-weight: bold; color: #2c7da0; }
     .cat-label { font-size: 0.65rem; color: #6c757d; margin-top: 4px; }
     .empty-cat { opacity: 0.5; }
+    
+    .data-placeholder {
+      text-align: center;
+      padding: 60px 20px;
+      background: #f8f9fa;
+      border-radius: 24px;
+      color: #6c757d;
+      margin: 20px 0;
+      font-size: 0.9rem;
+    }
     
     .modal-overlay {
       position: fixed;
@@ -381,6 +398,7 @@
     .login-card button:active { transform: scale(0.96); }
     .error-msg { color: #dc3545; font-size: 0.75rem; margin-top: 10px; }
     .switch-mode { margin-top: 16px; font-size: 0.75rem; color: #2c7da0; cursor: pointer; text-decoration: underline; }
+    .password-hint { font-size: 0.65rem; color: #6c757d; margin-top: 8px; }
     
     footer { margin-top: 20px; text-align: center; font-size: 0.6rem; color: #3a6b7c; padding: 12px; }
     @media (min-width: 700px) { 
@@ -398,22 +416,10 @@
 <div id="app"></div>
 
 <script>
-  const BASE_PASSWORD = "Закони водіїв";
+  // ПРОСТИЙ ПАРОЛЬ ДЛЯ ВСІХ КОРИСТУВАЧІВ
+  const BASE_PASSWORD = "123";
   
-  let globalDeliveryMethodsList = [
-    { key: "рокля_до_підсобки", title: "🛒 Рокля до підсобки" },
-    { key: "рокля_далеко", title: "🚶 Рокля + далеко" },
-    { key: "рокля_гора", title: "⛰️ Рокля + гора" },
-    { key: "рокля_вузько", title: "🚫 Рокля + вузько" },
-    { key: "рокля_поріг", title: "📏 Рокля + поріг" },
-    { key: "розрив_перед_весь", title: "📦 Розрив перед → весь магазин" },
-    { key: "розрив_перед_коротко", title: "📦 Розрив перед → коротко" },
-    { key: "розрив_всередині_весь", title: "🏪 Розрив всередині → весь магазин" },
-    { key: "розрив_всередині_коротко", title: "🏪 Розрив всередині → коротко" },
-    { key: "розрив_біля_підсобки", title: "🚪 Розрив біля підсобки" },
-    { key: "другий_поверх_руками", title: "🏢 2й поверх → руками" }
-  ];
-
+  let globalDeliveryMethodsList = [];
   let shops = {
     "білі": { "легко": [], "потно": [], "тяжко": [] },
     "сірі": { "легко": [], "потно": [], "тяжко": [] },
@@ -427,6 +433,7 @@
   let lastSnapshotShopsSet = new Set();
   let lastSnapshotDeliveriesHash = "";
   let isEditMode = false;
+  let isDataLoaded = false;
   
   function getAllShopNumbers() {
     const set = new Set();
@@ -461,6 +468,7 @@
   }
   
   function hasLocalChanges() {
+    if (!isDataLoaded) return false;
     const currentSet = getAllShopNumbers();
     if (currentSet.size !== lastSnapshotShopsSet.size) return true;
     for (const shop of currentSet) {
@@ -483,7 +491,7 @@
   }
   
   function saveGlobalDeliveryMethodsToCloud() {
-    if (!config.apiKey || !config.binId) return;
+    if (!config.apiKey || !config.binId || !isDataLoaded) return;
     fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", "X-Master-Key": config.apiKey },
@@ -531,11 +539,9 @@
       shopDeliveries = {};
       shopDescriptions = {};
       config = { apiKey: "", binId: "" };
-      initDemo();
     }
     updateSnapshot();
-    if (typeof renderCategories === 'function') renderCategories();
-    if (typeof updateSavedKeysDisplay === 'function') updateSavedKeysDisplay();
+    isDataLoaded = false;
   }
   
   function loadConfig() {
@@ -593,7 +599,7 @@
     const statusEl = document.getElementById("syncStatus");
     if (statusEl) {
       if (config.apiKey && config.binId) {
-        statusEl.innerHTML = "✅ Ключі збережено!";
+        statusEl.innerHTML = "✅ Ключі збережено! Натисніть 'Завантажити' для отримання даних";
       } else {
         statusEl.innerHTML = "⚠️ Введіть обидва ключі";
       }
@@ -613,6 +619,22 @@
     }
   }
   
+  function enableDataDependentComponents(enabled) {
+    const elements = ['checkShopInput', 'checkShopBtn', 'newShopNumber', 'newShopColor', 'newShopComplexity', 'addShopBtn', 'shopDescriptionInput', 'newDeliveryInput', 'addDeliveryBtn', 'toggleEditModeBtn'];
+    elements.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !enabled;
+    });
+    if (!enabled) {
+      const resultEl = document.getElementById("checkResult");
+      if (resultEl) resultEl.innerHTML = "🔒 Увійдіть в синхронізацію та завантажте дані";
+      const categoriesGrid = document.getElementById("categoriesGrid");
+      if (categoriesGrid) categoriesGrid.innerHTML = '<div class="data-placeholder">🔒 Увійдіть в синхронізацію та завантажте дані</div>';
+      const deliveryContainer = document.getElementById("deliveryButtons");
+      if (deliveryContainer) deliveryContainer.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">🔒 Завантажте дані з хмари</div>';
+    }
+  }
+  
   async function download() {
     if (!config.apiKey || !config.binId) {
       const apiKey = document.getElementById("apiKeyInput").value.trim();
@@ -624,13 +646,6 @@
       } else {
         const statusEl = document.getElementById("syncStatus");
         if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
-        return;
-      }
-    }
-    if (hasLocalChanges()) {
-      if (!confirm("⚠️ У вас є незбережені зміни. Завантажити з хмари? Локальні зміни будуть втрачені.")) {
-        const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = "⏸️ Завантаження скасовано";
         return;
       }
     }
@@ -648,18 +663,34 @@
           shopDescriptions = data.record.descriptions || {};
           if (data.record.deliveryMethods && Array.isArray(data.record.deliveryMethods)) {
             globalDeliveryMethodsList = data.record.deliveryMethods;
+          } else {
+            globalDeliveryMethodsList = [];
           }
           saveUserData();
           updateSnapshot();
+          isDataLoaded = true;
           if (typeof renderCategories === 'function') renderCategories();
           if (typeof initDeliveryButtons === 'function') initDeliveryButtons();
-          if (statusEl) statusEl.innerHTML = "✅ Завантажено!";
+          enableDataDependentComponents(true);
+          if (statusEl) statusEl.innerHTML = "✅ Дані завантажено!";
         } else {
-          await upload(true);
-          if (statusEl) statusEl.innerHTML = "✅ Ініціалізовано!";
+          shops = {
+            "білі": { "легко": [], "потно": [], "тяжко": [] },
+            "сірі": { "легко": [], "потно": [], "тяжко": [] },
+            "чорні": { "легко": [], "потно": [], "тяжко": [] }
+          };
+          shopDeliveries = {};
+          shopDescriptions = {};
+          globalDeliveryMethodsList = [];
+          isDataLoaded = true;
+          updateSnapshot();
+          if (typeof renderCategories === 'function') renderCategories();
+          if (typeof initDeliveryButtons === 'function') initDeliveryButtons();
+          enableDataDependentComponents(true);
+          if (statusEl) statusEl.innerHTML = "⚠️ Хмара порожня, створено нову базу";
         }
       } else {
-        if (statusEl) statusEl.innerHTML = "❌ Помилка завантаження";
+        if (statusEl) statusEl.innerHTML = "❌ Помилка завантаження. Перевірте ключі";
       }
     } catch(e) {
       if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
@@ -679,6 +710,11 @@
         if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
         return;
       }
+    }
+    if (!isDataLoaded) {
+      const statusEl = document.getElementById("syncStatus");
+      if (statusEl) statusEl.innerHTML = "⚠️ Спочатку завантажте дані";
+      return;
     }
     const deletedShops = getDeletedShops();
     if (!force && deletedShops.length > 0) {
@@ -714,6 +750,7 @@
   }
   
   function addShop(num, color, comp, delivery, description) {
+    if (!isDataLoaded) return;
     const n = Number(num);
     if (isNaN(n)) return;
     for (let c of ["білі","сірі","чорні"]) {
@@ -732,6 +769,7 @@
   }
   
   function removeShop(n, color, comp) {
+    if (!isDataLoaded) return;
     shops[color][comp] = shops[color][comp].filter(i => i !== n);
     delete shopDeliveries[n];
     delete shopDescriptions[n];
@@ -752,6 +790,7 @@
   }
   
   function addNewDeliveryMethod() {
+    if (!isDataLoaded) return;
     const input = document.getElementById("newDeliveryInput");
     const newTitle = input.value.trim();
     if (!newTitle) {
@@ -771,14 +810,32 @@
     if (config.apiKey && config.binId) {
       saveGlobalDeliveryMethodsToCloud();
       const statusEl = document.getElementById("syncStatus");
-      if (statusEl) statusEl.innerHTML = `✅ Додано новий спосіб доставки: ${newTitle} (синхронізовано)`;
-    } else {
-      const statusEl = document.getElementById("syncStatus");
       if (statusEl) statusEl.innerHTML = `✅ Додано новий спосіб доставки: ${newTitle}`;
     }
   }
   
+  function editDeliveryMethod(key, oldTitle) {
+    if (!isDataLoaded) return;
+    const newTitle = prompt("Редагувати спосіб доставки:", oldTitle);
+    if (!newTitle || newTitle === oldTitle) return;
+    const exists = globalDeliveryMethodsList.some(d => d.title === newTitle && d.key !== key);
+    if (exists) {
+      alert("Такий спосіб доставки вже існує!");
+      return;
+    }
+    const method = globalDeliveryMethodsList.find(d => d.key === key);
+    if (method) method.title = newTitle;
+    saveUserData();
+    initDeliveryButtons();
+    if (config.apiKey && config.binId) {
+      saveGlobalDeliveryMethodsToCloud();
+      const statusEl = document.getElementById("syncStatus");
+      if (statusEl) statusEl.innerHTML = `✏️ Перейменовано на: ${newTitle}`;
+    }
+  }
+  
   function deleteDeliveryMethod(key, title) {
+    if (!isDataLoaded) return;
     if (confirm(`⚠️ Видалити спосіб доставки "${title}"?\n\nУвага! Якщо цей спосіб використовується для якихось магазинів, у них зникне спосіб доставки.`)) {
       globalDeliveryMethodsList = globalDeliveryMethodsList.filter(d => d.key !== key);
       for (const shop in shopDeliveries) {
@@ -794,15 +851,13 @@
       if (config.apiKey && config.binId) {
         saveGlobalDeliveryMethodsToCloud();
         const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = `🗑 Видалено спосіб доставки: ${title} (синхронізовано)`;
-      } else {
-        const statusEl = document.getElementById("syncStatus");
         if (statusEl) statusEl.innerHTML = `🗑 Видалено спосіб доставки: ${title}`;
       }
     }
   }
   
   function toggleEditMode() {
+    if (!isDataLoaded) return;
     isEditMode = !isEditMode;
     const editBtn = document.getElementById("toggleEditModeBtn");
     if (editBtn) {
@@ -818,6 +873,7 @@
   }
   
   function openCategoryModal(color, complexity) {
+    if (!isDataLoaded) return;
     const shopsList = shops[color][complexity] || [];
     const colorNames = { "білі":"⚪ БІЛІ", "сірі":"⚫ СІРІ", "чорні":"⬛ ЧОРНІ" };
     const compNames = { "легко":"🟢 Легко", "потно":"💦 Потно", "тяжко":"⛰️ Тяжко" };
@@ -891,7 +947,7 @@
         </div>
         <div class="shop-description-area">
           <div class="delivery-title">📋 Короткий опис магазину:</div>
-          <textarea id="editShopDescription" rows="3" placeholder="Наприклад: важкий під'їзд, високий поріг, вузький двір...">${currentDescription}</textarea>
+          <textarea id="editShopDescription" rows="3" placeholder="Наприклад: важкий під'їзд, високий поріг...">${currentDescription}</textarea>
         </div>
       </div>
       <button id="saveEditBtn" style="margin: 0 20px 12px; background: #28a745;">💾 Зберегти зміни</button>
@@ -921,6 +977,10 @@
   function renderCategories() {
     const container = document.getElementById("categoriesGrid");
     if (!container) return;
+    if (!isDataLoaded) {
+      container.innerHTML = '<div class="data-placeholder">🔒 Увійдіть в синхронізацію та завантажте дані</div>';
+      return;
+    }
     const colors = ["білі", "сірі", "чорні"];
     const comps = ["легко", "потно", "тяжко"];
     const colorTitles = { "білі": "⚪ БІЛІ", "сірі": "⚫ СІРІ", "чорні": "⬛ ЧОРНІ" };
@@ -946,6 +1006,11 @@
   }
   
   function checkShop() {
+    if (!isDataLoaded) {
+      const resultEl = document.getElementById("checkResult");
+      if (resultEl) resultEl.innerHTML = "🔒 Спочатку завантажте дані з хмари";
+      return;
+    }
     let v = document.getElementById("checkShopInput").value.trim();
     if (!v) { 
       const resultEl = document.getElementById("checkResult");
@@ -978,6 +1043,10 @@
   }
   
   function addFromMobile() {
+    if (!isDataLoaded) {
+      alert("🔒 Спочатку завантажте дані з хмари");
+      return;
+    }
     let num = document.getElementById("newShopNumber").value.trim();
     if (!num) { alert("Введіть номер"); return; }
     addShop(Number(num), 
@@ -996,6 +1065,14 @@
     const container = document.getElementById("deliveryButtons");
     if (!container) return;
     container.innerHTML = "";
+    if (!isDataLoaded) {
+      container.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">🔒 Завантажте дані з хмари</div>';
+      return;
+    }
+    if (globalDeliveryMethodsList.length === 0) {
+      container.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">Немає способів доставки. Додайте новий</div>';
+      return;
+    }
     globalDeliveryMethodsList.forEach(delivery => {
       const itemDiv = document.createElement("div");
       itemDiv.className = "delivery-item";
@@ -1011,8 +1088,17 @@
           selectedDelivery = delivery.key;
         }
       };
+      const editBtn = document.createElement("button");
+      editBtn.className = "delivery-action-btn edit-delivery-btn";
+      editBtn.textContent = "✏️";
+      editBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (isEditMode) {
+          editDeliveryMethod(delivery.key, delivery.title);
+        }
+      };
       const deleteBtn = document.createElement("button");
-      deleteBtn.className = "delete-delivery-btn";
+      deleteBtn.className = "delivery-action-btn delete-delivery-btn";
       deleteBtn.textContent = "✖";
       deleteBtn.onclick = (e) => {
         e.stopPropagation();
@@ -1021,28 +1107,10 @@
         }
       };
       itemDiv.appendChild(btn);
+      itemDiv.appendChild(editBtn);
       itemDiv.appendChild(deleteBtn);
       container.appendChild(itemDiv);
     });
-  }
-  
-  function initDemo() {
-    let has = false;
-    for (let c of ["білі","сірі","чорні"]) {
-      for (let cp of ["легко","потно","тяжко"]) {
-        if (shops[c][cp].length) has = true;
-      }
-    }
-    if (!has) {
-      addShop(708, "чорні", "тяжко", "другий_поверх_руками", "Важкий підйом на другий поверх, вузькі сходи");
-      addShop(39, "чорні", "легко", "рокля_до_підсобки", "Рокля прямо до підсобки");
-      addShop(3039, "білі", "легко", "рокля_до_підсобки", "Зручний заїзд");
-      addShop(2719, "білі", "легко", "рокля_до_підсобки", "Гарна парковка");
-      addShop(3067, "білі", "легко", "рокля_до_підсобки", "Прямий під'їзд");
-      addShop(642, "білі", "потно", "розрив_біля_підсобки", "Розрив біля підсобки, далеко тягнути");
-      addShop(2738, "чорні", "тяжко", "другий_поверх_руками", "Другий поверх, вузькі сходи");
-      addShop(55, "білі", "легко", "рокля_до_підсобки", "Рокля до підсобки");
-    }
   }
   
   function showDeletionWarning(deletedShops, onConfirm, onCancel) {
@@ -1092,17 +1160,22 @@
       <button id="authBtn">${isLoginMode ? "Увійти" : "Зареєструватися"}</button>
       <div class="switch-mode" id="switchModeBtn">${isLoginMode ? "Немає акаунту? Зареєструватися" : "Вже є акаунт? Увійти"}</div>
       <div id="authError" class="error-msg"></div>
+      <div class="password-hint" id="passwordHint"></div>
     </div>`;
     document.body.appendChild(overlay);
+    
     const authBtn = document.getElementById('authBtn');
     const usernameInput = document.getElementById('usernameInput');
     const passwordInput = document.getElementById('passwordInput');
     const switchBtn = document.getElementById('switchModeBtn');
     const authModeText = document.getElementById('authModeText');
     const authError = document.getElementById('authError');
+    const passwordHint = document.getElementById('passwordHint');
+    
     function attemptAuth() {
       const username = usernameInput.value.trim();
       const password = passwordInput.value.trim();
+      
       if (!username) {
         authError.textContent = "❌ Введіть ім'я користувача";
         return;
@@ -1111,7 +1184,9 @@
         authError.textContent = "❌ Введіть пароль";
         return;
       }
+      
       const users = getUsers();
+      
       if (isLoginMode) {
         if (users[username] && users[username].password === password) {
           currentUser = username;
@@ -1128,7 +1203,8 @@
           return;
         }
         if (password !== BASE_PASSWORD) {
-          authError.textContent = `❌ Пароль має бути: "${BASE_PASSWORD}"`;
+          authError.textContent = "❌ Невірний пароль. Зверніться до адміністратора.";
+          passwordInput.value = "";
           return;
         }
         users[username] = {
@@ -1149,12 +1225,12 @@
         shopDeliveries = users[username].deliveries;
         shopDescriptions = users[username].descriptions;
         config = users[username].config;
-        initDemo();
         saveUserData();
         document.getElementById('loginOverlay')?.remove();
         showMainApp();
       }
     }
+    
     switchBtn.onclick = () => {
       isLoginMode = !isLoginMode;
       authModeText.textContent = isLoginMode ? "Вхід в систему" : "Створення акаунту";
@@ -1162,11 +1238,14 @@
       switchBtn.textContent = isLoginMode ? "Немає акаунту? Зареєструватися" : "Вже є акаунт? Увійти";
       authError.textContent = "";
       if (!isLoginMode) {
-        passwordInput.placeholder = `Пароль (повинен бути "${BASE_PASSWORD}")`;
+        passwordHint.textContent = "Для реєстрації зверніться до адміністратора";
+        passwordInput.placeholder = "Пароль адміністратора";
       } else {
+        passwordHint.textContent = "";
         passwordInput.placeholder = "Пароль";
       }
     };
+    
     authBtn.onclick = attemptAuth;
     usernameInput.onkeypress = (e) => { if (e.key === 'Enter') attemptAuth(); };
     passwordInput.onkeypress = (e) => { if (e.key === 'Enter') attemptAuth(); };
@@ -1196,43 +1275,43 @@
           <button id="syncDownBtn" class="btn-down">📥 Завантажити</button>
           <button id="syncUpBtn" class="btn-up">📤 Відправити</button>
         </div>
-        <div class="sync-status" id="syncStatus">⚙️ Введіть ключі або натисніть "Завантажити"</div>
+        <div class="sync-status" id="syncStatus">⚙️ Введіть ключі та натисніть "Завантажити"</div>
       </div>
       <div class="action-panel">
-        <div class="check-card"><h3>🔍 Перевірити</h3><div class="check-input-group"><input type="number" id="checkShopInput" placeholder="Номер"><button id="checkShopBtn">Підказка</button></div><div id="checkResult" class="check-result">👆 Введіть номер</div></div>
+        <div class="check-card"><h3>🔍 Перевірити</h3><div class="check-input-group"><input type="number" id="checkShopInput" placeholder="Номер" disabled><button id="checkShopBtn" disabled>Підказка</button></div><div id="checkResult" class="check-result">🔒 Завантажте дані з хмари</div></div>
         <div class="add-card">
           <h3>➕ Додати магазин</h3>
           <div class="select-group">
-            <input type="number" id="newShopNumber" placeholder="Номер магазину">
-            <select id="newShopColor"><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select>
-            <select id="newShopComplexity"><option value="легко">🟢 Легко</option><option value="потно">💦 Потно</option><option value="тяжко">⛰️ Тяжко</option></select>
+            <input type="number" id="newShopNumber" placeholder="Номер магазину" disabled>
+            <select id="newShopColor" disabled><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select>
+            <select id="newShopComplexity" disabled><option value="легко">🟢 Легко</option><option value="потно">💦 Потно</option><option value="тяжко">⛰️ Тяжко</option></select>
           </div>
           <div class="delivery-methods">
             <div class="delivery-header">
               <span class="delivery-title">🚚 Спосіб доставки:</span>
-              <button id="toggleEditModeBtn" class="edit-mode-btn">✏️ Редагувати способи</button>
+              <button id="toggleEditModeBtn" class="edit-mode-btn" disabled>✏️ Редагувати способи</button>
             </div>
             <div class="delivery-buttons" id="deliveryButtons"></div>
             <div class="add-delivery-row">
-              <input type="text" id="newDeliveryInput" placeholder="Новий спосіб доставки...">
-              <button id="addDeliveryBtn">➕ Додати</button>
+              <input type="text" id="newDeliveryInput" placeholder="Новий спосіб доставки..." disabled>
+              <button id="addDeliveryBtn" disabled>➕ Додати</button>
             </div>
           </div>
           <div class="shop-description-area">
             <div class="delivery-title">📋 Короткий опис магазину:</div>
-            <textarea id="shopDescriptionInput" rows="3" placeholder="Наприклад: важкий під'їзд, високий поріг, вузький двір, незручна підсобка..."></textarea>
+            <textarea id="shopDescriptionInput" rows="3" placeholder="Наприклад: важкий під'їзд, високий поріг..." disabled></textarea>
           </div>
-          <button id="addShopBtn" style="width:100%; margin-top:12px;">✅ Додати магазин</button>
+          <button id="addShopBtn" style="width:100%; margin-top:12px;" disabled>✅ Додати магазин</button>
         </div>
       </div>
-      <div class="categories-grid" id="categoriesGrid"></div>
-      <footer>💡 Ключі зберігаються на вашому пристрої. Натисніть "Редагувати способи" → з'являться хрестики для видалення</footer>
+      <div class="categories-grid" id="categoriesGrid"><div class="data-placeholder">🔒 Увійдіть в синхронізацію та завантажте дані</div></div>
+      <footer>💡 1. Введіть API ключ та Bin ID → Зберегти → Завантажити<br>💡 2. Для редагування способів натисніть "✏️ Редагувати способи" → з'являться ✏️ та ✖</footer>
     </div>`;
     loadConfig();
     initDeliveryButtons();
-    updateSnapshot();
     renderCategories();
     updateSavedKeysDisplay();
+    enableDataDependentComponents(false);
     document.getElementById("saveConfigBtn").onclick = saveConfig;
     document.getElementById("clearConfigBtn").onclick = clearConfig;
     document.getElementById("forgetAllBtn").onclick = forgetEverything;
