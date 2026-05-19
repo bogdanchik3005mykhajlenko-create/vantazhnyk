@@ -107,6 +107,52 @@
     .select-group { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
     .select-group input, .select-group select { padding: 14px; border-radius: 30px; border: 1px solid #bccbd4; font-size: 1rem; width: 100%; }
     
+    .complexity-settings {
+      background: #f0f4f8;
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    .complexity-settings-title {
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: #2c5a6e;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .complexity-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .complexity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+    }
+    .complexity-badge input {
+      width: 100px;
+      padding: 4px 8px;
+      border-radius: 20px;
+      border: 1px solid #cbdae2;
+      font-size: 0.7rem;
+    }
+    .complexity-badge button {
+      padding: 4px 8px;
+      font-size: 0.6rem;
+      background: #28a745;
+    }
+    
     .delivery-methods {
       margin-top: 12px;
     }
@@ -260,7 +306,7 @@
     .black-header { background: #1e2a2e; color: white; border-bottom: 3px solid #f39c12; }
     .cat-body { padding: 10px; text-align: center; }
     .cat-count { font-size: 1.8rem; font-weight: bold; color: #2c7da0; }
-    .cat-label { font-size: 0.65rem; color: #6c757d; margin-top: 4px; }
+    .cat-label { font-size: 0.7rem; color: #6c757d; margin-top: 4px; }
     .empty-cat { opacity: 0.5; }
     
     .data-placeholder {
@@ -342,6 +388,8 @@
       padding: 8px;
       border-radius: 12px;
       margin-top: 8px;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
     .delete-shop-modal { 
       background: #ffe0e0; 
@@ -409,6 +457,7 @@
       .sync-row { flex-direction: row; flex-wrap: wrap; }
       .input-group { flex: 1; }
       .sync-row-buttons { flex: 1; justify-content: flex-end; }
+      .complexity-row { flex-direction: row; }
     }
   </style>
 </head>
@@ -416,8 +465,14 @@
 <div id="app"></div>
 
 <script>
-  // ПРОСТИЙ ПАРОЛЬ ДЛЯ ВСІХ КОРИСТУВАЧІВ
   const BASE_PASSWORD = "123";
+  
+  // НАЗВИ КАТЕГОРІЙ СКЛАДНОСТІ (можна редагувати!)
+  let complexityNames = {
+    "легко": { title: "🟢 Стандарт", icon: "🟢", color: "#28a745" },
+    "потно": { title: "🟡 Ускладнений", icon: "🟡", color: "#ffc107" },
+    "тяжко": { title: "🔴 Складний", icon: "🔴", color: "#dc3545" }
+  };
   
   let globalDeliveryMethodsList = [];
   let shops = {
@@ -432,8 +487,13 @@
   let currentShopDescription = "";
   let lastSnapshotShopsSet = new Set();
   let lastSnapshotDeliveriesHash = "";
+  let lastSnapshotComplexityHash = "";
   let isEditMode = false;
   let isDataLoaded = false;
+  
+  function getComplexityHash() {
+    return JSON.stringify(complexityNames);
+  }
   
   function getAllShopNumbers() {
     const set = new Set();
@@ -452,6 +512,11 @@
   function updateSnapshot() { 
     lastSnapshotShopsSet = getAllShopNumbers();
     lastSnapshotDeliveriesHash = getDeliveriesHash();
+    lastSnapshotComplexityHash = getComplexityHash();
+  }
+  
+  function hasComplexityChanges() {
+    return lastSnapshotComplexityHash !== getComplexityHash();
   }
   
   function hasDeliveryMethodChanges() {
@@ -474,7 +539,7 @@
     for (const shop of currentSet) {
       if (!lastSnapshotShopsSet.has(shop)) return true;
     }
-    return hasDeliveryMethodChanges();
+    return hasDeliveryMethodChanges() || hasComplexityChanges();
   }
   
   function saveUserData() {
@@ -485,12 +550,13 @@
       shops: shops,
       deliveries: shopDeliveries,
       descriptions: shopDescriptions,
-      config: config
+      config: config,
+      complexityNames: complexityNames
     };
     saveUsers(users);
   }
   
-  function saveGlobalDeliveryMethodsToCloud() {
+  function saveGlobalDataToCloud() {
     if (!config.apiKey || !config.binId || !isDataLoaded) return;
     fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
       method: "PUT",
@@ -499,7 +565,8 @@
         shops: shops, 
         deliveries: shopDeliveries,
         descriptions: shopDescriptions,
-        deliveryMethods: globalDeliveryMethodsList
+        deliveryMethods: globalDeliveryMethodsList,
+        complexityNames: complexityNames
       })
     }).catch(e => console.error("Помилка збереження:", e));
   }
@@ -530,6 +597,9 @@
       shopDeliveries = userData.deliveries || {};
       shopDescriptions = userData.descriptions || {};
       config = userData.config || { apiKey: "", binId: "" };
+      if (userData.complexityNames) {
+        complexityNames = userData.complexityNames;
+      }
     } else {
       shops = {
         "білі": { "легко": [], "потно": [], "тяжко": [] },
@@ -619,6 +689,32 @@
     }
   }
   
+  function updateComplexityName(compKey) {
+    const newName = document.getElementById(`comp_name_${compKey}`).value.trim();
+    if (newName && complexityNames[compKey]) {
+      complexityNames[compKey].title = newName;
+      saveUserData();
+      if (config.apiKey && config.binId && isDataLoaded) {
+        saveGlobalDataToCloud();
+      }
+      renderCategories();
+      updateComplexitySelectors();
+      const statusEl = document.getElementById("syncStatus");
+      if (statusEl) statusEl.innerHTML = `✏️ Назву змінено на: ${newName}`;
+    }
+  }
+  
+  function updateComplexitySelectors() {
+    const selectEasy = document.getElementById("newShopComplexity");
+    if (selectEasy) {
+      selectEasy.innerHTML = `
+        <option value="легко">${complexityNames["легко"].icon} ${complexityNames["легко"].title}</option>
+        <option value="потно">${complexityNames["потно"].icon} ${complexityNames["потно"].title}</option>
+        <option value="тяжко">${complexityNames["тяжко"].icon} ${complexityNames["тяжко"].title}</option>
+      `;
+    }
+  }
+  
   function enableDataDependentComponents(enabled) {
     const elements = ['checkShopInput', 'checkShopBtn', 'newShopNumber', 'newShopColor', 'newShopComplexity', 'addShopBtn', 'shopDescriptionInput', 'newDeliveryInput', 'addDeliveryBtn', 'toggleEditModeBtn'];
     elements.forEach(id => {
@@ -632,6 +728,8 @@
       if (categoriesGrid) categoriesGrid.innerHTML = '<div class="data-placeholder">🔒 Увійдіть в синхронізацію та завантажте дані</div>';
       const deliveryContainer = document.getElementById("deliveryButtons");
       if (deliveryContainer) deliveryContainer.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">🔒 Завантажте дані з хмари</div>';
+    } else {
+      updateComplexitySelectors();
     }
   }
   
@@ -665,6 +763,9 @@
             globalDeliveryMethodsList = data.record.deliveryMethods;
           } else {
             globalDeliveryMethodsList = [];
+          }
+          if (data.record.complexityNames) {
+            complexityNames = data.record.complexityNames;
           }
           saveUserData();
           updateSnapshot();
@@ -731,7 +832,8 @@
         shops: shops, 
         deliveries: shopDeliveries,
         descriptions: shopDescriptions,
-        deliveryMethods: globalDeliveryMethodsList
+        deliveryMethods: globalDeliveryMethodsList,
+        complexityNames: complexityNames
       };
       const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
         method: "PUT",
@@ -808,7 +910,7 @@
     initDeliveryButtons();
     input.value = "";
     if (config.apiKey && config.binId) {
-      saveGlobalDeliveryMethodsToCloud();
+      saveGlobalDataToCloud();
       const statusEl = document.getElementById("syncStatus");
       if (statusEl) statusEl.innerHTML = `✅ Додано новий спосіб доставки: ${newTitle}`;
     }
@@ -828,7 +930,7 @@
     saveUserData();
     initDeliveryButtons();
     if (config.apiKey && config.binId) {
-      saveGlobalDeliveryMethodsToCloud();
+      saveGlobalDataToCloud();
       const statusEl = document.getElementById("syncStatus");
       if (statusEl) statusEl.innerHTML = `✏️ Перейменовано на: ${newTitle}`;
     }
@@ -849,7 +951,7 @@
         selectedDelivery = "";
       }
       if (config.apiKey && config.binId) {
-        saveGlobalDeliveryMethodsToCloud();
+        saveGlobalDataToCloud();
         const statusEl = document.getElementById("syncStatus");
         if (statusEl) statusEl.innerHTML = `🗑 Видалено спосіб доставки: ${title}`;
       }
@@ -876,7 +978,6 @@
     if (!isDataLoaded) return;
     const shopsList = shops[color][complexity] || [];
     const colorNames = { "білі":"⚪ БІЛІ", "сірі":"⚫ СІРІ", "чорні":"⬛ ЧОРНІ" };
-    const compNames = { "легко":"🟢 Легко", "потно":"💦 Потно", "тяжко":"⛰️ Тяжко" };
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     let listHtml = '';
@@ -900,7 +1001,7 @@
       }).join('');
     }
     overlay.innerHTML = `<div class="modal-content">
-      <div class="modal-header" style="background:#2c7da0; color:white;">${colorNames[color]} · ${compNames[complexity]}</div>
+      <div class="modal-header" style="background:#2c7da0; color:white;">${colorNames[color]} · ${complexityNames[complexity].icon} ${complexityNames[complexity].title}</div>
       <div class="modal-list">${listHtml}</div>
       <button class="modal-close" id="closeModalBtn">Закрити</button>
     </div>`;
@@ -985,7 +1086,7 @@
     const comps = ["легко", "потно", "тяжко"];
     const colorTitles = { "білі": "⚪ БІЛІ", "сірі": "⚫ СІРІ", "чорні": "⬛ ЧОРНІ" };
     const headerClass = { "білі": "white-header", "сірі": "gray-header", "чорні": "black-header" };
-    const compIcons = { "легко": "🟢", "потно": "💦", "тяжко": "⛰️" };
+    
     let html = '';
     for (let color of colors) {
       for (let comp of comps) {
@@ -994,7 +1095,7 @@
           <div class="cat-header ${headerClass[color]}">${colorTitles[color]}</div>
           <div class="cat-body ${count === 0 ? 'empty-cat' : ''}">
             <div class="cat-count">${count}</div>
-            <div class="cat-label">${compIcons[comp]} ${comp}</div>
+            <div class="cat-label">${complexityNames[comp].icon} ${complexityNames[comp].title}</div>
           </div>
         </div>`;
       }
@@ -1033,7 +1134,7 @@
     if (found) {
       let delivery = getDeliveryText(shopDeliveries[num]);
       let description = shopDescriptions[num] || "";
-      let details = `<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color}, ${found.comp}`;
+      let details = `<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color}, ${complexityNames[found.comp].icon} ${complexityNames[found.comp].title}`;
       if (delivery) details += `<br>🚚 Спосіб доставки: ${delivery}`;
       if (description) details += `<br>📋 Опис: ${description}`;
       if (resultEl) resultEl.innerHTML = details;
@@ -1216,7 +1317,8 @@
           },
           deliveries: {},
           descriptions: {},
-          config: { apiKey: "", binId: "" }
+          config: { apiKey: "", binId: "" },
+          complexityNames: complexityNames
         };
         saveUsers(users);
         currentUser = username;
@@ -1225,6 +1327,9 @@
         shopDeliveries = users[username].deliveries;
         shopDescriptions = users[username].descriptions;
         config = users[username].config;
+        if (users[username].complexityNames) {
+          complexityNames = users[username].complexityNames;
+        }
         saveUserData();
         document.getElementById('loginOverlay')?.remove();
         showMainApp();
@@ -1277,6 +1382,31 @@
         </div>
         <div class="sync-status" id="syncStatus">⚙️ Введіть ключі та натисніть "Завантажити"</div>
       </div>
+      
+      <div class="complexity-settings">
+        <div class="complexity-settings-title">
+          <span>⚙️ Налаштування категорій складності</span>
+        </div>
+        <div class="complexity-row">
+          <div class="complexity-badge">
+            <span>🟢</span>
+            <input type="text" id="comp_name_легко" value="${complexityNames["легко"].title.replace(/[🟢🔴🟡]/g, '').trim()}" placeholder="Назва">
+            <button onclick="updateComplexityName('легко')">💾</button>
+          </div>
+          <div class="complexity-badge">
+            <span>🟡</span>
+            <input type="text" id="comp_name_потно" value="${complexityNames["потно"].title.replace(/[🟢🔴🟡]/g, '').trim()}" placeholder="Назва">
+            <button onclick="updateComplexityName('потно')">💾</button>
+          </div>
+          <div class="complexity-badge">
+            <span>🔴</span>
+            <input type="text" id="comp_name_тяжко" value="${complexityNames["тяжко"].title.replace(/[🟢🔴🟡]/g, '').trim()}" placeholder="Назва">
+            <button onclick="updateComplexityName('тяжко')">💾</button>
+          </div>
+        </div>
+        <div style="font-size:0.6rem; color:#6c757d; margin-top:8px;">💡 Змініть назви категорій та натисніть 💾 для збереження</div>
+      </div>
+      
       <div class="action-panel">
         <div class="check-card"><h3>🔍 Перевірити</h3><div class="check-input-group"><input type="number" id="checkShopInput" placeholder="Номер" disabled><button id="checkShopBtn" disabled>Підказка</button></div><div id="checkResult" class="check-result">🔒 Завантажте дані з хмари</div></div>
         <div class="add-card">
@@ -1284,7 +1414,7 @@
           <div class="select-group">
             <input type="number" id="newShopNumber" placeholder="Номер магазину" disabled>
             <select id="newShopColor" disabled><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select>
-            <select id="newShopComplexity" disabled><option value="легко">🟢 Легко</option><option value="потно">💦 Потно</option><option value="тяжко">⛰️ Тяжко</option></select>
+            <select id="newShopComplexity" disabled></select>
           </div>
           <div class="delivery-methods">
             <div class="delivery-header">
@@ -1305,13 +1435,16 @@
         </div>
       </div>
       <div class="categories-grid" id="categoriesGrid"><div class="data-placeholder">🔒 Увійдіть в синхронізацію та завантажте дані</div></div>
-      <footer>💡 1. Введіть API ключ та Bin ID → Зберегти → Завантажити<br>💡 2. Для редагування способів натисніть "✏️ Редагувати способи" → з'являться ✏️ та ✖</footer>
+      <footer>💡 1. Введіть API ключ та Bin ID → Зберегти → Завантажити<br>💡 2. Змініть назви категорій складності вище<br>💡 3. Для редагування способів натисніть "✏️ Редагувати способи"</footer>
     </div>`;
     loadConfig();
     initDeliveryButtons();
     renderCategories();
     updateSavedKeysDisplay();
     enableDataDependentComponents(false);
+    
+    window.updateComplexityName = updateComplexityName;
+    
     document.getElementById("saveConfigBtn").onclick = saveConfig;
     document.getElementById("clearConfigBtn").onclick = clearConfig;
     document.getElementById("forgetAllBtn").onclick = forgetEverything;
