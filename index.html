@@ -91,6 +91,7 @@
     .btn-forget { background: #343a40; color: white; }
     .btn-down { background: #28a745; color: white; }
     .btn-up { background: #ffc107; color: #333; }
+    .btn-save-cloud { background: #28a745; color: white; font-weight: bold; }
     .sync-status { font-size: 0.7rem; color: #2c5a6e; margin-top: 8px; padding: 6px; background: rgba(255,255,255,0.5); border-radius: 12px; }
     .sync-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .sync-buttons button { flex: 1; min-width: 100px; }
@@ -414,10 +415,11 @@
     .empty-modal { text-align: center; color: #8c9aa8; padding: 32px; font-style: italic; }
     
     .warning-modal .modal-header { background: #fff0f0; color: #b91c1c; }
-    .deleted-list { background: #fff0f0; border-radius: 12px; padding: 10px; margin: 10px 0; max-height: 150px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; }
-    .deleted-list span { background: #b91c1c; color: white; padding: 6px 14px; border-radius: 30px; font-size: 0.9rem; }
+    .changes-list { background: #f8f9fa; border-radius: 12px; padding: 10px; margin: 10px 0; max-height: 200px; overflow-y: auto; }
+    .changes-list li { margin-left: 20px; font-size: 0.8rem; margin-bottom: 4px; }
     .btn-cancel { background: #6c757d; color: white; margin: 0 20px 12px; }
     .btn-proceed { background: #dc3545; color: white; margin: 0 20px 20px; }
+    .btn-confirm { background: #28a745; color: white; margin: 0 20px 20px; }
     
     .login-overlay {
       position: fixed;
@@ -467,11 +469,10 @@
 <script>
   const BASE_PASSWORD = "123";
   
-  // НАЗВИ КАТЕГОРІЙ СКЛАДНОСТІ (можна редагувати!)
   let complexityNames = {
-    "легко": { title: "🟢 Стандарт", color: "#28a745" },
-    "потно": { title: "🟡 Ускладнений", color: "#ffc107" },
-    "тяжко": { title: "🔴 Складний", color: "#dc3545" }
+    "легко": { title: "Стандарт", icon: "🟢", color: "#28a745" },
+    "потно": { title: "Ускладнений", icon: "🟡", color: "#ffc107" },
+    "тяжко": { title: "Складний", icon: "🔴", color: "#dc3545" }
   };
   
   let globalDeliveryMethodsList = [];
@@ -523,6 +524,15 @@
     return lastSnapshotDeliveriesHash !== getDeliveriesHash();
   }
   
+  function getAddedShops() {
+    const currentSet = getAllShopNumbers();
+    const added = [];
+    for (const shop of currentSet) {
+      if (!lastSnapshotShopsSet.has(shop)) added.push(shop);
+    }
+    return added;
+  }
+  
   function getDeletedShops() {
     const currentSet = getAllShopNumbers();
     const deleted = [];
@@ -540,6 +550,45 @@
       if (!lastSnapshotShopsSet.has(shop)) return true;
     }
     return hasDeliveryMethodChanges() || hasComplexityChanges();
+  }
+  
+  function showUnsavedChangesWarning(onConfirm, onCancel) {
+    const addedShops = getAddedShops();
+    const deletedShops = getDeletedShops();
+    const hasDeliveryChanges = hasDeliveryMethodChanges();
+    const hasComplexityChangesVal = hasComplexityChanges();
+    
+    let changesHtml = '';
+    if (addedShops.length > 0) {
+      changesHtml += `<li>➕ Додано магазини: ${addedShops.join(', ')}</li>`;
+    }
+    if (deletedShops.length > 0) {
+      changesHtml += `<li>➖ Видалено магазини: ${deletedShops.join(', ')}</li>`;
+    }
+    if (hasDeliveryChanges) {
+      changesHtml += `<li>📦 Змінено способи доставки</li>`;
+    }
+    if (hasComplexityChangesVal) {
+      changesHtml += `<li>⚙️ Змінено назви категорій</li>`;
+    }
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-content warning-modal">
+        <div class="modal-header">⚠️ У ВАС Є НЕЗБЕРЕЖЕНІ ЗМІНИ!</div>
+        <div class="modal-list">
+          <p style="margin-bottom:12px;">Ви зробили наступні зміни:</p>
+          <ul class="changes-list">${changesHtml}</ul>
+          <p style="margin-top:16px; color:#b91c1c; font-weight:bold;">Якщо ви не збережете зміни зараз, вони будуть ВТРАЧЕНІ!</p>
+        </div>
+        <button class="btn-cancel" id="cancelBtn">↩️ Повернутися</button>
+        <button class="btn-confirm" id="confirmBtn">✅ Продовжити (втратити зміни)</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#cancelBtn').onclick = () => { overlay.remove(); if(onCancel) onCancel(); };
+    overlay.querySelector('#confirmBtn').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
   }
   
   function saveUserData() {
@@ -669,7 +718,7 @@
     const statusEl = document.getElementById("syncStatus");
     if (statusEl) {
       if (config.apiKey && config.binId) {
-        statusEl.innerHTML = "✅ Ключі збережено! Натисніть 'Завантажити' для отримання даних";
+        statusEl.innerHTML = "✅ Ключі збережено! Натисніть '📥 Завантажити' для отримання даних";
       } else {
         statusEl.innerHTML = "⚠️ Введіть обидва ключі";
       }
@@ -700,7 +749,7 @@
       renderCategories();
       updateComplexitySelectors();
       const statusEl = document.getElementById("syncStatus");
-      if (statusEl) statusEl.innerHTML = `✏️ Назву змінено на: ${newName}`;
+      if (statusEl) statusEl.innerHTML = `✏️ Назву змінено на: ${complexityNames[compKey].icon} ${newName}`;
     }
   }
   
@@ -723,11 +772,11 @@
     });
     if (!enabled) {
       const resultEl = document.getElementById("checkResult");
-      if (resultEl) resultEl.innerHTML = "🔒 Увійдіть в синхронізацію та завантажте дані";
+      if (resultEl) resultEl.innerHTML = "🔒 Спочатку завантажте дані з хмари";
       const categoriesGrid = document.getElementById("categoriesGrid");
-      if (categoriesGrid) categoriesGrid.innerHTML = '<div class="data-placeholder">🔒 Увійдіть в синхронізацію та завантажте дані</div>';
+      if (categoriesGrid) categoriesGrid.innerHTML = '<div class="data-placeholder">🔒 Спочатку завантажте дані з хмари</div>';
       const deliveryContainer = document.getElementById("deliveryButtons");
-      if (deliveryContainer) deliveryContainer.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">🔒 Завантажте дані з хмари</div>';
+      if (deliveryContainer) deliveryContainer.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">🔒 Спочатку завантажте дані з хмари</div>';
     } else {
       updateComplexitySelectors();
     }
@@ -747,6 +796,62 @@
         return;
       }
     }
+    
+    if (hasLocalChanges()) {
+      showUnsavedChangesWarning(async () => {
+        const statusEl = document.getElementById("syncStatus");
+        if (statusEl) statusEl.innerHTML = "📥 Завантаження...";
+        try {
+          const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
+            headers: { "X-Master-Key": config.apiKey }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.record && data.record.shops) {
+              shops = data.record.shops;
+              shopDeliveries = data.record.deliveries || {};
+              shopDescriptions = data.record.descriptions || {};
+              if (data.record.deliveryMethods && Array.isArray(data.record.deliveryMethods)) {
+                globalDeliveryMethodsList = data.record.deliveryMethods;
+              } else {
+                globalDeliveryMethodsList = [];
+              }
+              if (data.record.complexityNames) {
+                complexityNames = data.record.complexityNames;
+              }
+              saveUserData();
+              updateSnapshot();
+              isDataLoaded = true;
+              if (typeof renderCategories === 'function') renderCategories();
+              if (typeof initDeliveryButtons === 'function') initDeliveryButtons();
+              enableDataDependentComponents(true);
+              if (statusEl) statusEl.innerHTML = "✅ Дані завантажено!";
+            } else {
+              shops = {
+                "білі": { "легко": [], "потно": [], "тяжко": [] },
+                "сірі": { "легко": [], "потно": [], "тяжко": [] },
+                "чорні": { "легко": [], "потно": [], "тяжко": [] }
+              };
+              shopDeliveries = {};
+              shopDescriptions = {};
+              globalDeliveryMethodsList = [];
+              isDataLoaded = true;
+              updateSnapshot();
+              if (typeof renderCategories === 'function') renderCategories();
+              if (typeof initDeliveryButtons === 'function') initDeliveryButtons();
+              enableDataDependentComponents(true);
+              if (statusEl) statusEl.innerHTML = "⚠️ Хмара порожня, створено нову базу";
+            }
+          } else {
+            if (statusEl) statusEl.innerHTML = "❌ Помилка завантаження. Перевірте ключі";
+          }
+        } catch(e) {
+          if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
+        }
+      }, () => {});
+      return;
+    }
+    
     const statusEl = document.getElementById("syncStatus");
     if (statusEl) statusEl.innerHTML = "📥 Завантаження...";
     try {
@@ -842,9 +947,9 @@
       });
       if (res.ok) {
         updateSnapshot();
-        if (statusEl) statusEl.innerHTML = "✅ Відправлено!";
+        if (statusEl) statusEl.innerHTML = "✅ Збережено в хмару!";
       } else {
-        if (statusEl) statusEl.innerHTML = "❌ Помилка відправлення";
+        if (statusEl) statusEl.innerHTML = "❌ Помилка збереження";
       }
     } catch(e) {
       if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
@@ -867,7 +972,7 @@
     saveUserData();
     if (typeof renderCategories === 'function') renderCategories();
     const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "✅ Магазин додано!";
+    if (statusEl) statusEl.innerHTML = "✅ Магазин додано! Не забудьте зберегти в хмару (💾 Зберегти в хмару)";
   }
   
   function removeShop(n, color, comp) {
@@ -878,7 +983,7 @@
     saveUserData();
     if (typeof renderCategories === 'function') renderCategories();
     const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "✅ Магазин видалено!";
+    if (statusEl) statusEl.innerHTML = "✅ Магазин видалено! Не забудьте зберегти в хмару (💾 Зберегти в хмару)";
   }
   
   function updateShop(n, color, comp, delivery, description) {
@@ -1079,7 +1184,7 @@
     const container = document.getElementById("categoriesGrid");
     if (!container) return;
     if (!isDataLoaded) {
-      container.innerHTML = '<div class="data-placeholder">🔒 Увійдіть в синхронізацію та завантажте дані</div>';
+      container.innerHTML = '<div class="data-placeholder">🔒 Спочатку завантажте дані з хмари</div>';
       return;
     }
     const colors = ["білі", "сірі", "чорні"];
@@ -1167,7 +1272,7 @@
     if (!container) return;
     container.innerHTML = "";
     if (!isDataLoaded) {
-      container.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">🔒 Завантажте дані з хмари</div>';
+      container.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">🔒 Спочатку завантажте дані з хмари</div>';
       return;
     }
     if (globalDeliveryMethodsList.length === 0) {
@@ -1219,18 +1324,18 @@
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-content warning-modal">
-        <div class="modal-header">⚠️ ВАЖЛИВО!</div>
+        <div class="modal-header">⚠️ ВИДАЛЕННЯ МАГАЗИНІВ!</div>
         <div class="modal-list">
-          <p style="margin-bottom:12px;">Виявлено ВИДАЛЕННЯ магазинів:</p>
+          <p style="margin-bottom:12px;">Ви ВИДАЛИЛИ наступні магазини:</p>
           <div class="deleted-list">${deletedShops.map(s => `<span>🏪 ${s}</span>`).join('')}</div>
-          <p style="margin-top:16px; color:#666;">Вони будуть НАЗАВЖДИ видалені з хмари.</p>
+          <p style="margin-top:16px; color:#b91c1c; font-weight:bold;">Вони будуть НАЗАВЖДИ видалені з хмари!</p>
         </div>
-        <button class="btn-cancel">Скасувати</button>
-        <button class="btn-proceed">✅ Все одно відправити</button>
+        <button class="btn-cancel" id="cancelBtn">↩️ Скасувати</button>
+        <button class="btn-proceed" id="proceedBtn">✅ Все одно відправити</button>
       </div>
     `;
-    overlay.querySelector('.btn-cancel').onclick = () => { overlay.remove(); if(onCancel) onCancel(); };
-    overlay.querySelector('.btn-proceed').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
+    overlay.querySelector('#cancelBtn').onclick = () => { overlay.remove(); if(onCancel) onCancel(); };
+    overlay.querySelector('#proceedBtn').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
     document.body.appendChild(overlay);
   }
   
@@ -1365,52 +1470,51 @@
       </div>
       <div class="sub">🏬 Натисніть на категорію для перегляду магазинів</div>
       <div class="sync-panel">
-        <div class="sync-title">☁️ СИНХРОНІЗАЦІЯ</div>
+        <div class="sync-title">☁️ НАЛАШТУВАННЯ ХМАРИ</div>
         <div class="sync-row">
-          <div class="input-group"><label>🔑 API</label><input type="text" id="apiKeyInput" placeholder="API ключ" autocomplete="off"></div>
-          <div class="input-group"><label>📦 Bin</label><input type="text" id="binIdInput" placeholder="ID Bin" autocomplete="off"></div>
+          <div class="input-group"><label>🔑 API ключ</label><input type="text" id="apiKeyInput" placeholder="API ключ (отримайте на jsonbin.io)" autocomplete="off"></div>
+          <div class="input-group"><label>📦 ID Bin</label><input type="text" id="binIdInput" placeholder="ID Bin (отримайте на jsonbin.io)" autocomplete="off"></div>
         </div>
         <div class="key-badge-container" id="savedKeysContainer"></div>
         <div class="sync-row-buttons">
-          <button id="saveConfigBtn" class="btn-save">💾 Зберегти</button>
-          <button id="clearConfigBtn" class="btn-clear">🗑 Очистити</button>
+          <button id="saveConfigBtn" class="btn-save">💾 Зберегти ключі</button>
+          <button id="clearConfigBtn" class="btn-clear">🗑 Очистити ключі</button>
           <button id="forgetAllBtn" class="btn-forget">⚠️ Забути все</button>
         </div>
         <div class="sync-buttons">
-          <button id="syncDownBtn" class="btn-down">📥 Завантажити</button>
-          <button id="syncUpBtn" class="btn-up">📤 Відправити</button>
+          <button id="syncDownBtn" class="btn-down">📥 Завантажити з хмари</button>
+          <button id="syncUpBtn" class="btn-save-cloud">💾 Зберегти в хмару</button>
         </div>
-        <div class="sync-status" id="syncStatus">⚙️ Введіть ключі та натисніть "Завантажити"</div>
+        <div class="sync-status" id="syncStatus">⚙️ Введіть ключі та натисніть "Завантажити з хмари"</div>
       </div>
       
       <div class="complexity-settings">
         <div class="complexity-settings-title">
-          <span>⚙️ Налаштування категорій складності</span>
+          <span>⚙️ НАЛАШТУВАННЯ КАТЕГОРІЙ</span>
         </div>
         <div class="complexity-row">
           <div class="complexity-badge">
             <span>🟢</span>
-            <input type="text" id="comp_name_легко" value="${complexityNames["легко"].title.replace(/[🟢🔴🟡]/g, '').trim()}" placeholder="Назва">
+            <input type="text" id="comp_name_легко" value="${complexityNames["легко"].title}" placeholder="Назва">
             <button onclick="updateComplexityName('легко')">💾</button>
           </div>
           <div class="complexity-badge">
             <span>🟡</span>
-            <input type="text" id="comp_name_потно" value="${complexityNames["потно"].title.replace(/[🟢🔴🟡]/g, '').trim()}" placeholder="Назва">
+            <input type="text" id="comp_name_потно" value="${complexityNames["потно"].title}" placeholder="Назва">
             <button onclick="updateComplexityName('потно')">💾</button>
           </div>
           <div class="complexity-badge">
             <span>🔴</span>
-            <input type="text" id="comp_name_тяжко" value="${complexityNames["тяжко"].title.replace(/[🟢🔴🟡]/g, '').trim()}" placeholder="Назва">
+            <input type="text" id="comp_name_тяжко" value="${complexityNames["тяжко"].title}" placeholder="Назва">
             <button onclick="updateComplexityName('тяжко')">💾</button>
           </div>
         </div>
-        <div style="font-size:0.6rem; color:#6c757d; margin-top:8px;">💡 Змініть назви категорій та натисніть 💾 для збереження</div>
       </div>
       
       <div class="action-panel">
-        <div class="check-card"><h3>🔍 Перевірити</h3><div class="check-input-group"><input type="number" id="checkShopInput" placeholder="Номер" disabled><button id="checkShopBtn" disabled>Підказка</button></div><div id="checkResult" class="check-result">🔒 Завантажте дані з хмари</div></div>
+        <div class="check-card"><h3>🔍 ПЕРЕВІРИТИ МАГАЗИН</h3><div class="check-input-group"><input type="number" id="checkShopInput" placeholder="Номер магазину" disabled><button id="checkShopBtn" disabled>Підказка</button></div><div id="checkResult" class="check-result">🔒 Спочатку завантажте дані з хмари</div></div>
         <div class="add-card">
-          <h3>➕ Додати магазин</h3>
+          <h3>➕ ДОДАТИ МАГАЗИН</h3>
           <div class="select-group">
             <input type="number" id="newShopNumber" placeholder="Номер магазину" disabled>
             <select id="newShopColor" disabled><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select>
@@ -1418,7 +1522,7 @@
           </div>
           <div class="delivery-methods">
             <div class="delivery-header">
-              <span class="delivery-title">🚚 Спосіб доставки:</span>
+              <span class="delivery-title">🚚 СПОСІБ ДОСТАВКИ:</span>
               <button id="toggleEditModeBtn" class="edit-mode-btn" disabled>✏️ Редагувати способи</button>
             </div>
             <div class="delivery-buttons" id="deliveryButtons"></div>
@@ -1428,14 +1532,14 @@
             </div>
           </div>
           <div class="shop-description-area">
-            <div class="delivery-title">📋 Короткий опис магазину:</div>
-            <textarea id="shopDescriptionInput" rows="3" placeholder="Наприклад: важкий під'їзд, високий поріг..." disabled></textarea>
+            <div class="delivery-title">📋 КОРОТКИЙ ОПИС МАГАЗИНУ:</div>
+            <textarea id="shopDescriptionInput" rows="3" placeholder="Наприклад: важкий під'їзд, високий поріг, вузький двір..." disabled></textarea>
           </div>
           <button id="addShopBtn" style="width:100%; margin-top:12px;" disabled>✅ Додати магазин</button>
         </div>
       </div>
-      <div class="categories-grid" id="categoriesGrid"><div class="data-placeholder">🔒 Увійдіть в синхронізацію та завантажте дані</div></div>
-      <footer>💡 1. Введіть API ключ та Bin ID → Зберегти → Завантажити<br>💡 2. Змініть назви категорій складності вище<br>💡 3. Для редагування способів натисніть "✏️ Редагувати способи"</footer>
+      <div class="categories-grid" id="categoriesGrid"><div class="data-placeholder">🔒 Спочатку завантажте дані з хмари</div></div>
+      <footer>📌 ПОРАДА: Після додавання/видалення магазинів ОБОВ'ЯЗКОВО натисніть "💾 Зберегти в хмару"!</footer>
     </div>`;
     loadConfig();
     initDeliveryButtons();
@@ -1455,9 +1559,17 @@
     document.getElementById("addDeliveryBtn").onclick = addNewDeliveryMethod;
     document.getElementById("toggleEditModeBtn").onclick = toggleEditMode;
     document.getElementById("logoutBtn").onclick = () => {
-      localStorage.removeItem("app_current_user");
-      currentUser = null;
-      location.reload();
+      if (hasLocalChanges()) {
+        showUnsavedChangesWarning(() => {
+          localStorage.removeItem("app_current_user");
+          currentUser = null;
+          location.reload();
+        }, () => {});
+      } else {
+        localStorage.removeItem("app_current_user");
+        currentUser = null;
+        location.reload();
+      }
     };
     const descInput = document.getElementById("shopDescriptionInput");
     if (descInput) {
