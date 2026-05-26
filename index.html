@@ -3,321 +3,169 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <meta name="theme-color" content="#2c7da0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Вантажник">
-  <title>Вантажники-водії</title>
+  <title>Вантажник - довідник магазинів</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: linear-gradient(135deg, #e2e9f0 0%, #cfdbe5 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 12px; min-height: 100vh; }
     .container { max-width: 800px; margin: 0 auto; }
+    
     h1 { font-size: 1.5rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; color: #1a3a44; flex-wrap: wrap; gap: 8px; }
     h1 small { font-size: 0.65rem; background: #2c7da0; color: white; padding: 4px 10px; border-radius: 40px; }
-    .sub { color: #2c5a6e; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #aac7d6; font-size: 0.8rem; }
     .user-greeting { background: #d4edda; color: #155724; padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; display: inline-block; margin-bottom: 10px; }
     
     .sync-panel {
-      background: #e8f4f8;
-      border-radius: 18px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      border: 1px solid #b8d4e3;
-    }
-    .sync-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; }
-    .sync-row { 
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .input-group {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-    }
-    .input-group label {
-      font-size: 0.7rem;
-      font-weight: bold;
-      color: #2c5a6e;
-      min-width: 55px;
-    }
-    .input-group input {
-      flex: 1;
-      padding: 10px 12px;
-      border: 1px solid #cbdae2;
-      border-radius: 30px;
-      font-size: 0.8rem;
-    }
-    .saved-key-badge {
-      background: #d4edda;
-      color: #155724;
-      padding: 6px 12px;
-      border-radius: 30px;
-      font-size: 0.7rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-    .saved-key-badge:active {
-      background: #c3e6cb;
-      transform: scale(0.97);
-    }
-    .key-badge-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .btn-sm {
-      padding: 6px 12px;
-      font-size: 0.7rem;
-    }
-    .sync-row-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .sync-row-buttons button {
-      flex: 1;
-      min-width: 80px;
-      padding: 8px 12px;
-      font-size: 0.75rem;
-    }
-    .btn-save { background: #6c757d; color: white; }
-    .btn-clear { background: #dc3545; color: white; }
-    .btn-forget { background: #343a40; color: white; }
-    .btn-down { background: #28a745; color: white; }
-    .btn-up { background: #ffc107; color: #333; }
-    .btn-save-cloud { background: #28a745; color: white; font-weight: bold; }
-    .sync-status { font-size: 0.7rem; color: #2c5a6e; margin-top: 8px; padding: 6px; background: rgba(255,255,255,0.5); border-radius: 12px; }
-    .sync-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .sync-buttons button { flex: 1; min-width: 100px; }
-    
-    .action-panel { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
-    .check-card, .add-card { background: white; border-radius: 18px; padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    h3 { margin-bottom: 10px; font-size: 1rem; }
-    .check-input-group { display: flex; gap: 8px; flex-wrap: wrap; }
-    .check-input-group input { flex: 2; padding: 14px; border: 2px solid #cbdae2; border-radius: 30px; font-size: 1rem; }
-    button { background: #2c7da0; border: none; padding: 12px 20px; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; min-height: 44px; }
-    button:active { transform: scale(0.96); }
-    button:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
-    .check-result { margin-top: 12px; padding: 12px; background: #eef3fa; border-radius: 16px; font-size: 0.9rem; border-left: 4px solid #2c7da0; }
-    .select-group { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
-    .select-group input, .select-group select { padding: 14px; border-radius: 30px; border: 1px solid #bccbd4; font-size: 1rem; width: 100%; }
-    
-    .complexity-settings {
-      background: #f0f4f8;
-      border-radius: 16px;
-      padding: 12px;
-      margin-bottom: 16px;
-    }
-    .complexity-settings-title {
-      font-size: 0.7rem;
-      font-weight: bold;
-      color: #2c5a6e;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .complexity-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .complexity-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
       background: white;
-      padding: 6px 12px;
-      border-radius: 30px;
-      font-size: 0.7rem;
+      border-radius: 24px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 2px solid #2c7da0;
     }
-    .complexity-badge input {
-      width: 100px;
-      padding: 4px 8px;
-      border-radius: 20px;
-      border: 1px solid #cbdae2;
-      font-size: 0.7rem;
-    }
-    .complexity-badge button {
-      padding: 4px 8px;
-      font-size: 0.6rem;
-      background: #28a745;
-    }
-    
-    .delivery-methods {
-      margin-top: 12px;
-    }
-    .delivery-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .delivery-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #2c5a6e;
-    }
-    .edit-mode-btn {
-      background: #6c757d;
-      padding: 6px 12px;
-      font-size: 0.65rem;
-      min-height: auto;
-    }
-    .edit-mode-btn.active {
-      background: #dc3545;
-    }
-    .delivery-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-      padding: 8px;
-      background: #f8f9fa;
-      border-radius: 16px;
-      min-height: 60px;
-    }
-    .delivery-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 0;
-      background: #e9ecef;
-      border: 1px solid #ced4da;
-      border-radius: 30px;
-      overflow: hidden;
-      transition: all 0.2s ease;
-    }
-    .delivery-item.edit-mode {
-      background: #fff0f0;
-      border-color: #dc3545;
-    }
-    .delivery-btn {
-      background: #e9ecef;
-      border: none;
-      padding: 8px 12px;
-      font-size: 0.75rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-    .delivery-item.edit-mode .delivery-btn {
-      background: #fff0f0;
-      padding-right: 4px;
-    }
-    .delivery-btn.selected {
-      background: #2c7da0;
-      color: white;
-    }
-    .delivery-action-btn {
-      background: none;
-      border: none;
-      padding: 8px 8px;
-      font-size: 0.7rem;
-      cursor: pointer;
-      min-height: auto;
-      width: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: all 0.2s ease;
-    }
-    .delivery-item.edit-mode .delivery-action-btn {
-      width: auto;
-      opacity: 1;
-      padding: 8px 8px;
-    }
-    .edit-delivery-btn {
-      background: #ffc107;
-      color: #333;
-    }
-    .delete-delivery-btn {
-      background: #dc3545;
-      color: white;
-    }
-    .delivery-action-btn:active {
-      transform: scale(0.95);
-    }
-    .add-delivery-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .add-delivery-row input {
-      flex: 1;
-      padding: 10px 12px;
-      border: 1px solid #cbdae2;
-      border-radius: 30px;
-      font-size: 0.8rem;
-    }
-    .add-delivery-row button {
-      padding: 8px 16px;
-      font-size: 0.7rem;
-      background: #28a745;
-      white-space: nowrap;
-    }
-    
-    .shop-description-area {
-      margin-top: 12px;
-    }
-    .shop-description-area textarea {
+    .sync-title { font-weight: bold; font-size: 0.9rem; margin-bottom: 12px; color: #1a3a44; text-align: center; }
+    .btn-big {
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 50px;
+      margin: 8px 0;
       width: 100%;
+    }
+    .btn-green { background: #28a745; color: white; }
+    .btn-blue { background: #2c7da0; color: white; }
+    .btn-red { background: #dc3545; color: white; }
+    .btn-gray { background: #6c757d; color: white; }
+    button { border: none; cursor: pointer; transition: transform 0.05s ease; min-height: 52px; }
+    button:active { transform: scale(0.97); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .sync-status {
+      font-size: 0.75rem;
       padding: 10px;
-      border: 1px solid #cbdae2;
-      border-radius: 16px;
-      font-size: 0.8rem;
-      resize: vertical;
-      font-family: inherit;
+      margin-top: 12px;
+      border-radius: 40px;
+      text-align: center;
+      background: #eef3fa;
+      color: #2c5a6e;
     }
     
     .categories-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-top: 16px;
-      margin-bottom: 20px;
+      margin: 20px 0;
     }
     .category-card {
       background: white;
-      border-radius: 18px;
+      border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       cursor: pointer;
-      transition: transform 0.1s ease;
     }
     .category-card:active { transform: scale(0.97); }
     .cat-header {
-      padding: 10px 4px;
+      padding: 12px 4px;
       text-align: center;
       font-weight: bold;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
     }
     .white-header { background: #e3e8ee; color: #1e3a4a; border-bottom: 3px solid #2c7da0; }
     .gray-header { background: #5a6e78; color: white; border-bottom: 3px solid #2c3e42; }
     .black-header { background: #1e2a2e; color: white; border-bottom: 3px solid #f39c12; }
-    .cat-body { padding: 10px; text-align: center; }
-    .cat-count { font-size: 1.8rem; font-weight: bold; color: #2c7da0; }
+    .cat-body { padding: 12px; text-align: center; }
+    .cat-count { font-size: 2rem; font-weight: bold; color: #2c7da0; }
     .cat-label { font-size: 0.7rem; color: #6c757d; margin-top: 4px; }
     .empty-cat { opacity: 0.5; }
     
+    .add-card, .check-card {
+      background: white;
+      border-radius: 24px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .add-card h3, .check-card h3 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: #1a3a44;
+      text-align: center;
+    }
+    .row-input {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .row-input input, .row-input select {
+      flex: 1;
+      padding: 14px;
+      border: 2px solid #cbdae2;
+      border-radius: 40px;
+      font-size: 1rem;
+      text-align: center;
+    }
+    .delivery-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 20px;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+    .delivery-btn {
+      background: #e9ecef;
+      padding: 8px 14px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .delivery-btn.selected {
+      background: #2c7da0;
+      color: white;
+    }
+    .add-delivery-row {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .add-delivery-row input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 40px;
+      border: 1px solid #ced4da;
+    }
+    .add-delivery-row button {
+      padding: 10px 16px;
+      background: #28a745;
+    }
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ced4da;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      margin-top: 8px;
+    }
+    .check-result {
+      margin-top: 12px;
+      padding: 12px;
+      background: #eef3fa;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
     .data-placeholder {
       text-align: center;
-      padding: 60px 20px;
+      padding: 40px;
       background: #f8f9fa;
       border-radius: 24px;
       color: #6c757d;
-      margin: 20px 0;
-      font-size: 0.9rem;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.6rem;
+      color: #6c757d;
+      padding: 16px;
     }
     
     .modal-overlay {
@@ -326,16 +174,15 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.7);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      backdrop-filter: blur(3px);
     }
     .modal-content {
       background: white;
-      border-radius: 28px;
+      border-radius: 32px;
       width: 90%;
       max-width: 500px;
       max-height: 85vh;
@@ -344,16 +191,20 @@
       overflow: hidden;
     }
     .modal-header {
-      padding: 16px 20px;
-      font-size: 1.1rem;
+      padding: 20px;
+      font-size: 1.2rem;
       font-weight: bold;
       text-align: center;
       border-bottom: 1px solid #e9ecef;
     }
-    .modal-list { flex: 1; overflow-y: auto; padding: 12px; }
+    .modal-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
     .modal-shop-item {
       background: #f8f9fa;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 12px;
       margin-bottom: 10px;
     }
@@ -363,63 +214,46 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 8px;
     }
-    .modal-shop-num { 
-      font-weight: bold; 
-      font-size: 1rem; 
-      background: #2c7da0; 
-      color: white; 
-      padding: 4px 12px; 
-      border-radius: 30px; 
+    .modal-shop-num {
+      font-weight: bold;
+      font-size: 1.1rem;
+      background: #2c7da0;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 30px;
     }
     .modal-shop-delivery {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #2c7da0;
       background: #e8f4f8;
       padding: 4px 10px;
       border-radius: 30px;
+      margin: 6px 0;
       display: inline-block;
-      margin: 4px 0;
     }
     .modal-shop-description {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #555;
       background: #f0f0f0;
       padding: 8px;
       border-radius: 12px;
       margin-top: 8px;
-      white-space: pre-wrap;
-      word-break: break-word;
     }
-    .delete-shop-modal { 
-      background: #ffe0e0; 
-      border: none; 
-      padding: 5px 12px; 
-      border-radius: 30px; 
-      color: #b91c1c; 
-      font-weight: bold; 
-      cursor: pointer; 
-      font-size: 0.7rem; 
-    }
-    .edit-shop-modal {
-      background: #e3f2fd;
+    .delete-shop-modal, .edit-shop-modal {
       border: none;
-      padding: 5px 12px;
+      padding: 6px 12px;
       border-radius: 30px;
-      color: #2c7da0;
-      font-weight: bold;
-      cursor: pointer;
       font-size: 0.7rem;
+      cursor: pointer;
     }
-    .empty-modal { text-align: center; color: #8c9aa8; padding: 32px; font-style: italic; }
-    
-    .warning-modal .modal-header { background: #fff0f0; color: #b91c1c; }
-    .changes-list { background: #f8f9fa; border-radius: 12px; padding: 10px; margin: 10px 0; max-height: 200px; overflow-y: auto; }
-    .changes-list li { margin-left: 20px; font-size: 0.8rem; margin-bottom: 4px; }
-    .btn-cancel { background: #6c757d; color: white; margin: 0 20px 12px; }
-    .btn-proceed { background: #dc3545; color: white; margin: 0 20px 20px; }
-    .btn-confirm { background: #28a745; color: white; margin: 0 20px 20px; }
+    .delete-shop-modal { background: #ffe0e0; color: #b91c1c; }
+    .edit-shop-modal { background: #e3f2fd; color: #2c7da0; }
+    .modal-close {
+      margin: 12px 20px 20px;
+      padding: 12px;
+      background: #6c757d;
+    }
     
     .login-overlay {
       position: fixed;
@@ -435,769 +269,206 @@
     }
     .login-card {
       background: white;
-      border-radius: 32px;
-      padding: 28px 20px;
+      border-radius: 40px;
+      padding: 32px 24px;
       width: 85%;
       max-width: 340px;
       text-align: center;
     }
-    .login-card h2 { margin-bottom: 8px; color: #1a3a44; font-size: 1.3rem; }
-    .login-card p { color: #6c757d; font-size: 0.75rem; margin-bottom: 20px; }
-    .login-card input { width: 100%; padding: 14px; border: 2px solid #cbdae2; border-radius: 40px; font-size: 1rem; margin-bottom: 16px; text-align: center; }
-    .login-card button { width: 100%; background: #2c7da0; padding: 14px; font-size: 1rem; margin-top: 8px; }
-    .login-card button:active { transform: scale(0.96); }
-    .error-msg { color: #dc3545; font-size: 0.75rem; margin-top: 10px; }
-    .switch-mode { margin-top: 16px; font-size: 0.75rem; color: #2c7da0; cursor: pointer; text-decoration: underline; }
-    .password-hint { font-size: 0.65rem; color: #6c757d; margin-top: 8px; }
-    
-    footer { margin-top: 20px; text-align: center; font-size: 0.6rem; color: #3a6b7c; padding: 12px; }
-    @media (min-width: 700px) { 
-      .action-panel { flex-direction: row; } 
-      .select-group { flex-direction: row; } 
-      .select-group input { flex: 2; } 
-      .select-group select { flex: 1; }
-      .sync-row { flex-direction: row; flex-wrap: wrap; }
-      .input-group { flex: 1; }
-      .sync-row-buttons { flex: 1; justify-content: flex-end; }
-      .complexity-row { flex-direction: row; }
+    .login-card h2 { margin-bottom: 8px; color: #1a3a44; }
+    .login-card input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #cbdae2;
+      border-radius: 40px;
+      font-size: 1rem;
+      margin: 12px 0;
+      text-align: center;
     }
+    .login-card button {
+      width: 100%;
+      padding: 14px;
+      background: #2c7da0;
+      font-size: 1rem;
+      border-radius: 40px;
+    }
+    .switch-mode {
+      margin-top: 16px;
+      font-size: 0.75rem;
+      color: #2c7da0;
+      cursor: pointer;
+    }
+    .error-msg { color: #dc3545; font-size: 0.7rem; margin-top: 8px; }
   </style>
 </head>
 <body>
 <div id="app"></div>
 
 <script>
+  // ============================================================
+  // ВАШІ ДАНІ З SUPABASE
+  const SUPABASE_URL = "https://iairlqllcbjemvlqqonl.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_g2FK03ci-RrYFJk_DdqOsA_CQC3lg4X";
+  // ============================================================
+  
   const BASE_PASSWORD = "123";
   
-  let complexityNames = {
-    "легко": { title: "Стандарт", icon: "🟢", color: "#28a745" },
-    "потно": { title: "Ускладнений", icon: "🟡", color: "#ffc107" },
-    "тяжко": { title: "Складний", icon: "🔴", color: "#dc3545" }
-  };
-  
-  let globalDeliveryMethodsList = [];
-  let shops = {
-    "білі": { "легко": [], "потно": [], "тяжко": [] },
-    "сірі": { "легко": [], "потно": [], "тяжко": [] },
-    "чорні": { "легко": [], "потно": [], "тяжко": [] }
-  };
-  let shopDeliveries = {};
-  let shopDescriptions = {};
-  let config = { apiKey: "", binId: "" };
-  let selectedDelivery = "";
-  let currentShopDescription = "";
-  let lastSnapshotShopsSet = new Set();
-  let lastSnapshotDeliveriesHash = "";
-  let lastSnapshotComplexityHash = "";
-  let isEditMode = false;
-  let isDataLoaded = false;
-  
-  function getComplexityHash() {
-    return JSON.stringify(complexityNames);
-  }
-  
-  function getAllShopNumbers() {
-    const set = new Set();
-    for (const color of ["білі","сірі","чорні"]) {
-      for (const comp of ["легко","потно","тяжко"]) {
-        for (const num of shops[color][comp]) set.add(num);
-      }
-    }
-    return set;
-  }
-  
-  function getDeliveriesHash() {
-    return JSON.stringify(globalDeliveryMethodsList);
-  }
-  
-  function updateSnapshot() { 
-    lastSnapshotShopsSet = getAllShopNumbers();
-    lastSnapshotDeliveriesHash = getDeliveriesHash();
-    lastSnapshotComplexityHash = getComplexityHash();
-  }
-  
-  function hasComplexityChanges() {
-    return lastSnapshotComplexityHash !== getComplexityHash();
-  }
-  
-  function hasDeliveryMethodChanges() {
-    return lastSnapshotDeliveriesHash !== getDeliveriesHash();
-  }
-  
-  function getAddedShops() {
-    const currentSet = getAllShopNumbers();
-    const added = [];
-    for (const shop of currentSet) {
-      if (!lastSnapshotShopsSet.has(shop)) added.push(shop);
-    }
-    return added;
-  }
-  
-  function getDeletedShops() {
-    const currentSet = getAllShopNumbers();
-    const deleted = [];
-    for (const shop of lastSnapshotShopsSet) {
-      if (!currentSet.has(shop)) deleted.push(shop);
-    }
-    return deleted;
-  }
-  
-  function hasLocalChanges() {
-    if (!isDataLoaded) return false;
-    const currentSet = getAllShopNumbers();
-    if (currentSet.size !== lastSnapshotShopsSet.size) return true;
-    for (const shop of currentSet) {
-      if (!lastSnapshotShopsSet.has(shop)) return true;
-    }
-    return hasDeliveryMethodChanges() || hasComplexityChanges();
-  }
-  
-  function showUnsavedChangesWarning(onConfirm, onCancel) {
-    const addedShops = getAddedShops();
-    const deletedShops = getDeletedShops();
-    const hasDeliveryChanges = hasDeliveryMethodChanges();
-    const hasComplexityChangesVal = hasComplexityChanges();
-    
-    let changesHtml = '';
-    if (addedShops.length > 0) {
-      changesHtml += `<li>➕ Додано магазини: ${addedShops.join(', ')}</li>`;
-    }
-    if (deletedShops.length > 0) {
-      changesHtml += `<li>➖ Видалено магазини: ${deletedShops.join(', ')}</li>`;
-    }
-    if (hasDeliveryChanges) {
-      changesHtml += `<li>📦 Змінено способи доставки</li>`;
-    }
-    if (hasComplexityChangesVal) {
-      changesHtml += `<li>⚙️ Змінено назви категорій</li>`;
-    }
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-content warning-modal">
-        <div class="modal-header">⚠️ У ВАС Є НЕЗБЕРЕЖЕНІ ЗМІНИ!</div>
-        <div class="modal-list">
-          <p style="margin-bottom:12px;">Ви зробили наступні зміни:</p>
-          <ul class="changes-list">${changesHtml}</ul>
-          <p style="margin-top:16px; color:#b91c1c; font-weight:bold;">Якщо ви не збережете зміни зараз, вони будуть ВТРАЧЕНІ!</p>
-        </div>
-        <button class="btn-cancel" id="cancelBtn">↩️ Повернутися</button>
-        <button class="btn-confirm" id="confirmBtn">✅ Продовжити (втратити зміни)</button>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    overlay.querySelector('#cancelBtn').onclick = () => { overlay.remove(); if(onCancel) onCancel(); };
-    overlay.querySelector('#confirmBtn').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
-  }
-  
-  function saveUserData() {
-    if (!currentUser) return;
-    const users = getUsers();
-    users[currentUser] = {
-      password: BASE_PASSWORD,
-      shops: shops,
-      deliveries: shopDeliveries,
-      descriptions: shopDescriptions,
-      config: config,
-      complexityNames: complexityNames
-    };
-    saveUsers(users);
-  }
-  
-  function saveGlobalDataToCloud() {
-    if (!config.apiKey || !config.binId || !isDataLoaded) return;
-    fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "X-Master-Key": config.apiKey },
-      body: JSON.stringify({ 
-        shops: shops, 
-        deliveries: shopDeliveries,
-        descriptions: shopDescriptions,
-        deliveryMethods: globalDeliveryMethodsList,
-        complexityNames: complexityNames
-      })
-    }).catch(e => console.error("Помилка збереження:", e));
-  }
-  
-  function getUsers() {
-    const users = localStorage.getItem("app_users");
-    if (users) {
-      try { return JSON.parse(users); } catch(e) {}
-    }
-    return {};
-  }
-  
-  function saveUsers(users) {
-    localStorage.setItem("app_users", JSON.stringify(users));
-  }
-  
   let currentUser = null;
+  let shopsData = [];
+  let deliveryMethodsList = [];
+  let selectedDelivery = "";
+  let currentDescription = "";
   
-  function loadUserData(username) {
-    const users = getUsers();
-    const userData = users[username];
-    if (userData) {
-      shops = userData.shops || {
-        "білі": { "легко": [], "потно": [], "тяжко": [] },
-        "сірі": { "легко": [], "потно": [], "тяжко": [] },
-        "чорні": { "легко": [], "потно": [], "тяжко": [] }
-      };
-      shopDeliveries = userData.deliveries || {};
-      shopDescriptions = userData.descriptions || {};
-      config = userData.config || { apiKey: "", binId: "" };
-      if (userData.complexityNames) {
-        complexityNames = userData.complexityNames;
+  const colorNames = { "білі": "⚪ БІЛІ", "сірі": "⚫ СІРІ", "чорні": "⬛ ЧОРНІ" };
+  const complexityNames = {
+    "легко": { title: "Стандарт", icon: "🟢" },
+    "потно": { title: "Ускладнений", icon: "🟡" },
+    "тяжко": { title: "Складний", icon: "🔴" }
+  };
+  
+  // ========== РОБОТА З SUPABASE ==========
+  async function fetchShops() {
+    const url = `${SUPABASE_URL}/rest/v1/shops?select=*`;
+    console.log("Запит до:", url);
+    
+    const response = await fetch(url, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
       }
-    } else {
-      shops = {
-        "білі": { "легко": [], "потно": [], "тяжко": [] },
-        "сірі": { "легко": [], "потно": [], "тяжко": [] },
-        "чорні": { "легко": [], "потно": [], "тяжко": [] }
-      };
-      shopDeliveries = {};
-      shopDescriptions = {};
-      config = { apiKey: "", binId: "" };
-    }
-    updateSnapshot();
-    isDataLoaded = false;
-  }
-  
-  function loadConfig() {
-    if (currentUser) {
-      const users = getUsers();
-      const userData = users[currentUser];
-      if (userData && userData.config) {
-        config = userData.config;
-      }
-      const apiInput = document.getElementById("apiKeyInput");
-      const binInput = document.getElementById("binIdInput");
-      if (apiInput) apiInput.value = config.apiKey || "";
-      if (binInput) binInput.value = config.binId || "";
-    }
-    updateSavedKeysDisplay();
-  }
-  
-  function updateSavedKeysDisplay() {
-    const container = document.getElementById("savedKeysContainer");
-    if (!container) return;
-    let html = '';
-    if (config.apiKey && config.apiKey.length > 3) {
-      const maskedApi = config.apiKey.slice(0, 8) + '••••••••';
-      html += `<span class="saved-key-badge" data-keytype="api" data-keyvalue="${config.apiKey}">🔑 API: ${maskedApi}</span>`;
-    }
-    if (config.binId && config.binId.length > 3) {
-      const maskedBin = config.binId.slice(0, 6) + '••••••';
-      html += `<span class="saved-key-badge" data-keytype="bin" data-keyvalue="${config.binId}">📦 Bin: ${maskedBin}</span>`;
-    }
-    if (!config.apiKey && !config.binId) {
-      html = '<span style="font-size:0.65rem; color:#6c757d;">💾 Немає збережених ключів</span>';
-    }
-    container.innerHTML = html;
-    document.querySelectorAll('.saved-key-badge').forEach(badge => {
-      badge.onclick = (e) => {
-        e.stopPropagation();
-        const keyType = badge.dataset.keytype;
-        const keyValue = badge.dataset.keyvalue;
-        if (keyType === 'api') {
-          document.getElementById("apiKeyInput").value = keyValue;
-          document.getElementById("syncStatus").innerHTML = "✅ API ключ вставлено!";
-        } else if (keyType === 'bin') {
-          document.getElementById("binIdInput").value = keyValue;
-          document.getElementById("syncStatus").innerHTML = "✅ Bin ID вставлено!";
-        }
-      };
     });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Помилка:", response.status, errorText);
+      throw new Error(`Помилка ${response.status}: ${errorText}`);
+    }
+    return await response.json();
   }
   
-  function saveConfig() {
-    config.apiKey = document.getElementById("apiKeyInput").value.trim();
-    config.binId = document.getElementById("binIdInput").value.trim();
-    saveUserData();
-    updateSavedKeysDisplay();
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) {
-      if (config.apiKey && config.binId) {
-        statusEl.innerHTML = "✅ Ключі збережено! Натисніть '📥 Завантажити' для отримання даних";
-      } else {
-        statusEl.innerHTML = "⚠️ Введіть обидва ключі";
+  async function addShopToDB(number, color, difficulty, delivery_method, description) {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/shops`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ number, color, difficulty, delivery_method, description })
+    });
+    if (!response.ok) throw new Error('Помилка додавання');
+    return await response.json();
+  }
+  
+  async function deleteShopFromDB(id) {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/shops?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (!response.ok) throw new Error('Помилка видалення');
+  }
+  
+  async function updateShopInDB(id, updates) {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/shops?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updates)
+    });
+    if (!response.ok) throw new Error('Помилка оновлення');
+  }
+  
+  // ========== ОБРОБКА ДАНИХ ==========
+  function getShopsByColorAndDifficulty() {
+    const result = {
+      "білі": { "легко": [], "потно": [], "тяжко": [] },
+      "сірі": { "легко": [], "потно": [], "тяжко": [] },
+      "чорні": { "легко": [], "потно": [], "тяжко": [] }
+    };
+    shopsData.forEach(shop => {
+      if (result[shop.color] && result[shop.color][shop.difficulty]) {
+        result[shop.color][shop.difficulty].push(shop);
+      }
+    });
+    for (let color in result) {
+      for (let diff in result[color]) {
+        result[color][diff].sort((a,b) => a.number - b.number);
       }
     }
+    return result;
   }
   
-  function clearConfig() {
-    if (confirm("Очистити збережені ключі?")) {
-      config.apiKey = "";
-      config.binId = "";
-      saveUserData();
-      document.getElementById("apiKeyInput").value = "";
-      document.getElementById("binIdInput").value = "";
-      updateSavedKeysDisplay();
-      const statusEl = document.getElementById("syncStatus");
-      if (statusEl) statusEl.innerHTML = "🗑 Ключі очищено";
-    }
-  }
-  
-  function updateComplexityName(compKey) {
-    const newName = document.getElementById(`comp_name_${compKey}`).value.trim();
-    if (newName && complexityNames[compKey]) {
-      complexityNames[compKey].title = newName;
-      saveUserData();
-      if (config.apiKey && config.binId && isDataLoaded) {
-        saveGlobalDataToCloud();
+  function getDeliveryMethods() {
+    const methods = new Set();
+    shopsData.forEach(shop => {
+      if (shop.delivery_method && shop.delivery_method.trim()) {
+        methods.add(shop.delivery_method);
       }
+    });
+    return Array.from(methods).map(m => ({ key: m, title: m }));
+  }
+  
+  // ========== ІНТЕРФЕЙС ==========
+  async function loadData() {
+    const statusDiv = document.getElementById("syncStatus");
+    statusDiv.innerHTML = "📥 Завантаження...";
+    try {
+      shopsData = await fetchShops();
+      console.log("Отримано магазинів:", shopsData.length);
+      deliveryMethodsList = getDeliveryMethods();
       renderCategories();
-      updateComplexitySelectors();
-      const statusEl = document.getElementById("syncStatus");
-      if (statusEl) statusEl.innerHTML = `✏️ Назву змінено на: ${complexityNames[compKey].icon} ${newName}`;
-    }
-  }
-  
-  function updateComplexitySelectors() {
-    const selectEasy = document.getElementById("newShopComplexity");
-    if (selectEasy) {
-      selectEasy.innerHTML = `
-        <option value="легко">${complexityNames["легко"].icon} ${complexityNames["легко"].title}</option>
-        <option value="потно">${complexityNames["потно"].icon} ${complexityNames["потно"].title}</option>
-        <option value="тяжко">${complexityNames["тяжко"].icon} ${complexityNames["тяжко"].title}</option>
-      `;
-    }
-  }
-  
-  function enableDataDependentComponents(enabled) {
-    const elements = ['checkShopInput', 'checkShopBtn', 'newShopNumber', 'newShopColor', 'newShopComplexity', 'addShopBtn', 'shopDescriptionInput', 'newDeliveryInput', 'addDeliveryBtn', 'toggleEditModeBtn'];
-    elements.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.disabled = !enabled;
-    });
-    if (!enabled) {
-      const resultEl = document.getElementById("checkResult");
-      if (resultEl) resultEl.innerHTML = "🔒 Спочатку завантажте дані з хмари";
-      const categoriesGrid = document.getElementById("categoriesGrid");
-      if (categoriesGrid) categoriesGrid.innerHTML = '<div class="data-placeholder">🔒 Спочатку завантажте дані з хмари</div>';
-      const deliveryContainer = document.getElementById("deliveryButtons");
-      if (deliveryContainer) deliveryContainer.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">🔒 Спочатку завантажте дані з хмари</div>';
-    } else {
-      updateComplexitySelectors();
-    }
-  }
-  
-  async function download() {
-    if (!config.apiKey || !config.binId) {
-      const apiKey = document.getElementById("apiKeyInput").value.trim();
-      const binId = document.getElementById("binIdInput").value.trim();
-      if (apiKey && binId) {
-        config.apiKey = apiKey;
-        config.binId = binId;
-        saveUserData();
-      } else {
-        const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
-        return;
-      }
-    }
-    
-    if (hasLocalChanges()) {
-      showUnsavedChangesWarning(async () => {
-        const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = "📥 Завантаження...";
-        try {
-          const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
-            headers: { "X-Master-Key": config.apiKey }
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.record && data.record.shops) {
-              shops = data.record.shops;
-              shopDeliveries = data.record.deliveries || {};
-              shopDescriptions = data.record.descriptions || {};
-              if (data.record.deliveryMethods && Array.isArray(data.record.deliveryMethods)) {
-                globalDeliveryMethodsList = data.record.deliveryMethods;
-              } else {
-                globalDeliveryMethodsList = [];
-              }
-              if (data.record.complexityNames) {
-                complexityNames = data.record.complexityNames;
-              }
-              saveUserData();
-              updateSnapshot();
-              isDataLoaded = true;
-              if (typeof renderCategories === 'function') renderCategories();
-              if (typeof initDeliveryButtons === 'function') initDeliveryButtons();
-              enableDataDependentComponents(true);
-              if (statusEl) statusEl.innerHTML = "✅ Дані завантажено!";
-            } else {
-              shops = {
-                "білі": { "легко": [], "потно": [], "тяжко": [] },
-                "сірі": { "легко": [], "потно": [], "тяжко": [] },
-                "чорні": { "легко": [], "потно": [], "тяжко": [] }
-              };
-              shopDeliveries = {};
-              shopDescriptions = {};
-              globalDeliveryMethodsList = [];
-              isDataLoaded = true;
-              updateSnapshot();
-              if (typeof renderCategories === 'function') renderCategories();
-              if (typeof initDeliveryButtons === 'function') initDeliveryButtons();
-              enableDataDependentComponents(true);
-              if (statusEl) statusEl.innerHTML = "⚠️ Хмара порожня, створено нову базу";
-            }
-          } else {
-            if (statusEl) statusEl.innerHTML = "❌ Помилка завантаження. Перевірте ключі";
-          }
-        } catch(e) {
-          if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
-        }
-      }, () => {});
-      return;
-    }
-    
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "📥 Завантаження...";
-    try {
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}/latest`, {
-        headers: { "X-Master-Key": config.apiKey }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.record && data.record.shops) {
-          shops = data.record.shops;
-          shopDeliveries = data.record.deliveries || {};
-          shopDescriptions = data.record.descriptions || {};
-          if (data.record.deliveryMethods && Array.isArray(data.record.deliveryMethods)) {
-            globalDeliveryMethodsList = data.record.deliveryMethods;
-          } else {
-            globalDeliveryMethodsList = [];
-          }
-          if (data.record.complexityNames) {
-            complexityNames = data.record.complexityNames;
-          }
-          saveUserData();
-          updateSnapshot();
-          isDataLoaded = true;
-          if (typeof renderCategories === 'function') renderCategories();
-          if (typeof initDeliveryButtons === 'function') initDeliveryButtons();
-          enableDataDependentComponents(true);
-          if (statusEl) statusEl.innerHTML = "✅ Дані завантажено!";
-        } else {
-          shops = {
-            "білі": { "легко": [], "потно": [], "тяжко": [] },
-            "сірі": { "легко": [], "потно": [], "тяжко": [] },
-            "чорні": { "легко": [], "потно": [], "тяжко": [] }
-          };
-          shopDeliveries = {};
-          shopDescriptions = {};
-          globalDeliveryMethodsList = [];
-          isDataLoaded = true;
-          updateSnapshot();
-          if (typeof renderCategories === 'function') renderCategories();
-          if (typeof initDeliveryButtons === 'function') initDeliveryButtons();
-          enableDataDependentComponents(true);
-          if (statusEl) statusEl.innerHTML = "⚠️ Хмара порожня, створено нову базу";
-        }
-      } else {
-        if (statusEl) statusEl.innerHTML = "❌ Помилка завантаження. Перевірте ключі";
-      }
-    } catch(e) {
-      if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
-    }
-  }
-  
-  async function upload(force = false) {
-    if (!config.apiKey || !config.binId) {
-      const apiKey = document.getElementById("apiKeyInput").value.trim();
-      const binId = document.getElementById("binIdInput").value.trim();
-      if (apiKey && binId) {
-        config.apiKey = apiKey;
-        config.binId = binId;
-        saveUserData();
-      } else {
-        const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = "⚠️ Введіть API ключ та ID Bin!";
-        return;
-      }
-    }
-    if (!isDataLoaded) {
-      const statusEl = document.getElementById("syncStatus");
-      if (statusEl) statusEl.innerHTML = "⚠️ Спочатку завантажте дані";
-      return;
-    }
-    const deletedShops = getDeletedShops();
-    if (!force && deletedShops.length > 0) {
-      showDeletionWarning(deletedShops, () => upload(true), () => {
-        const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = "⏸️ Відправлення скасовано";
-      });
-      return;
-    }
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "📤 Відправка...";
-    try {
-      const data = { 
-        shops: shops, 
-        deliveries: shopDeliveries,
-        descriptions: shopDescriptions,
-        deliveryMethods: globalDeliveryMethodsList,
-        complexityNames: complexityNames
-      };
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${config.binId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "X-Master-Key": config.apiKey },
-        body: JSON.stringify(data)
-      });
-      if (res.ok) {
-        updateSnapshot();
-        if (statusEl) statusEl.innerHTML = "✅ Збережено в хмару!";
-      } else {
-        if (statusEl) statusEl.innerHTML = "❌ Помилка збереження";
-      }
-    } catch(e) {
-      if (statusEl) statusEl.innerHTML = "❌ Немає інтернету";
-    }
-  }
-  
-  function addShop(num, color, comp, delivery, description) {
-    if (!isDataLoaded) return;
-    const n = Number(num);
-    if (isNaN(n)) return;
-    for (let c of ["білі","сірі","чорні"]) {
-      for (let cp of ["легко","потно","тяжко"]) {
-        shops[c][cp] = shops[c][cp].filter(i => i !== n);
-      }
-    }
-    shops[color][comp].push(n);
-    shops[color][comp].sort((a,b)=>a-b);
-    if (delivery) shopDeliveries[n] = delivery;
-    if (description && description.trim()) shopDescriptions[n] = description.trim();
-    saveUserData();
-    if (typeof renderCategories === 'function') renderCategories();
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "✅ Магазин додано! Не забудьте зберегти в хмару (💾 Зберегти в хмару)";
-  }
-  
-  function removeShop(n, color, comp) {
-    if (!isDataLoaded) return;
-    shops[color][comp] = shops[color][comp].filter(i => i !== n);
-    delete shopDeliveries[n];
-    delete shopDescriptions[n];
-    saveUserData();
-    if (typeof renderCategories === 'function') renderCategories();
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) statusEl.innerHTML = "✅ Магазин видалено! Не забудьте зберегти в хмару (💾 Зберегти в хмару)";
-  }
-  
-  function updateShop(n, color, comp, delivery, description) {
-    removeShop(n, color, comp);
-    addShop(n, color, comp, delivery, description);
-  }
-  
-  function getDeliveryText(key) {
-    const found = globalDeliveryMethodsList.find(d => d.key === key);
-    return found ? found.title : key;
-  }
-  
-  function addNewDeliveryMethod() {
-    if (!isDataLoaded) return;
-    const input = document.getElementById("newDeliveryInput");
-    const newTitle = input.value.trim();
-    if (!newTitle) {
-      alert("Введіть назву способу доставки");
-      return;
-    }
-    const exists = globalDeliveryMethodsList.some(d => d.title === newTitle);
-    if (exists) {
-      alert("Такий спосіб доставки вже існує!");
-      return;
-    }
-    const newKey = "custom_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
-    globalDeliveryMethodsList.push({ key: newKey, title: newTitle });
-    saveUserData();
-    initDeliveryButtons();
-    input.value = "";
-    if (config.apiKey && config.binId) {
-      saveGlobalDataToCloud();
-      const statusEl = document.getElementById("syncStatus");
-      if (statusEl) statusEl.innerHTML = `✅ Додано новий спосіб доставки: ${newTitle}`;
-    }
-  }
-  
-  function editDeliveryMethod(key, oldTitle) {
-    if (!isDataLoaded) return;
-    const newTitle = prompt("Редагувати спосіб доставки:", oldTitle);
-    if (!newTitle || newTitle === oldTitle) return;
-    const exists = globalDeliveryMethodsList.some(d => d.title === newTitle && d.key !== key);
-    if (exists) {
-      alert("Такий спосіб доставки вже існує!");
-      return;
-    }
-    const method = globalDeliveryMethodsList.find(d => d.key === key);
-    if (method) method.title = newTitle;
-    saveUserData();
-    initDeliveryButtons();
-    if (config.apiKey && config.binId) {
-      saveGlobalDataToCloud();
-      const statusEl = document.getElementById("syncStatus");
-      if (statusEl) statusEl.innerHTML = `✏️ Перейменовано на: ${newTitle}`;
-    }
-  }
-  
-  function deleteDeliveryMethod(key, title) {
-    if (!isDataLoaded) return;
-    if (confirm(`⚠️ Видалити спосіб доставки "${title}"?\n\nУвага! Якщо цей спосіб використовується для якихось магазинів, у них зникне спосіб доставки.`)) {
-      globalDeliveryMethodsList = globalDeliveryMethodsList.filter(d => d.key !== key);
-      for (const shop in shopDeliveries) {
-        if (shopDeliveries[shop] === key) {
-          delete shopDeliveries[shop];
-        }
-      }
-      saveUserData();
       initDeliveryButtons();
-      if (selectedDelivery === key) {
-        selectedDelivery = "";
-      }
-      if (config.apiKey && config.binId) {
-        saveGlobalDataToCloud();
-        const statusEl = document.getElementById("syncStatus");
-        if (statusEl) statusEl.innerHTML = `🗑 Видалено спосіб доставки: ${title}`;
-      }
+      statusDiv.innerHTML = `✅ Завантажено ${shopsData.length} магазинів`;
+    } catch(e) {
+      statusDiv.innerHTML = "❌ Помилка: " + e.message;
+      console.error(e);
     }
   }
   
-  function toggleEditMode() {
-    if (!isDataLoaded) return;
-    isEditMode = !isEditMode;
-    const editBtn = document.getElementById("toggleEditModeBtn");
-    if (editBtn) {
-      if (isEditMode) {
-        editBtn.textContent = "✅ Готово";
-        editBtn.classList.add("active");
-      } else {
-        editBtn.textContent = "✏️ Редагувати способи";
-        editBtn.classList.remove("active");
-      }
+  async function addNewShop() {
+    const num = document.getElementById("newShopNumber").value.trim();
+    if (!num) { alert("Введіть номер магазину"); return; }
+    const number = parseInt(num);
+    const color = document.getElementById("newShopColor").value;
+    const difficulty = document.getElementById("newShopComplexity").value;
+    const delivery_method = selectedDelivery;
+    const description = currentDescription;
+    
+    try {
+      await addShopToDB(number, color, difficulty, delivery_method, description);
+      await loadData();
+      document.getElementById("newShopNumber").value = "";
+      document.getElementById("shopDescriptionInput").value = "";
+      currentDescription = "";
+      selectedDelivery = "";
+      document.querySelectorAll('.delivery-btn').forEach(b => b.classList.remove('selected'));
+      document.getElementById("syncStatus").innerHTML = "✅ Магазин додано!";
+    } catch(e) {
+      alert("Помилка: " + e.message);
     }
-    initDeliveryButtons();
-  }
-  
-  function openCategoryModal(color, complexity) {
-    if (!isDataLoaded) return;
-    const shopsList = shops[color][complexity] || [];
-    const colorNames = { "білі":"⚪ БІЛІ", "сірі":"⚫ СІРІ", "чорні":"⬛ ЧОРНІ" };
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    let listHtml = '';
-    if (shopsList.length === 0) {
-      listHtml = '<div class="empty-modal">✖️ Немає магазинів</div>';
-    } else {
-      listHtml = shopsList.map(shop => {
-        const delivery = getDeliveryText(shopDeliveries[shop]);
-        const description = shopDescriptions[shop] || "";
-        return `<div class="modal-shop-item">
-          <div class="modal-shop-header">
-            <span class="modal-shop-num">${shop}</span>
-            <div style="display: flex; gap: 8px;">
-              <button class="edit-shop-modal" data-shop="${shop}" data-color="${color}" data-comp="${complexity}">✏️ Редагувати</button>
-              <button class="delete-shop-modal" data-shop="${shop}" data-color="${color}" data-comp="${complexity}">✖ Видалити</button>
-            </div>
-          </div>
-          ${delivery ? `<div class="modal-shop-delivery">🚚 Спосіб доставки: ${delivery}</div>` : ''}
-          ${description ? `<div class="modal-shop-description">📝 Опис: ${description}</div>` : ''}
-        </div>`;
-      }).join('');
-    }
-    overlay.innerHTML = `<div class="modal-content">
-      <div class="modal-header" style="background:#2c7da0; color:white;">${colorNames[color]} · ${complexityNames[complexity].icon} ${complexityNames[complexity].title}</div>
-      <div class="modal-list">${listHtml}</div>
-      <button class="modal-close" id="closeModalBtn">Закрити</button>
-    </div>`;
-    document.body.appendChild(overlay);
-    overlay.querySelectorAll('.delete-shop-modal').forEach(btn => {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        const shopNum = parseInt(btn.dataset.shop);
-        if (confirm(`Видалити магазин ${shopNum}?`)) {
-          removeShop(shopNum, btn.dataset.color, btn.dataset.comp);
-          overlay.remove();
-          openCategoryModal(color, complexity);
-        }
-      };
-    });
-    overlay.querySelectorAll('.edit-shop-modal').forEach(btn => {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        const shopNum = parseInt(btn.dataset.shop);
-        overlay.remove();
-        openEditShopModal(shopNum, btn.dataset.color, btn.dataset.comp);
-      };
-    });
-    overlay.querySelector('#closeModalBtn').onclick = () => overlay.remove();
-    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-  }
-  
-  function openEditShopModal(shopNum, color, comp) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    const currentDelivery = shopDeliveries[shopNum] || "";
-    const currentDescription = shopDescriptions[shopNum] || "";
-    let deliveryButtonsHtml = globalDeliveryMethodsList.map(d => 
-      `<div class="delivery-item">
-        <div class="delivery-btn ${currentDelivery === d.key ? 'selected' : ''}" data-delivery="${d.key}">${d.title}</div>
-      </div>`
-    ).join('');
-    overlay.innerHTML = `<div class="modal-content">
-      <div class="modal-header" style="background:#2c7da0; color:white;">✏️ Редагувати магазин ${shopNum}</div>
-      <div class="modal-list">
-        <div class="delivery-methods">
-          <div class="delivery-title">🚚 Спосіб доставки:</div>
-          <div class="delivery-buttons" id="editDeliveryButtons">${deliveryButtonsHtml}</div>
-        </div>
-        <div class="shop-description-area">
-          <div class="delivery-title">📋 Короткий опис магазину:</div>
-          <textarea id="editShopDescription" rows="3" placeholder="Наприклад: важкий під'їзд, високий поріг...">${currentDescription}</textarea>
-        </div>
-      </div>
-      <button id="saveEditBtn" style="margin: 0 20px 12px; background: #28a745;">💾 Зберегти зміни</button>
-      <button id="cancelEditBtn" style="margin: 0 20px 20px; background: #6c757d;">Скасувати</button>
-    </div>`;
-    document.body.appendChild(overlay);
-    let selectedEditDelivery = currentDelivery;
-    overlay.querySelectorAll('#editDeliveryButtons .delivery-btn').forEach(btn => {
-      btn.onclick = () => {
-        overlay.querySelectorAll('#editDeliveryButtons .delivery-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedEditDelivery = btn.dataset.delivery;
-      };
-    });
-    overlay.querySelector('#saveEditBtn').onclick = () => {
-      const description = overlay.querySelector('#editShopDescription').value;
-      updateShop(shopNum, color, comp, selectedEditDelivery, description);
-      overlay.remove();
-      openCategoryModal(color, comp);
-    };
-    overlay.querySelector('#cancelEditBtn').onclick = () => {
-      overlay.remove();
-      openCategoryModal(color, comp);
-    };
   }
   
   function renderCategories() {
     const container = document.getElementById("categoriesGrid");
     if (!container) return;
-    if (!isDataLoaded) {
-      container.innerHTML = '<div class="data-placeholder">🔒 Спочатку завантажте дані з хмари</div>';
-      return;
-    }
+    const organized = getShopsByColorAndDifficulty();
     const colors = ["білі", "сірі", "чорні"];
     const comps = ["легко", "потно", "тяжко"];
-    const colorTitles = { "білі": "⚪ БІЛІ", "сірі": "⚫ СІРІ", "чорні": "⬛ ЧОРНІ" };
     const headerClass = { "білі": "white-header", "сірі": "gray-header", "чорні": "black-header" };
     
     let html = '';
     for (let color of colors) {
       for (let comp of comps) {
-        const count = shops[color][comp].length;
+        const shopsList = organized[color][comp];
+        const count = shopsList.length;
         html += `<div class="category-card" data-color="${color}" data-comp="${comp}">
-          <div class="cat-header ${headerClass[color]}">${colorTitles[color]}</div>
+          <div class="cat-header ${headerClass[color]}">${colorNames[color]}</div>
           <div class="cat-body ${count === 0 ? 'empty-cat' : ''}">
             <div class="cat-count">${count}</div>
             <div class="cat-label">${complexityNames[comp].icon} ${complexityNames[comp].title}</div>
@@ -1206,375 +477,268 @@
       }
     }
     container.innerHTML = html;
+    
     document.querySelectorAll('.category-card').forEach(card => {
-      card.onclick = () => openCategoryModal(card.dataset.color, card.dataset.comp);
+      card.onclick = () => openShopList(card.dataset.color, card.dataset.comp);
     });
   }
   
-  function checkShop() {
-    if (!isDataLoaded) {
-      const resultEl = document.getElementById("checkResult");
-      if (resultEl) resultEl.innerHTML = "🔒 Спочатку завантажте дані з хмари";
-      return;
-    }
-    let v = document.getElementById("checkShopInput").value.trim();
-    if (!v) { 
-      const resultEl = document.getElementById("checkResult");
-      if (resultEl) resultEl.innerHTML = "⚠️ Введіть номер";
-      return; 
-    }
-    let num = Number(v);
-    if (isNaN(num)) { 
-      const resultEl = document.getElementById("checkResult");
-      if (resultEl) resultEl.innerHTML = "❌ Помилка";
-      return; 
-    }
-    let found = null;
-    for (let c of ["білі","сірі","чорні"]) {
-      for (let cp of ["легко","потно","тяжко"]) {
-        if (shops[c][cp].includes(num)) found = { color: c, comp: cp };
-      }
-    }
-    const resultEl = document.getElementById("checkResult");
-    if (found) {
-      let delivery = getDeliveryText(shopDeliveries[num]);
-      let description = shopDescriptions[num] || "";
-      let details = `<strong>🏪 Магазин ${num}</strong><br>📌 ${found.color}, ${complexityNames[found.comp].icon} ${complexityNames[found.comp].title}`;
-      if (delivery) details += `<br>🚚 Спосіб доставки: ${delivery}`;
-      if (description) details += `<br>📋 Опис: ${description}`;
-      if (resultEl) resultEl.innerHTML = details;
+  function openShopList(color, difficulty) {
+    const organized = getShopsByColorAndDifficulty();
+    const shopsList = organized[color][difficulty];
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    
+    let listHtml = '';
+    if (shopsList.length === 0) {
+      listHtml = '<div style="text-align:center; padding:40px;">✖️ Немає магазинів</div>';
     } else {
-      if (resultEl) resultEl.innerHTML = `<strong>🏪 Магазин ${num}</strong><br>⚠️ Немає даних`;
+      listHtml = shopsList.map(shop => `
+        <div class="modal-shop-item">
+          <div class="modal-shop-header">
+            <span class="modal-shop-num">${shop.number}</span>
+            <div style="display:flex; gap:8px;">
+              <button class="edit-shop-modal" data-id="${shop.id}">✏️ Редагувати</button>
+              <button class="delete-shop-modal" data-id="${shop.id}" data-number="${shop.number}">✖ Видалити</button>
+            </div>
+          </div>
+          ${shop.delivery_method ? `<div class="modal-shop-delivery">🚚 ${shop.delivery_method}</div>` : ''}
+          ${shop.description ? `<div class="modal-shop-description">📝 ${shop.description}</div>` : ''}
+        </div>
+      `).join('');
     }
+    
+    overlay.innerHTML = `<div class="modal-content">
+      <div class="modal-header" style="background:#2c7da0; color:white;">${colorNames[color]} · ${complexityNames[difficulty].icon} ${complexityNames[difficulty].title}</div>
+      <div class="modal-list">${listHtml}</div>
+      <button class="modal-close" id="closeModalBtn">Закрити</button>
+    </div>`;
+    document.body.appendChild(overlay);
+    
+    overlay.querySelectorAll('.delete-shop-modal').forEach(btn => {
+      btn.onclick = async () => {
+        const id = parseInt(btn.dataset.id);
+        const number = btn.dataset.number;
+        if (confirm(`Видалити магазин ${number}?`)) {
+          await deleteShopFromDB(id);
+          await loadData();
+          overlay.remove();
+        }
+      };
+    });
+    overlay.querySelectorAll('.edit-shop-modal').forEach(btn => {
+      btn.onclick = async () => {
+        const id = parseInt(btn.dataset.id);
+        const shop = shopsData.find(s => s.id === id);
+        const newDesc = prompt("Новий опис магазину:", shop.description || "");
+        if (newDesc !== null) {
+          await updateShopInDB(id, { description: newDesc || null });
+          await loadData();
+          overlay.remove();
+          openShopList(color, difficulty);
+        }
+      };
+    });
+    overlay.querySelector('#closeModalBtn').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
   }
   
-  function addFromMobile() {
-    if (!isDataLoaded) {
-      alert("🔒 Спочатку завантажте дані з хмари");
-      return;
+  function checkShop() {
+    const num = document.getElementById("checkShopInput").value.trim();
+    if (!num) { document.getElementById("checkResult").innerHTML = "⚠️ Введіть номер"; return; }
+    const number = parseInt(num);
+    const shop = shopsData.find(s => s.number === number);
+    if (shop) {
+      document.getElementById("checkResult").innerHTML = `
+        <strong>🏪 Магазин ${shop.number}</strong><br>
+        📌 ${colorNames[shop.color]}, ${complexityNames[shop.difficulty].icon} ${complexityNames[shop.difficulty].title}
+        ${shop.delivery_method ? `<br>🚚 ${shop.delivery_method}` : ''}
+        ${shop.description ? `<br>📝 ${shop.description}` : ''}
+      `;
+    } else {
+      document.getElementById("checkResult").innerHTML = `<strong>🏪 Магазин ${number}</strong><br>⚠️ Немає даних`;
     }
-    let num = document.getElementById("newShopNumber").value.trim();
-    if (!num) { alert("Введіть номер"); return; }
-    addShop(Number(num), 
-      document.getElementById("newShopColor").value, 
-      document.getElementById("newShopComplexity").value, 
-      selectedDelivery,
-      currentShopDescription);
-    document.getElementById("newShopNumber").value = "";
-    document.getElementById("shopDescriptionInput").value = "";
-    currentShopDescription = "";
-    selectedDelivery = "";
-    document.querySelectorAll('.delivery-btn').forEach(b => b.classList.remove('selected'));
   }
   
   function initDeliveryButtons() {
     const container = document.getElementById("deliveryButtons");
     if (!container) return;
     container.innerHTML = "";
-    if (!isDataLoaded) {
-      container.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">🔒 Спочатку завантажте дані з хмари</div>';
-      return;
-    }
-    if (globalDeliveryMethodsList.length === 0) {
-      container.innerHTML = '<div style="color:#6c757d; padding:8px; text-align:center;">Немає способів доставки. Додайте новий</div>';
-      return;
-    }
-    globalDeliveryMethodsList.forEach(delivery => {
-      const itemDiv = document.createElement("div");
-      itemDiv.className = "delivery-item";
-      if (isEditMode) itemDiv.classList.add("edit-mode");
+    deliveryMethodsList.forEach(m => {
       const btn = document.createElement("div");
       btn.className = "delivery-btn";
-      btn.textContent = delivery.title;
-      btn.dataset.delivery = delivery.key;
+      btn.textContent = m.title;
       btn.onclick = () => {
-        if (!isEditMode) {
-          document.querySelectorAll('#deliveryButtons .delivery-btn').forEach(b => b.classList.remove('selected'));
-          btn.classList.add('selected');
-          selectedDelivery = delivery.key;
-        }
+        document.querySelectorAll('.delivery-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedDelivery = m.title;
       };
-      const editBtn = document.createElement("button");
-      editBtn.className = "delivery-action-btn edit-delivery-btn";
-      editBtn.textContent = "✏️";
-      editBtn.onclick = (e) => {
-        e.stopPropagation();
-        if (isEditMode) {
-          editDeliveryMethod(delivery.key, delivery.title);
-        }
-      };
-      const deleteBtn = document.createElement("button");
-      deleteBtn.className = "delivery-action-btn delete-delivery-btn";
-      deleteBtn.textContent = "✖";
-      deleteBtn.onclick = (e) => {
-        e.stopPropagation();
-        if (isEditMode) {
-          deleteDeliveryMethod(delivery.key, delivery.title);
-        }
-      };
-      itemDiv.appendChild(btn);
-      itemDiv.appendChild(editBtn);
-      itemDiv.appendChild(deleteBtn);
-      container.appendChild(itemDiv);
+      container.appendChild(btn);
     });
   }
   
-  function showDeletionWarning(deletedShops, onConfirm, onCancel) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-content warning-modal">
-        <div class="modal-header">⚠️ ВИДАЛЕННЯ МАГАЗИНІВ!</div>
-        <div class="modal-list">
-          <p style="margin-bottom:12px;">Ви ВИДАЛИЛИ наступні магазини:</p>
-          <div class="deleted-list">${deletedShops.map(s => `<span>🏪 ${s}</span>`).join('')}</div>
-          <p style="margin-top:16px; color:#b91c1c; font-weight:bold;">Вони будуть НАЗАВЖДИ видалені з хмари!</p>
-        </div>
-        <button class="btn-cancel" id="cancelBtn">↩️ Скасувати</button>
-        <button class="btn-proceed" id="proceedBtn">✅ Все одно відправити</button>
-      </div>
-    `;
-    overlay.querySelector('#cancelBtn').onclick = () => { overlay.remove(); if(onCancel) onCancel(); };
-    overlay.querySelector('#proceedBtn').onclick = () => { overlay.remove(); if(onConfirm) onConfirm(); };
-    document.body.appendChild(overlay);
+  function addCustomDelivery() {
+    const input = document.getElementById("newDeliveryInput");
+    const newMethod = input.value.trim();
+    if (!newMethod) { alert("Введіть назву способу доставки"); return; }
+    if (deliveryMethodsList.some(m => m.title === newMethod)) {
+      alert("Такий спосіб вже існує!");
+      return;
+    }
+    deliveryMethodsList.push({ key: newMethod, title: newMethod });
+    initDeliveryButtons();
+    input.value = "";
   }
   
-  function forgetEverything() {
-    if (confirm("⚠️ ВИДАЛИТИ ВСІ ДАНІ КОРИСТУВАЧА? Це видалить всі магазини, ключі та налаштування!")) {
-      if (currentUser) {
-        const users = getUsers();
-        delete users[currentUser];
-        saveUsers(users);
-      }
-      localStorage.removeItem("app_current_user");
-      currentUser = null;
-      location.reload();
+  function updateComplexitySelectors() {
+    const select = document.getElementById("newShopComplexity");
+    if (select) {
+      select.innerHTML = `
+        <option value="легко">${complexityNames["легко"].icon} ${complexityNames["легко"].title}</option>
+        <option value="потно">${complexityNames["потно"].icon} ${complexityNames["потно"].title}</option>
+        <option value="тяжко">${complexityNames["тяжко"].icon} ${complexityNames["тяжко"].title}</option>
+      `;
     }
   }
   
-  let isLoginMode = true;
+  // АВТОРИЗАЦІЯ
+  function getUsers() {
+    const users = localStorage.getItem("app_users");
+    if (users) { try { return JSON.parse(users); } catch(e) {} }
+    return {};
+  }
+  function saveUsers(users) { localStorage.setItem("app_users", JSON.stringify(users)); }
   
+  let isLoginMode = true;
   function showAuthScreen() {
     const overlay = document.createElement('div');
     overlay.className = 'login-overlay';
-    overlay.id = 'loginOverlay';
     overlay.innerHTML = `<div class="login-card">
-      <h2>🚛 Вантажники-водії</h2>
-      <p id="authModeText">${isLoginMode ? "Вхід в систему" : "Створення акаунту"}</p>
-      <input type="text" id="usernameInput" placeholder="Ім'я користувача" autocomplete="off">
+      <h2>🚛 Вантажник</h2>
+      <p id="authModeText">${isLoginMode ? "Вхід" : "Реєстрація"}</p>
+      <input type="text" id="usernameInput" placeholder="Ім'я" autocomplete="off">
       <input type="password" id="passwordInput" placeholder="Пароль" autocomplete="off">
       <button id="authBtn">${isLoginMode ? "Увійти" : "Зареєструватися"}</button>
       <div class="switch-mode" id="switchModeBtn">${isLoginMode ? "Немає акаунту? Зареєструватися" : "Вже є акаунт? Увійти"}</div>
       <div id="authError" class="error-msg"></div>
-      <div class="password-hint" id="passwordHint"></div>
     </div>`;
     document.body.appendChild(overlay);
     
-    const authBtn = document.getElementById('authBtn');
-    const usernameInput = document.getElementById('usernameInput');
-    const passwordInput = document.getElementById('passwordInput');
-    const switchBtn = document.getElementById('switchModeBtn');
-    const authModeText = document.getElementById('authModeText');
-    const authError = document.getElementById('authError');
-    const passwordHint = document.getElementById('passwordHint');
-    
-    function attemptAuth() {
-      const username = usernameInput.value.trim();
-      const password = passwordInput.value.trim();
-      
-      if (!username) {
-        authError.textContent = "❌ Введіть ім'я користувача";
-        return;
-      }
-      if (!password) {
-        authError.textContent = "❌ Введіть пароль";
-        return;
-      }
-      
+    document.getElementById('authBtn').onclick = () => {
+      const username = document.getElementById('usernameInput').value.trim();
+      const password = document.getElementById('passwordInput').value.trim();
       const users = getUsers();
-      
       if (isLoginMode) {
         if (users[username] && users[username].password === password) {
           currentUser = username;
           localStorage.setItem("app_current_user", username);
-          document.getElementById('loginOverlay')?.remove();
-          showMainApp();
+          overlay.remove();
+          startApp();
         } else {
-          authError.textContent = "❌ Невірне ім'я користувача або пароль";
-          passwordInput.value = "";
+          document.getElementById('authError').textContent = "❌ Невірне ім'я або пароль";
         }
       } else {
         if (users[username]) {
-          authError.textContent = "❌ Користувач з таким ім'ям вже існує";
+          document.getElementById('authError').textContent = "❌ Користувач вже існує";
           return;
         }
         if (password !== BASE_PASSWORD) {
-          authError.textContent = "❌ Невірний пароль. Зверніться до адміністратора.";
-          passwordInput.value = "";
+          document.getElementById('authError').textContent = "❌ Невірний пароль. Зверніться до адміністратора";
           return;
         }
-        users[username] = {
-          password: password,
-          shops: {
-            "білі": { "легко": [], "потно": [], "тяжко": [] },
-            "сірі": { "легко": [], "потно": [], "тяжко": [] },
-            "чорні": { "легко": [], "потно": [], "тяжко": [] }
-          },
-          deliveries: {},
-          descriptions: {},
-          config: { apiKey: "", binId: "" },
-          complexityNames: complexityNames
-        };
+        users[username] = { password };
         saveUsers(users);
         currentUser = username;
         localStorage.setItem("app_current_user", username);
-        shops = users[username].shops;
-        shopDeliveries = users[username].deliveries;
-        shopDescriptions = users[username].descriptions;
-        config = users[username].config;
-        if (users[username].complexityNames) {
-          complexityNames = users[username].complexityNames;
-        }
-        saveUserData();
-        document.getElementById('loginOverlay')?.remove();
-        showMainApp();
-      }
-    }
-    
-    switchBtn.onclick = () => {
-      isLoginMode = !isLoginMode;
-      authModeText.textContent = isLoginMode ? "Вхід в систему" : "Створення акаунту";
-      authBtn.textContent = isLoginMode ? "Увійти" : "Зареєструватися";
-      switchBtn.textContent = isLoginMode ? "Немає акаунту? Зареєструватися" : "Вже є акаунт? Увійти";
-      authError.textContent = "";
-      if (!isLoginMode) {
-        passwordHint.textContent = "Для реєстрації зверніться до адміністратора";
-        passwordInput.placeholder = "Пароль адміністратора";
-      } else {
-        passwordHint.textContent = "";
-        passwordInput.placeholder = "Пароль";
+        overlay.remove();
+        startApp();
       }
     };
-    
-    authBtn.onclick = attemptAuth;
-    usernameInput.onkeypress = (e) => { if (e.key === 'Enter') attemptAuth(); };
-    passwordInput.onkeypress = (e) => { if (e.key === 'Enter') attemptAuth(); };
+    document.getElementById('switchModeBtn').onclick = () => {
+      isLoginMode = !isLoginMode;
+      document.getElementById('authModeText').textContent = isLoginMode ? "Вхід" : "Реєстрація";
+      document.getElementById('authBtn').textContent = isLoginMode ? "Увійти" : "Зареєструватися";
+      document.getElementById('switchModeBtn').textContent = isLoginMode ? "Немає акаунту? Зареєструватися" : "Вже є акаунт? Увійти";
+      document.getElementById('authError').textContent = "";
+    };
   }
   
-  function showMainApp() {
+  function startApp() {
     const appContainer = document.getElementById('app');
     appContainer.innerHTML = `<div class="container">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h1>🚛 Вантажники-водії 📦 <small>синхронізація</small></h1>
-        <div class="user-greeting">👤 ${currentUser} <button id="logoutBtn" style="background: none; border: none; color: #dc3545; font-size: 0.7rem; margin-left: 8px;">🚪 Вийти</button></div>
+        <h1>🚛 Вантажник <small>довідник</small></h1>
+        <div class="user-greeting">👤 ${currentUser} <button id="logoutBtn" style="background: none; border: none; color: #dc3545; font-size: 0.7rem;">🚪 Вийти</button></div>
       </div>
-      <div class="sub">🏬 Натисніть на категорію для перегляду магазинів</div>
+      
       <div class="sync-panel">
-        <div class="sync-title">☁️ НАЛАШТУВАННЯ ХМАРИ</div>
-        <div class="sync-row">
-          <div class="input-group"><label>🔑 API ключ</label><input type="text" id="apiKeyInput" placeholder="API ключ (отримайте на jsonbin.io)" autocomplete="off"></div>
-          <div class="input-group"><label>📦 ID Bin</label><input type="text" id="binIdInput" placeholder="ID Bin (отримайте на jsonbin.io)" autocomplete="off"></div>
-        </div>
-        <div class="key-badge-container" id="savedKeysContainer"></div>
-        <div class="sync-row-buttons">
-          <button id="saveConfigBtn" class="btn-save">💾 Зберегти ключі</button>
-          <button id="clearConfigBtn" class="btn-clear">🗑 Очистити ключі</button>
-          <button id="forgetAllBtn" class="btn-forget">⚠️ Забути все</button>
-        </div>
-        <div class="sync-buttons">
-          <button id="syncDownBtn" class="btn-down">📥 Завантажити з хмари</button>
-          <button id="syncUpBtn" class="btn-save-cloud">💾 Зберегти в хмару</button>
-        </div>
-        <div class="sync-status" id="syncStatus">⚙️ Введіть ключі та натисніть "Завантажити з хмари"</div>
+        <div class="sync-title">☁️ ПІДКЛЮЧЕННЯ ДО БАЗИ ДАНИХ</div>
+        <button id="loadDataBtn" class="btn-green btn-big">📥 ЗАВАНТАЖИТИ ДАНІ</button>
+        <div class="sync-status" id="syncStatus">⚙️ Натисніть "ЗАВАНТАЖИТИ"</div>
       </div>
       
-      <div class="complexity-settings">
-        <div class="complexity-settings-title">
-          <span>⚙️ НАЛАШТУВАННЯ КАТЕГОРІЙ</span>
+      <div class="check-card">
+        <h3>🔍 ПЕРЕВІРИТИ МАГАЗИН</h3>
+        <div class="row-input">
+          <input type="number" id="checkShopInput" placeholder="Номер магазину" disabled>
+          <button id="checkShopBtn" class="btn-gray" disabled>Підказка</button>
         </div>
-        <div class="complexity-row">
-          <div class="complexity-badge">
-            <span>🟢</span>
-            <input type="text" id="comp_name_легко" value="${complexityNames["легко"].title}" placeholder="Назва">
-            <button onclick="updateComplexityName('легко')">💾</button>
-          </div>
-          <div class="complexity-badge">
-            <span>🟡</span>
-            <input type="text" id="comp_name_потно" value="${complexityNames["потно"].title}" placeholder="Назва">
-            <button onclick="updateComplexityName('потно')">💾</button>
-          </div>
-          <div class="complexity-badge">
-            <span>🔴</span>
-            <input type="text" id="comp_name_тяжко" value="${complexityNames["тяжко"].title}" placeholder="Назва">
-            <button onclick="updateComplexityName('тяжко')">💾</button>
-          </div>
-        </div>
+        <div id="checkResult" class="check-result">🔒 Спочатку завантажте дані</div>
       </div>
       
-      <div class="action-panel">
-        <div class="check-card"><h3>🔍 ПЕРЕВІРИТИ МАГАЗИН</h3><div class="check-input-group"><input type="number" id="checkShopInput" placeholder="Номер магазину" disabled><button id="checkShopBtn" disabled>Підказка</button></div><div id="checkResult" class="check-result">🔒 Спочатку завантажте дані з хмари</div></div>
-        <div class="add-card">
-          <h3>➕ ДОДАТИ МАГАЗИН</h3>
-          <div class="select-group">
-            <input type="number" id="newShopNumber" placeholder="Номер магазину" disabled>
-            <select id="newShopColor" disabled><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select>
-            <select id="newShopComplexity" disabled></select>
-          </div>
-          <div class="delivery-methods">
-            <div class="delivery-header">
-              <span class="delivery-title">🚚 СПОСІБ ДОСТАВКИ:</span>
-              <button id="toggleEditModeBtn" class="edit-mode-btn" disabled>✏️ Редагувати способи</button>
-            </div>
-            <div class="delivery-buttons" id="deliveryButtons"></div>
-            <div class="add-delivery-row">
-              <input type="text" id="newDeliveryInput" placeholder="Новий спосіб доставки..." disabled>
-              <button id="addDeliveryBtn" disabled>➕ Додати</button>
-            </div>
-          </div>
-          <div class="shop-description-area">
-            <div class="delivery-title">📋 КОРОТКИЙ ОПИС МАГАЗИНУ:</div>
-            <textarea id="shopDescriptionInput" rows="3" placeholder="Наприклад: важкий під'їзд, високий поріг, вузький двір..." disabled></textarea>
-          </div>
-          <button id="addShopBtn" style="width:100%; margin-top:12px;" disabled>✅ Додати магазин</button>
+      <div class="add-card">
+        <h3>➕ ДОДАТИ МАГАЗИН</h3>
+        <div class="row-input">
+          <input type="number" id="newShopNumber" placeholder="Номер" disabled>
+          <select id="newShopColor" disabled><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select>
+          <select id="newShopComplexity" disabled></select>
         </div>
+        <div class="delivery-buttons" id="deliveryButtons"></div>
+        <div class="add-delivery-row">
+          <input type="text" id="newDeliveryInput" placeholder="Новий спосіб доставки..." disabled>
+          <button id="addDeliveryBtn" class="btn-green" disabled>➕ Додати</button>
+        </div>
+        <textarea id="shopDescriptionInput" rows="2" placeholder="Короткий опис (не обов'язково)" disabled></textarea>
+        <button id="addShopBtn" class="btn-blue btn-big" style="width:100%; margin-top:12px;" disabled>✅ ДОДАТИ МАГАЗИН</button>
       </div>
-      <div class="categories-grid" id="categoriesGrid"><div class="data-placeholder">🔒 Спочатку завантажте дані з хмари</div></div>
-      <footer>📌 ПОРАДА: Після додавання/видалення магазинів ОБОВ'ЯЗКОВО натисніть "💾 Зберегти в хмару"!</footer>
+      
+      <div class="categories-grid" id="categoriesGrid"><div class="data-placeholder">🔒 Натисніть "ЗАВАНТАЖИТИ"</div></div>
+      
+      <footer>
+        <button id="forgetBtn" class="btn-red" style="padding:8px 16px; font-size:0.7rem;">⚠️ Забути всі дані</button>
+      </footer>
     </div>`;
-    loadConfig();
-    initDeliveryButtons();
-    renderCategories();
-    updateSavedKeysDisplay();
-    enableDataDependentComponents(false);
     
-    window.updateComplexityName = updateComplexityName;
+    updateComplexitySelectors();
     
-    document.getElementById("saveConfigBtn").onclick = saveConfig;
-    document.getElementById("clearConfigBtn").onclick = clearConfig;
-    document.getElementById("forgetAllBtn").onclick = forgetEverything;
-    document.getElementById("syncDownBtn").onclick = download;
-    document.getElementById("syncUpBtn").onclick = () => upload(false);
+    document.getElementById("loadDataBtn").onclick = async () => {
+      await loadData();
+      document.getElementById("checkShopInput").disabled = false;
+      document.getElementById("checkShopBtn").disabled = false;
+      document.getElementById("newShopNumber").disabled = false;
+      document.getElementById("newShopColor").disabled = false;
+      document.getElementById("newShopComplexity").disabled = false;
+      document.getElementById("addDeliveryBtn").disabled = false;
+      document.getElementById("newDeliveryInput").disabled = false;
+      document.getElementById("addShopBtn").disabled = false;
+      document.getElementById("shopDescriptionInput").disabled = false;
+    };
     document.getElementById("checkShopBtn").onclick = checkShop;
-    document.getElementById("addShopBtn").onclick = addFromMobile;
-    document.getElementById("addDeliveryBtn").onclick = addNewDeliveryMethod;
-    document.getElementById("toggleEditModeBtn").onclick = toggleEditMode;
-    document.getElementById("logoutBtn").onclick = () => {
-      if (hasLocalChanges()) {
-        showUnsavedChangesWarning(() => {
-          localStorage.removeItem("app_current_user");
-          currentUser = null;
-          location.reload();
-        }, () => {});
-      } else {
-        localStorage.removeItem("app_current_user");
-        currentUser = null;
+    document.getElementById("addShopBtn").onclick = addNewShop;
+    document.getElementById("addDeliveryBtn").onclick = addCustomDelivery;
+    document.getElementById("forgetBtn").onclick = () => {
+      if (confirm("⚠️ ВИДАЛИТИ ВСІ ДАНІ?")) {
+        localStorage.clear();
         location.reload();
       }
     };
+    document.getElementById("logoutBtn").onclick = () => {
+      localStorage.removeItem("app_current_user");
+      location.reload();
+    };
+    
     const descInput = document.getElementById("shopDescriptionInput");
-    if (descInput) {
-      descInput.oninput = (e) => { currentShopDescription = e.target.value; };
-    }
+    if (descInput) descInput.oninput = (e) => { currentDescription = e.target.value; };
   }
   
   const savedUser = localStorage.getItem("app_current_user");
@@ -1582,8 +746,7 @@
     const users = getUsers();
     if (users[savedUser]) {
       currentUser = savedUser;
-      loadUserData(currentUser);
-      showMainApp();
+      startApp();
     } else {
       showAuthScreen();
     }
