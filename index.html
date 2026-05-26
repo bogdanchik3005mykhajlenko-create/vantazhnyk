@@ -5,37 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
   <title>Вантажник - довідник магазинів</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: linear-gradient(135deg, #e2e9f0 0%, #cfdbe5 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 12px; min-height: 100vh; }
-    .container { max-width: 800px; margin: 0 auto; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
+    body { 
+      background: linear-gradient(135deg, #e2e9f0 0%, #cfdbe5 100%); 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      padding: 16px; 
+      min-height: 100vh;
+    }
+    .container { 
+      max-width: 600px; 
+      margin: 0 auto; 
+      width: 100%;
+    }
     
-    h1 { font-size: 1.5rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; color: #1a3a44; flex-wrap: wrap; gap: 8px; }
-    h1 small { font-size: 0.65rem; background: #2c7da0; color: white; padding: 4px 10px; border-radius: 40px; }
-    .user-greeting { background: #d4edda; color: #155724; padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; display: inline-block; margin-bottom: 10px; }
+    /* ШАПКА */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    h1 { 
+      font-size: 1.4rem; 
+      color: #1a3a44; 
+    }
+    h1 small { 
+      font-size: 0.6rem; 
+      background: #2c7da0; 
+      color: white; 
+      padding: 4px 10px; 
+      border-radius: 40px;
+      margin-left: 8px;
+    }
+    .user-greeting { 
+      background: #d4edda; 
+      color: #155724; 
+      padding: 6px 12px; 
+      border-radius: 30px; 
+      font-size: 0.7rem; 
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logout-btn {
+      background: none;
+      border: none;
+      color: #dc3545;
+      font-size: 0.7rem;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
     
+    /* ПАНЕЛЬ ЗАВАНТАЖЕННЯ */
     .sync-panel {
       background: white;
-      border-radius: 24px;
+      border-radius: 20px;
       padding: 16px;
       margin-bottom: 16px;
       border: 2px solid #2c7da0;
     }
-    .sync-title { font-weight: bold; font-size: 0.9rem; margin-bottom: 12px; color: #1a3a44; text-align: center; }
-    .btn-big {
+    .sync-title { 
+      font-weight: bold; 
+      font-size: 0.9rem; 
+      margin-bottom: 12px; 
+      color: #1a3a44; 
+      text-align: center; 
+    }
+    .btn-full {
+      width: 100%;
       padding: 16px;
       font-size: 1.1rem;
       font-weight: bold;
       border-radius: 50px;
-      margin: 8px 0;
-      width: 100%;
+      border: none;
+      cursor: pointer;
     }
     .btn-green { background: #28a745; color: white; }
     .btn-blue { background: #2c7da0; color: white; }
     .btn-red { background: #dc3545; color: white; }
     .btn-gray { background: #6c757d; color: white; }
-    button { border: none; cursor: pointer; transition: transform 0.05s ease; min-height: 52px; }
-    button:active { transform: scale(0.97); }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     
     .sync-status {
       font-size: 0.75rem;
@@ -47,6 +103,7 @@
       color: #2c5a6e;
     }
     
+    /* КАРТКИ КАТЕГОРІЙ */
     .categories-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -55,51 +112,57 @@
     }
     .category-card {
       background: white;
-      border-radius: 20px;
+      border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       cursor: pointer;
+      text-align: center;
     }
     .category-card:active { transform: scale(0.97); }
     .cat-header {
-      padding: 12px 4px;
-      text-align: center;
+      padding: 10px 4px;
       font-weight: bold;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
     .white-header { background: #e3e8ee; color: #1e3a4a; border-bottom: 3px solid #2c7da0; }
     .gray-header { background: #5a6e78; color: white; border-bottom: 3px solid #2c3e42; }
     .black-header { background: #1e2a2e; color: white; border-bottom: 3px solid #f39c12; }
-    .cat-body { padding: 12px; text-align: center; }
-    .cat-count { font-size: 2rem; font-weight: bold; color: #2c7da0; }
-    .cat-label { font-size: 0.7rem; color: #6c757d; margin-top: 4px; }
+    .cat-body { padding: 12px; }
+    .cat-count { font-size: 1.8rem; font-weight: bold; color: #2c7da0; }
+    .cat-label { font-size: 0.65rem; color: #6c757d; margin-top: 4px; }
     .empty-cat { opacity: 0.5; }
     
-    .add-card, .check-card {
+    /* КАРТКИ ДЛЯ ДІЙ */
+    .action-card {
       background: white;
-      border-radius: 24px;
+      border-radius: 20px;
       padding: 16px;
       margin-bottom: 16px;
     }
-    .add-card h3, .check-card h3 {
+    .action-card h3 {
       font-size: 1rem;
       margin-bottom: 12px;
       color: #1a3a44;
       text-align: center;
     }
+    
+    /* ПОЛЯ ВВОДУ */
     .row-input {
       display: flex;
-      gap: 8px;
+      flex-direction: column;
+      gap: 10px;
       margin-bottom: 12px;
     }
     .row-input input, .row-input select {
-      flex: 1;
+      width: 100%;
       padding: 14px;
       border: 2px solid #cbdae2;
       border-radius: 40px;
       font-size: 1rem;
       text-align: center;
     }
+    
+    /* СПОСОБИ ДОСТАВКИ */
     .delivery-buttons {
       display: flex;
       flex-wrap: wrap;
@@ -107,8 +170,8 @@
       margin: 12px 0;
       padding: 8px;
       background: #f8f9fa;
-      border-radius: 20px;
-      max-height: 100px;
+      border-radius: 16px;
+      max-height: 110px;
       overflow-y: auto;
     }
     .delivery-btn {
@@ -123,44 +186,66 @@
       background: #2c7da0;
       color: white;
     }
+    
+    /* ДОДАВАННЯ НОВОГО СПОСОБУ */
     .add-delivery-row {
       display: flex;
+      flex-direction: column;
       gap: 8px;
       margin: 12px 0;
     }
     .add-delivery-row input {
-      flex: 1;
+      width: 100%;
       padding: 12px;
       border-radius: 40px;
       border: 1px solid #ced4da;
     }
     .add-delivery-row button {
-      padding: 10px 16px;
+      width: 100%;
+      padding: 12px;
       background: #28a745;
+      border-radius: 40px;
     }
+    
+    /* ТЕКСТОВЕ ПОЛЕ */
     textarea {
       width: 100%;
       padding: 12px;
       border: 1px solid #ced4da;
-      border-radius: 20px;
+      border-radius: 16px;
       font-size: 0.8rem;
       font-family: inherit;
       margin-top: 8px;
+      resize: vertical;
     }
+    
+    /* РЕЗУЛЬТАТ ПЕРЕВІРКИ */
     .check-result {
       margin-top: 12px;
       padding: 12px;
       background: #eef3fa;
-      border-radius: 20px;
+      border-radius: 16px;
       font-size: 0.85rem;
     }
+    
+    .error-message {
+      background: #ffe0e0;
+      color: #b91c1c;
+      padding: 10px;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      text-align: center;
+      margin-top: 8px;
+    }
+    
     .data-placeholder {
       text-align: center;
       padding: 40px;
       background: #f8f9fa;
-      border-radius: 24px;
+      border-radius: 20px;
       color: #6c757d;
     }
+    
     footer {
       text-align: center;
       font-size: 0.6rem;
@@ -168,6 +253,7 @@
       padding: 16px;
     }
     
+    /* МОДАЛЬНЕ ВІКНО */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -182,7 +268,7 @@
     }
     .modal-content {
       background: white;
-      border-radius: 32px;
+      border-radius: 28px;
       width: 90%;
       max-width: 500px;
       max-height: 85vh;
@@ -191,8 +277,8 @@
       overflow: hidden;
     }
     .modal-header {
-      padding: 20px;
-      font-size: 1.2rem;
+      padding: 16px 20px;
+      font-size: 1.1rem;
       font-weight: bold;
       text-align: center;
       border-bottom: 1px solid #e9ecef;
@@ -204,7 +290,7 @@
     }
     .modal-shop-item {
       background: #f8f9fa;
-      border-radius: 16px;
+      border-radius: 14px;
       padding: 12px;
       margin-bottom: 10px;
     }
@@ -217,7 +303,7 @@
     }
     .modal-shop-num {
       font-weight: bold;
-      font-size: 1.1rem;
+      font-size: 1rem;
       background: #2c7da0;
       color: white;
       padding: 4px 12px;
@@ -242,7 +328,7 @@
     }
     .delete-shop-modal, .edit-shop-modal {
       border: none;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 30px;
       font-size: 0.7rem;
       cursor: pointer;
@@ -253,8 +339,10 @@
       margin: 12px 20px 20px;
       padding: 12px;
       background: #6c757d;
+      border-radius: 40px;
     }
     
+    /* ЛОГІН */
     .login-overlay {
       position: fixed;
       top: 0;
@@ -272,7 +360,7 @@
       border-radius: 40px;
       padding: 32px 24px;
       width: 85%;
-      max-width: 340px;
+      max-width: 320px;
       text-align: center;
     }
     .login-card h2 { margin-bottom: 8px; color: #1a3a44; }
@@ -291,6 +379,9 @@
       background: #2c7da0;
       font-size: 1rem;
       border-radius: 40px;
+      border: none;
+      color: white;
+      font-weight: bold;
     }
     .switch-mode {
       margin-top: 16px;
@@ -326,23 +417,20 @@
     "тяжко": { title: "Складний", icon: "🔴" }
   };
   
+  // ========== ПЕРЕВІРКА НА ДУБЛІКАТ ==========
+  function isShopExists(number) {
+    return shopsData.some(shop => shop.number === number);
+  }
+  
   // ========== РОБОТА З SUPABASE ==========
   async function fetchShops() {
-    const url = `${SUPABASE_URL}/rest/v1/shops?select=*`;
-    console.log("Запит до:", url);
-    
-    const response = await fetch(url, {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/shops?select=*`, {
       headers: {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
       }
     });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Помилка:", response.status, errorText);
-      throw new Error(`Помилка ${response.status}: ${errorText}`);
-    }
+    if (!response.ok) throw new Error('Помилка завантаження');
     return await response.json();
   }
   
@@ -352,12 +440,13 @@
       headers: {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
       },
-      body: JSON.stringify({ number, color, difficulty, delivery_method, description })
+      body: JSON.stringify({ number, color, difficulty, delivery_method, description: description || null })
     });
     if (!response.ok) throw new Error('Помилка додавання');
-    return await response.json();
+    return true;
   }
   
   async function deleteShopFromDB(id) {
@@ -406,6 +495,11 @@
   
   function getDeliveryMethods() {
     const methods = new Set();
+    methods.add("🏪 Завоз в магазин");
+    methods.add("✋ Ручне занесення");
+    methods.add("🏢 2й поверх → руками");
+    methods.add("⬇️ Підвал");
+    
     shopsData.forEach(shop => {
       if (shop.delivery_method && shop.delivery_method.trim()) {
         methods.add(shop.delivery_method);
@@ -420,7 +514,6 @@
     statusDiv.innerHTML = "📥 Завантаження...";
     try {
       shopsData = await fetchShops();
-      console.log("Отримано магазинів:", shopsData.length);
       deliveryMethodsList = getDeliveryMethods();
       renderCategories();
       initDeliveryButtons();
@@ -432,13 +525,34 @@
   }
   
   async function addNewShop() {
+    // Прибрати помилку, якщо була
+    const errorDiv = document.getElementById("addError");
+    if (errorDiv) errorDiv.style.display = "none";
+    
     const num = document.getElementById("newShopNumber").value.trim();
-    if (!num) { alert("Введіть номер магазину"); return; }
+    if (!num) { 
+      showError("Введіть номер магазину");
+      return; 
+    }
     const number = parseInt(num);
+    if (isNaN(number)) { 
+      showError("Номер має бути числом");
+      return; 
+    }
+    
+    // ПЕРЕВІРКА НА ДУБЛІКАТ
+    if (isShopExists(number)) {
+      showError(`❌ Магазин ${number} вже існує в базі даних!`);
+      return;
+    }
+    
     const color = document.getElementById("newShopColor").value;
     const difficulty = document.getElementById("newShopComplexity").value;
     const delivery_method = selectedDelivery;
     const description = currentDescription;
+    
+    const statusDiv = document.getElementById("syncStatus");
+    statusDiv.innerHTML = "💾 Збереження...";
     
     try {
       await addShopToDB(number, color, difficulty, delivery_method, description);
@@ -448,10 +562,27 @@
       currentDescription = "";
       selectedDelivery = "";
       document.querySelectorAll('.delivery-btn').forEach(b => b.classList.remove('selected'));
-      document.getElementById("syncStatus").innerHTML = "✅ Магазин додано!";
+      statusDiv.innerHTML = "✅ Магазин додано!";
     } catch(e) {
-      alert("Помилка: " + e.message);
+      showError("Помилка: " + e.message);
+      statusDiv.innerHTML = "❌ Помилка: " + e.message;
     }
+  }
+  
+  function showError(message) {
+    let errorDiv = document.getElementById("addError");
+    if (!errorDiv) {
+      const addBtn = document.getElementById("addShopBtn");
+      errorDiv = document.createElement("div");
+      errorDiv.id = "addError";
+      errorDiv.className = "error-message";
+      addBtn.parentNode.insertBefore(errorDiv, addBtn);
+    }
+    errorDiv.style.display = "block";
+    errorDiv.innerHTML = message;
+    setTimeout(() => {
+      if (errorDiv) errorDiv.style.display = "none";
+    }, 3000);
   }
   
   function renderCategories() {
@@ -498,8 +629,8 @@
           <div class="modal-shop-header">
             <span class="modal-shop-num">${shop.number}</span>
             <div style="display:flex; gap:8px;">
-              <button class="edit-shop-modal" data-id="${shop.id}">✏️ Редагувати</button>
-              <button class="delete-shop-modal" data-id="${shop.id}" data-number="${shop.number}">✖ Видалити</button>
+              <button class="edit-shop-modal" data-id="${shop.id}">✏️</button>
+              <button class="delete-shop-modal" data-id="${shop.id}" data-number="${shop.number}">✖</button>
             </div>
           </div>
           ${shop.delivery_method ? `<div class="modal-shop-delivery">🚚 ${shop.delivery_method}</div>` : ''}
@@ -666,18 +797,18 @@
   function startApp() {
     const appContainer = document.getElementById('app');
     appContainer.innerHTML = `<div class="container">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div class="header">
         <h1>🚛 Вантажник <small>довідник</small></h1>
-        <div class="user-greeting">👤 ${currentUser} <button id="logoutBtn" style="background: none; border: none; color: #dc3545; font-size: 0.7rem;">🚪 Вийти</button></div>
+        <div class="user-greeting">👤 ${currentUser} <button class="logout-btn" id="logoutBtn">🚪 Вийти</button></div>
       </div>
       
       <div class="sync-panel">
-        <div class="sync-title">☁️ ПІДКЛЮЧЕННЯ ДО БАЗИ ДАНИХ</div>
-        <button id="loadDataBtn" class="btn-green btn-big">📥 ЗАВАНТАЖИТИ ДАНІ</button>
+        <div class="sync-title">☁️ ПІДКЛЮЧЕННЯ ДО БАЗИ</div>
+        <button id="loadDataBtn" class="btn-full btn-green">📥 ЗАВАНТАЖИТИ ДАНІ</button>
         <div class="sync-status" id="syncStatus">⚙️ Натисніть "ЗАВАНТАЖИТИ"</div>
       </div>
       
-      <div class="check-card">
+      <div class="action-card">
         <h3>🔍 ПЕРЕВІРИТИ МАГАЗИН</h3>
         <div class="row-input">
           <input type="number" id="checkShopInput" placeholder="Номер магазину" disabled>
@@ -686,11 +817,15 @@
         <div id="checkResult" class="check-result">🔒 Спочатку завантажте дані</div>
       </div>
       
-      <div class="add-card">
+      <div class="action-card">
         <h3>➕ ДОДАТИ МАГАЗИН</h3>
         <div class="row-input">
-          <input type="number" id="newShopNumber" placeholder="Номер" disabled>
-          <select id="newShopColor" disabled><option value="білі">⚪ Білі</option><option value="сірі">⚫ Сірі</option><option value="чорні">⬛ Чорні</option></select>
+          <input type="number" id="newShopNumber" placeholder="Номер магазину" disabled>
+          <select id="newShopColor" disabled>
+            <option value="білі">⚪ Білі</option>
+            <option value="сірі">⚫ Сірі</option>
+            <option value="чорні">⬛ Чорні</option>
+          </select>
           <select id="newShopComplexity" disabled></select>
         </div>
         <div class="delivery-buttons" id="deliveryButtons"></div>
@@ -699,13 +834,13 @@
           <button id="addDeliveryBtn" class="btn-green" disabled>➕ Додати</button>
         </div>
         <textarea id="shopDescriptionInput" rows="2" placeholder="Короткий опис (не обов'язково)" disabled></textarea>
-        <button id="addShopBtn" class="btn-blue btn-big" style="width:100%; margin-top:12px;" disabled>✅ ДОДАТИ МАГАЗИН</button>
+        <button id="addShopBtn" class="btn-full btn-blue" style="margin-top:12px;" disabled>✅ ДОДАТИ МАГАЗИН</button>
       </div>
       
       <div class="categories-grid" id="categoriesGrid"><div class="data-placeholder">🔒 Натисніть "ЗАВАНТАЖИТИ"</div></div>
       
       <footer>
-        <button id="forgetBtn" class="btn-red" style="padding:8px 16px; font-size:0.7rem;">⚠️ Забути всі дані</button>
+        <button id="forgetBtn" class="btn-red" style="padding:10px 20px; font-size:0.7rem; border-radius:30px;">⚠️ Забути всі дані</button>
       </footer>
     </div>`;
     
