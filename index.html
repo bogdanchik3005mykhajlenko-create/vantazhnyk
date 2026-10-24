@@ -840,7 +840,6 @@
       <div class="categories-grid" id="categoriesGrid"><div class="data-placeholder">🔒 Натисніть "ЗАВАНТАЖИТИ"</div></div>
       
       <footer>
-        <button id="forgetBtn" class="btn-red" style="padding:10px 20px; font-size:0.7rem; border-radius:30px;">⚠️ Забути всі дані</button>
       </footer>
     </div>`;
     
@@ -861,12 +860,6 @@
     document.getElementById("checkShopBtn").onclick = checkShop;
     document.getElementById("addShopBtn").onclick = addNewShop;
     document.getElementById("addDeliveryBtn").onclick = addCustomDelivery;
-    document.getElementById("forgetBtn").onclick = () => {
-      if (confirm("⚠️ ВИДАЛИТИ ВСІ ДАНІ?")) {
-        localStorage.clear();
-        location.reload();
-      }
-    };
     document.getElementById("logoutBtn").onclick = () => {
       localStorage.removeItem("app_current_user");
       location.reload();
